@@ -1,3 +1,4 @@
-use std::sync::Arc;
+use std::sync;
 
-pub type Ptr<T> = Arc<T>;
+pub type Ptr<T> = sync::Arc<T>;
+pub type Weak<T> = sync::Weak<T>;
