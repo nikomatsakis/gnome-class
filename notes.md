@@ -41,7 +41,44 @@ struct Counter {
 This has some appeal, but it's not entirely clear that it will solve
 our problems.
 
-Total hack: can we keep a **weak ref**?
+Total hack: can we keep a **weak ref**? Ah, yes, that's the ticket out
+of this mess (in the real gobject system: we could (at worst) do this
+with a hack). It's just a temporary workaround.
 
+So let's review the procedure now. A full class declaration looks like
+this (in "pre-processed" form). Right now we are not supporting more
+than one superclass, but I don't see any fundamental obstacle to that,
+it'd just make things a bit more annoying in the macro itself.
 
+```
+class CLASS extends SUPERCLASS {
+    new({CARG: CARG_TY}) -> CRET_TY { CBODY }
+    
+    fields {
+      {FIELD: FIELD_TY}
+    }
+    
+    methods {
+      {fn CLASS_METHOD(CLASS_MARG: CLASS_MARG_TY) -> CLASS_MRET_TY { CLASS_MBODY }}
+    }
+    
+    impl SUPERCLASS {
+      {fn SC_METHOD(SC_MARG, SC_MARG_TY) -> SC_MRET_TY { SC_MBODY }}
+    }
+}
+```
 
+- Given a class Foo with superclass Bar
+  - All classes have a superclass, but sometimes it is GObject, which has no members
+- Generate `FooFields` for user fields `{{F:TY}}` with ctor `new({{X:TY}}) { BLK }`:
+  - `struct FooFields { Bar: BarFields, {{F:TY}} }`
+  - `impl FooFields { fn new({{X:TY}}) -> Self { BLK }`
+- Given methods `fn M(this, {{X:TY}}) -> TY { ... }`, generate the `Foo` trait:
+  - `trait Foo: 'static + Bar {...}` with members:
+    - `fn Foo(&self) -> FooFields;`
+    - `fn FooPtr(&self) -> Ptr<Foo>;`
+    - `fn M(&self, {{X:TY}}) -> TY;`
+  - Inherent impl `impl Foo {..}` with members:
+    - `fn new({{X:TY}}) -> 
+-     
+   

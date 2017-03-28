@@ -2,7 +2,7 @@
 
 Example:
 
-```
+```notrust
 gobject! {
     class Foo {
         let foo_field: u32;
@@ -36,7 +36,7 @@ gobject! {
 
 generates:
 
-```
+```notrust
 // eventually: #[repr(first)]
 pub struct FooFields {
     GObject: GObject,
