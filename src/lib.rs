@@ -11,7 +11,6 @@ mod g;
 mod gobject;
 mod ptr;
 mod mock;
-mod real;
 
 pub mod prelude {
     pub use ptr::Ptr;
