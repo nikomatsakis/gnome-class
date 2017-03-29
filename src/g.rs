@@ -23,6 +23,14 @@ pub struct G<T: GObjectContents + ?Sized> {
 pub unsafe trait GObjectContents {
 }
 
+/// Convert `p`, which is a pointer to the contents of some `GObject`, into
+/// a `*mut GObject`, for use with the gtk-rs APIs.
+///
+/// NB: There is a subtle interaction here in the case where `T` is a
+/// trait type (e.g., the trait type representing a class). In that
+/// case, we take in a fat pointer (`*const Trait`) and return a thin
+/// pointer (`*mut GObject`) representing just the data itself,
+/// stripped of its vtable.
 fn to_gobject_ptr<T: GObjectContents + ?Sized>(p: *const T) -> *mut GObject {
     p as *mut GObject
 }
@@ -37,6 +45,17 @@ fn to_gobject_ptr<T: GObjectContents + ?Sized>(p: *const T) -> *mut GObject {
 ///   inside some gobject allocation.
 /// - Having an `&Self` instance means that this gobject allocation
 ///   must have a valid ref-count spanning this call.
+///
+///
+/// NB: In principle, the signature of this method could be `&T ->
+/// &G<T>`, which would be nice since we would forego one
+/// ref-count. However, that doesn't work because, in the case where
+/// `T` is a trait, we would be taking in a fat pointer and returning
+/// a thin pointer that is supposed to be a pointer to the fat
+/// pointer.
+///
+/// Open question: It might be possible to take an `&&T` and return an
+/// `&G<T>` so as to avoid this.
 pub fn to_ref<T: GObjectContents + ?Sized>(p: &T) -> G<T> {
     unsafe {
         gobject_sys::g_object_ref(to_gobject_ptr(p));
