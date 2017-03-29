@@ -4,9 +4,17 @@ use super::*;
 
 #[test]
 fn create_counter() {
-    let c: G<Counter> = Counter::new(20);
-    c.add(2);
-    assert_eq!(c.get(), 22);
+    // This `DropCounter` will help us track whether finalizer for `c` got run.
+    let i = DropCounter::new();
+
+    {
+        let c: G<Counter> = Counter::new(20, i.clone());
+        c.add(2);
+        assert_eq!(c.get(), 22);
+        assert_eq!(i.get(), 0); // not dropped yet
+    }
+
+    assert_eq!(i.get(), 1); // should be dropped now
 }
 
 //#[test]

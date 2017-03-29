@@ -45,10 +45,35 @@
 use g::{self, G, GObjectContents};
 use glib_sys::{GType, gpointer};
 use gobject::*;
-use gobject_sys::{self, GObject, GObjectClass, GTypeFlags, GTypeInstance};
+use gobject_sys::{self, GObject, GObjectClass, GTypeClass, GTypeFlags, GTypeInstance};
 use std::cell::Cell;
 use std::mem;
 use std::ptr;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicUsize, Ordering};
+
+//
+
+#[derive(Clone)]
+pub struct DropCounter {
+    counter: Arc<AtomicUsize>
+}
+
+impl DropCounter {
+    pub fn new() -> Self {
+        DropCounter { counter: Arc::new(AtomicUsize::new(0)) }
+    }
+
+    pub fn get(&self) -> usize {
+        self.counter.load(Ordering::SeqCst)
+    }
+}
+
+impl Drop for DropCounter {
+    fn drop(&mut self) {
+        self.counter.fetch_add(1, Ordering::SeqCst);
+    }
+}
 
 ///////////////////////////////////////////////////////////////////////////
 // Counter
@@ -57,14 +82,16 @@ use std::ptr;
 pub struct CounterFields {
     GObject: GObjectFields,
     count: Cell<u32>,
+    finalized: DropCounter,
 }
 
 impl CounterFields {
-    pub fn new(f: u32) -> CounterFields {
+    pub fn new(f: u32, i: DropCounter) -> CounterFields {
         // user code here
         CounterFields {
             GObject: GObjectFields::new(),
             count: Cell::new(f),
+            finalized: i,
         }
     }
 }
@@ -108,13 +135,18 @@ impl<T: ?Sized + Counter> CounterSuper for G<T> {
 }
 
 impl Counter {
-    pub fn new(f: u32) -> G<Counter> {
+    pub fn new(f: u32, dc: DropCounter) -> G<Counter> {
         struct Class {
             parent_class: GObjectClass
         }
 
         impl Class {
-            extern "C" fn init(_: gpointer, _: gpointer) { }
+            extern "C" fn init(klass: gpointer, _klass_data: gpointer) {
+                unsafe {
+                    let g_object_class = klass as *mut GObjectClass;
+                    (*g_object_class).finalize = Some(Instance::finalize);
+                }
+            }
         }
 
         struct Instance {
@@ -126,6 +158,33 @@ impl Counter {
 
         impl Instance {
             extern "C" fn init(_this: *mut GTypeInstance, _klass: gpointer) { }
+
+            extern "C" fn finalize(this: *mut GObject) {
+                unsafe {
+                    {
+                        let this = &*(this as *mut Instance);
+                        ptr::read(&this.fields.count);
+                        ptr::read(&this.fields.finalized);
+                    }
+
+                    // I am a horrible monster and I pray for death:
+                    // the first field of `GObject` has type `*mut
+                    // GTypeClass`, but it is private in the
+                    // `gobject_sys` crate. Therefore, we cast this
+                    // pointer to a pointer to the first field and
+                    // read from it.
+                    let object_class = {
+                        let xxx = this as *mut *mut GTypeClass;
+                        *xxx
+                    };
+
+                    let parent_class = gobject_sys::g_type_class_peek_parent(object_class as gpointer);
+                    let g_parent_class = parent_class as *mut GObjectClass;
+                    if let Some(f) = (*g_parent_class).finalize {
+                        f(this);
+                    }
+                }
+            }
         }
 
         impl Counter for Instance {
@@ -162,7 +221,7 @@ impl Counter {
         }
 
         unsafe {
-            let fields = CounterFields::new(f);
+            let fields = CounterFields::new(f, dc);
             let data: *mut GObject = gobject_sys::g_object_new(*COUNTER_GTYPE, ptr::null_mut());
 
             // Dirty, dirty hack. At this point, both `fields` and
