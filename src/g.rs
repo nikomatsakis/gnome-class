@@ -2,7 +2,7 @@ use gobject_sys::{self, GObject};
 use std::ops::Deref;
 
 /// A reference to a `GObject`; the `T` is the subtype of `GObject`.
-pub struct G<T: GObjectContents> {
+pub struct G<T: GObjectContents + ?Sized> {
     data: *const T
 }
 
@@ -21,44 +21,42 @@ pub struct G<T: GObjectContents> {
 /// code could take an `&Self` and produce a `Self` that is not stored
 /// in a gobject.
 pub unsafe trait GObjectContents {
-    fn to_gobject_ptr(&self) -> *mut GObject {
-        let this: *const Self = self;
-        this as *mut GObject
-    }
+}
 
-    /// Given a valid pointer to a `GObjectContents`, we can convert
-    /// this into an owned `G<>` reference by incrementing the
-    /// reference count.
-    ///
-    /// This is safe because:
-    ///
-    /// - The trait requires that each instance of `self` must be
-    ///   inside some gobject allocation.
-    /// - Having an `&Self` instance means that this gobject allocation
-    ///   must have a valid ref-count spanning this call.
-    fn to_ref(&self) -> G<Self>
-        where Self: Sized
-    {
-        unsafe {
-            gobject_sys::g_object_ref(self.to_gobject_ptr());
-            G::new(self)
-        }
+fn to_gobject_ptr<T: GObjectContents + ?Sized>(p: *const T) -> *mut GObject {
+    p as *mut GObject
+}
+
+/// Given a valid pointer to a `GObjectContents`, we can convert
+/// this into an owned `G<>` reference by incrementing the
+/// reference count.
+///
+/// This is safe because:
+///
+/// - The trait requires that each instance of `self` must be
+///   inside some gobject allocation.
+/// - Having an `&Self` instance means that this gobject allocation
+///   must have a valid ref-count spanning this call.
+pub fn to_ref<T: GObjectContents + ?Sized>(p: &T) -> G<T> {
+    unsafe {
+        gobject_sys::g_object_ref(to_gobject_ptr(p));
+        G::new(p)
     }
 }
 
-impl<T: GObjectContents> G<T> {
+impl<T: GObjectContents + ?Sized> G<T> {
     pub unsafe fn new(data: *const T) -> G<T> {
         G { data: data }
     }
 }
 
-impl<T: GObjectContents> Clone for G<T> {
+impl<T: GObjectContents + ?Sized> Clone for G<T> {
     fn clone(&self) -> Self {
-        unsafe { (*self.data).to_ref() }
+        unsafe { to_ref(&*self.data) }
     }
 }
 
-impl<T: GObjectContents> Deref for G<T> {
+impl<T: GObjectContents + ?Sized> Deref for G<T> {
     type Target = T;
 
     fn deref(&self) -> &T {
@@ -68,10 +66,10 @@ impl<T: GObjectContents> Deref for G<T> {
     }
 }
 
-impl<T: GObjectContents> Drop for G<T> {
+impl<T: GObjectContents + ?Sized> Drop for G<T> {
     fn drop(&mut self) {
         unsafe {
-            let ptr = (*self.data).to_gobject_ptr();
+            let ptr = to_gobject_ptr(self.data);
             gobject_sys::g_object_unref(ptr);
         }
     }

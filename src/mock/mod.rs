@@ -42,10 +42,13 @@
 //     }
 // }
 
+use g::{self, G, GObjectContents};
+use glib_sys::{GType, gpointer};
 use gobject::*;
-use std::cell::{Cell, RefCell};
-use std::sync::Arc;
-use ptr::{Ptr, Weak};
+use gobject_sys::{self, GObject, GObjectClass, GTypeFlags, GTypeInstance};
+use std::cell::Cell;
+use std::mem;
+use std::ptr;
 
 ///////////////////////////////////////////////////////////////////////////
 // Counter
@@ -67,13 +70,13 @@ impl CounterFields {
 }
 
 // eventually: #[repr(class)]
-trait Counter {
+trait Counter: GObjectContents {
     // ideally would be:
     // count: u32;
 
     // instead:
     fn Counter(&self) -> &CounterFields;
-    fn CounterPtr(&self) -> Ptr<Counter>;
+    fn CounterG(&self) -> G<Counter>;
 
     fn add(&self, a: u32) -> u32;
 
@@ -85,180 +88,234 @@ trait CounterSuper {
     fn get(this: &Self) -> u32;
 }
 
-impl<T: ?Sized + Counter> CounterSuper for Ptr<T> {
+impl<T: ?Sized + Counter> CounterSuper for G<T> {
     fn add(this: &Self, a: u32) -> u32 {
-        fn m(this: &Ptr<Counter>, a: u32) -> u32 {
+        fn m(this: &G<Counter>, a: u32) -> u32 {
             let foo = this.Counter();
             let v = foo.count.get() + a;
             foo.count.set(v);
             v
         }
-        m(&this.CounterPtr(), a)
+        m(&this.CounterG(), a)
     }
 
     fn get(this: &Self) -> u32 {
-        fn m(this: &Ptr<Counter>) -> u32 {
+        fn m(this: &G<Counter>) -> u32 {
             this.Counter().count.get()
         }
-        m(&this.CounterPtr())
+        m(&this.CounterG())
     }
 }
 
 impl Counter {
-    pub fn new(f: u32) -> Ptr<Counter> {
-        struct Impl {
+    pub fn new(f: u32) -> G<Counter> {
+        struct Class {
+            parent_class: GObjectClass
+        }
+
+        impl Class {
+            extern "C" fn init(_: gpointer, _: gpointer) { }
+        }
+
+        struct Instance {
             fields: CounterFields,
-            self_ref: RefCell<Weak<Impl>>,
         }
 
-        impl Counter for Impl {
+        unsafe impl GObjectContents for Instance {
+        }
+
+        impl Instance {
+            extern "C" fn init(_this: *mut GTypeInstance, _klass: gpointer) { }
+        }
+
+        impl Counter for Instance {
             fn Counter(&self) -> &CounterFields {
                 &self.fields
             }
 
-            fn CounterPtr(&self) -> Ptr<Counter> {
-                self.self_ref
-                    .borrow()
-                    .upgrade()
-                    .unwrap()
+            fn CounterG(&self) -> G<Counter> {
+                g::to_ref(self)
             }
 
             fn add(&self, a: u32) -> u32 {
-                CounterSuper::add(&self.CounterPtr(), a)
+                CounterSuper::add(&self.CounterG(), a)
             }
 
             fn get(&self) -> u32 {
-                CounterSuper::get(&self.CounterPtr())
+                CounterSuper::get(&self.CounterG())
             }
         }
 
-        let ptr = Ptr::new(Impl {
-                               fields: CounterFields::new(f),
-                               self_ref: RefCell::new(Weak::new()),
-                           });
-
-        {
-            let mut self_ref = ptr.self_ref.borrow_mut();
-            *self_ref = Arc::downgrade(&ptr);
+        lazy_static! {
+            pub static ref COUNTER_GTYPE: GType = {
+                unsafe {
+                    gobject_sys::g_type_register_static_simple(
+                        gobject_sys::g_object_get_type(),
+                        b"Counter\0" as *const u8 as *const i8,
+                        mem::size_of::<Class>() as u32,
+                        Some(Class::init),
+                        mem::size_of::<Instance>() as u32,
+                        Some(Instance::init),
+                        GTypeFlags::empty())
+                }
+            };
         }
 
-        ptr
+        unsafe {
+            let fields = CounterFields::new(f);
+            let data: *mut GObject = gobject_sys::g_object_new(*COUNTER_GTYPE, ptr::null_mut());
+
+            // Dirty, dirty hack. At this point, both `fields` and
+            // `data` have type `Instance`, but they have different
+            // parts initialized:
+            //
+            // ```
+            // +-------------------+
+            // | CounterFields     |
+            // | +---------------+ |
+            // | |             // ```
+            //
+            // In particular, in the `fields`, the `GObjectFields` at
+            // the front are zeroed. In `data`, meanwhile, the gobject
+            // fields are initialized, but the rest are not. We need
+            // to copy over the initialized fields from `fields` into
+            // `data`.
+            //
+            // You might be wondering why we do this. The goal is to
+            // allow the user's constructor function to set their
+            // fields to their final, initialized values in one shot
+            // without having an intermediate state where they are
+            // uninitalized (or set to default values, which in Rust
+            // don't always exist).
+            {
+                let gobject_size = mem::size_of::<GObjectFields>();
+                let fields_ptr = &fields as *const CounterFields as *const u8;
+                let data_ptr = data as *mut u8;
+                let copy_size = mem::size_of::<Instance>() - gobject_size;
+                ptr::copy_nonoverlapping(fields_ptr.offset(gobject_size as isize),
+                                         data_ptr.offset(gobject_size as isize),
+                                         copy_size);
+                mem::forget(fields);
+            }
+
+            G::new(data as *mut Instance)
+        }
     }
 }
 
-///////////////////////////////////////////////////////////////////////////
-// MultCounter
-
-pub struct MultCounterFields {
-    CounterFields: CounterFields,
-    multiplier: u32,
-}
-
-impl MultCounterFields {
-    pub fn new(m: u32) -> MultCounterFields {
-        let CounterFields = CounterFields::new(0);
-        MultCounterFields {
-            CounterFields,
-            multiplier: m,
-        }
-    }
-}
-
-trait MultCounter: Counter {
-    fn MultCounter(&self) -> &MultCounterFields;
-    fn MultCounterPtr(&self) -> Ptr<MultCounter>;
-    fn multiplier(&self) -> u32;
-}
-
-trait MultCounterSuper {
-    fn multiplier(this: &Self) -> u32;
-    fn add(this: &Self, a: u32) -> u32;
-    fn get(this: &Self) -> u32;
-}
-
-impl<T: ?Sized + MultCounter> MultCounterSuper for Ptr<T> {
-    fn multiplier(this: &Self) -> u32 {
-        fn m(this: &Ptr<MultCounter>) -> u32 {
-            this.MultCounter().multiplier
-        }
-
-        m(&this.MultCounterPtr())
-    }
-
-    fn add(this: &Self, a: u32) -> u32 {
-        fn m(this: &Ptr<MultCounter>, a: u32) -> u32 {
-            CounterSuper::add(this, a * this.MultCounter().multiplier)
-        }
-
-        m(&this.MultCounterPtr(), a)
-    }
-
-    fn get(this: &Self) -> u32 {
-        fn m(this: &Ptr<MultCounter>) -> u32 {
-            CounterSuper::get(this)
-        }
-
-        m(&this.MultCounterPtr())
-    }
-}
-
-impl MultCounter {
-    pub fn new(m: u32) -> Ptr<MultCounter> {
-        struct Impl {
-            fields: MultCounterFields,
-            self_ref: RefCell<Weak<Impl>>,
-        }
-
-        impl MultCounter for Impl {
-            fn MultCounter(&self) -> &MultCounterFields {
-                &self.fields
-            }
-
-            fn MultCounterPtr(&self) -> Ptr<MultCounter> {
-                self.self_ref
-                    .borrow()
-                    .upgrade()
-                    .unwrap()
-            }
-
-            fn multiplier(&self) -> u32 {
-                MultCounterSuper::multiplier(&self.MultCounterPtr())
-            }
-        }
-
-        impl Counter for Impl {
-            fn Counter(&self) -> &CounterFields {
-                &self.fields.CounterFields
-            }
-
-            fn CounterPtr(&self) -> Ptr<Counter> {
-                self.self_ref
-                    .borrow()
-                    .upgrade()
-                    .unwrap()
-            }
-
-            fn add(&self, a: u32) -> u32 {
-                MultCounterSuper::add(&self.MultCounterPtr(), a)
-            }
-
-            fn get(&self) -> u32 {
-                MultCounterSuper::get(&self.MultCounterPtr())
-            }
-        }
-
-        let ptr = Ptr::new(Impl {
-                               fields: MultCounterFields::new(m),
-                               self_ref: RefCell::new(Weak::new()),
-                           });
-
-        {
-            let mut self_ref = ptr.self_ref.borrow_mut();
-            *self_ref = Arc::downgrade(&ptr);
-        }
-
-        ptr
-    }
-}
+/////////////////////////////////////////////////////////////////////////////
+//// MultCounter
+//
+//pub struct MultCounterFields {
+//    CounterFields: CounterFields,
+//    multiplier: u32,
+//}
+//
+//impl MultCounterFields {
+//    pub fn new(m: u32) -> MultCounterFields {
+//        let CounterFields = CounterFields::new(0);
+//        MultCounterFields {
+//            CounterFields,
+//            multiplier: m,
+//        }
+//    }
+//}
+//
+//trait MultCounter: Counter {
+//    fn MultCounter(&self) -> &MultCounterFields;
+//    fn MultCounterG(&self) -> G<MultCounter>;
+//    fn multiplier(&self) -> u32;
+//}
+//
+//trait MultCounterSuper {
+//    fn multiplier(this: &Self) -> u32;
+//    fn add(this: &Self, a: u32) -> u32;
+//    fn get(this: &Self) -> u32;
+//}
+//
+//impl<T: ?Sized + MultCounter> MultCounterSuper for G<T> {
+//    fn multiplier(this: &Self) -> u32 {
+//        fn m(this: &G<MultCounter>) -> u32 {
+//            this.MultCounter().multiplier
+//        }
+//
+//        m(&this.MultCounterG())
+//    }
+//
+//    fn add(this: &Self, a: u32) -> u32 {
+//        fn m(this: &G<MultCounter>, a: u32) -> u32 {
+//            CounterSuper::add(this, a * this.MultCounter().multiplier)
+//        }
+//
+//        m(&this.MultCounterG(), a)
+//    }
+//
+//    fn get(this: &Self) -> u32 {
+//        fn m(this: &G<MultCounter>) -> u32 {
+//            CounterSuper::get(this)
+//        }
+//
+//        m(&this.MultCounterG())
+//    }
+//}
+//
+//impl MultCounter {
+//    pub fn new(m: u32) -> G<MultCounter> {
+//        struct Impl {
+//            fields: MultCounterFields,
+//            self_ref: RefCell<Weak<Impl>>,
+//        }
+//
+//        impl MultCounter for Impl {
+//            fn MultCounter(&self) -> &MultCounterFields {
+//                &self.fields
+//            }
+//
+//            fn MultCounterG(&self) -> G<MultCounter> {
+//                self.self_ref
+//                    .borrow()
+//                    .upgrade()
+//                    .unwrap()
+//            }
+//
+//            fn multiplier(&self) -> u32 {
+//                MultCounterSuper::multiplier(&self.MultCounterG())
+//            }
+//        }
+//
+//        impl Counter for Impl {
+//            fn Counter(&self) -> &CounterFields {
+//                &self.fields.CounterFields
+//            }
+//
+//            fn CounterG(&self) -> G<Counter> {
+//                self.self_ref
+//                    .borrow()
+//                    .upgrade()
+//                    .unwrap()
+//            }
+//
+//            fn add(&self, a: u32) -> u32 {
+//                MultCounterSuper::add(&self.MultCounterG(), a)
+//            }
+//
+//            fn get(&self) -> u32 {
+//                MultCounterSuper::get(&self.MultCounterG())
+//            }
+//        }
+//
+//        let ptr = G::new(Impl {
+//                               fields: MultCounterFields::new(m),
+//                               self_ref: RefCell::new(Weak::new()),
+//                           });
+//
+//        {
+//            let mut self_ref = ptr.self_ref.borrow_mut();
+//            *self_ref = Arc::downgrade(&ptr);
+//        }
+//
+//        ptr
+//    }
+//}
 
 mod test;
