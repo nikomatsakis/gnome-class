@@ -149,7 +149,6 @@ macro_rules! __gobject_make_super_trait__ {
                 $($mbody:tt)*
             }
         )*),
-        extends: ($($unused:tt)*) { }
     ) => {
         trait $ClassSuper {
             $(fn $mname($mthis: &Self, $($marg:$marg_ty,)*) -> $mret_ty;)*
@@ -173,7 +172,7 @@ macro_rules! __gobject_make_super_trait__ {
         class: ($($class_names:ident),*),
         methods: ($($accumulated:tt)*),
         extends: ($SClass:ident, $SClassFields:ident, $SClassPtr:ident) {
-            extends ($($extends_idents:ident),*) { $($extends_methods:tt)* }
+            $( extends ($($extends_idents:ident),*) { $($extends_methods:tt)* } )*
 
             $(fn $sname:ident($sthis:ident, $($sarg:ident:$sarg_ty:ty),*) -> $sret_ty:ty {
                 $($sbody:tt)*
@@ -185,7 +184,7 @@ macro_rules! __gobject_make_super_trait__ {
             methods: ($($accumulated)* $(fn $sname($sthis, $($sarg:$sarg_ty),*) -> $sret_ty {
                 $($sbody)*
             })*),
-            extends: ($($extends_idents)*) { $($extends_methods)* }
+            $( extends: ($($extends_idents),*) { $($extends_methods)* } )*
         }
     };
 }
