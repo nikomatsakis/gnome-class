@@ -4,3 +4,7 @@ version = "0.1.0"
 authors = ["Niko Matsakis <niko@alum.mit.edu>"]
 
 [dependencies]
+glib-sys = "0.3.1"
+gobject-2-0-sys = "*"
+gtypes = "0.2.0"
+lazy_static = "0.2.2"
