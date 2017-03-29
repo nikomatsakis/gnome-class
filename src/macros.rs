@@ -19,9 +19,7 @@ macro_rules! __gobject__ {
             // "impls" -- impls of the superclass; eventually we should figure out how
             // to supper nesting > 1
             extends ($SClass:ident, $SClassFields:ident, $SClassPtr:ident) {
-                $(fn $sname:ident($sthis:ident, $($sarg:ident:$sarg_ty:ty),*) -> $sret_ty:ty {
-                    $($sbody:tt)*
-                })*
+                $($SClassDecl:tt)*
             }
         }
     ) => {
@@ -84,32 +82,14 @@ macro_rules! __gobject__ {
         // superclass.
         //
         // NB: These are specifically defined in "free fn" form.
-        trait $ClassSuper {
-            $(fn $mname($mthis: &Self, $($marg:$marg_ty,)*) -> $mret_ty;)*
-            $(fn $sname($sthis: &Self, $($sarg:$sarg_ty,)*) -> $sret_ty;)*
-        }
-
-        // Impl the `ClassSuper` trait for any `Ptr<This>` where `This: Class`.
-        impl<This: ?Sized + $Class> $ClassSuper for Ptr<This> {
-            $(
-                fn $mname($mthis: &Self, $($marg:$marg_ty,)*) -> $mret_ty {
-                    fn m($mthis: &Ptr<$Class>, $($marg:$marg_ty,)*) -> $mret_ty {
-                        $($mbody)*
-                    }
-
-                    m(&$mthis.$ClassPtr(), $($marg,)*)
-                }
-            )*
-
-            $(
-                fn $sname($sthis: &Self, $($sarg:$sarg_ty),*) -> $sret_ty {
-                    fn m($sthis: &Ptr<$Class>, $($sarg:$sarg_ty),*) -> $sret_ty {
-                        $($sbody)*
-                    }
-
-                    m(&$sthis.$ClassPtr(), $($sarg),*)
-                }
-            )*
+        __gobject_make_super_trait__! {
+            class: ($Class, $ClassFields, $ClassPtr, $ClassSuper),
+            methods: ($(fn $mname($mthis, $($marg:$marg_ty),*) -> $mret_ty {
+                $($mbody)*
+            })*),
+            extends: ($SClass, $SClassFields, $SClassPtr) {
+                $($SClassDecl)*
+            }
         }
 
         // Add a `new` method for creating instances of this class.
@@ -147,12 +127,6 @@ macro_rules! __gobject__ {
                     fn $SClassPtr(&self) -> Ptr<$SClass> {
                         self.self_ref.borrow().upgrade().unwrap()
                     }
-
-                    $(
-                        fn $sname(&self, $($sarg: $sarg_ty),*) -> $sret_ty {
-                            $ClassSuper::$sname(&self.$ClassPtr(), $($sarg),*)
-                        }
-                    )*
                 }
 
                 let ptr = Ptr::new(Impl {
@@ -168,3 +142,55 @@ macro_rules! __gobject__ {
         }
     }
 }
+
+macro_rules! __gobject_make_super_trait__ {
+    (
+        class: ($Class:ident, $ClassFields:ident, $ClassPtr:ident, $ClassSuper:ident),
+        methods: ($(
+            fn $mname:ident($mthis:ident, $($marg:ident:$marg_ty:ty),*) -> $mret_ty:ty {
+                $($mbody:tt)*
+            }
+        )*),
+        extends: ($($unused:tt)*) { }
+    ) => {
+        trait $ClassSuper {
+            $(fn $mname($mthis: &Self, $($marg:$marg_ty,)*) -> $mret_ty;)*
+        }
+
+        // Impl the `ClassSuper` trait for any `Ptr<This>` where `This: Class`.
+        impl<This: ?Sized + $Class> $ClassSuper for Ptr<This> {
+            $(
+                fn $mname($mthis: &Self, $($marg:$marg_ty,)*) -> $mret_ty {
+                    fn m($mthis: &Ptr<$Class>, $($marg:$marg_ty,)*) -> $mret_ty {
+                        $($mbody)*
+                    }
+
+                    m(&$mthis.$ClassPtr(), $($marg,)*)
+                }
+            )*
+        }
+    };
+
+    (
+        class: ($($class_names:ident),*),
+        methods: ($($accumulated:tt)*),
+        extends: ($SClass:ident, $SClassFields:ident, $SClassPtr:ident) {
+            extends ($($extends_idents:ident),*) { $($extends_methods:tt)* }
+
+            $(fn $sname:ident($sthis:ident, $($sarg:ident:$sarg_ty:ty),*) -> $sret_ty:ty {
+                $($sbody:tt)*
+            })*
+        }
+    ) => {
+        __gobject_flatten_methods__ {
+            class: ($($class_names)*),
+            methods: ($($accumulated)* fn $sname($sthis, $($sarg:$sarg_ty),*) -> $sret_ty {
+                $($sbody)*
+            }),
+            extends: ($($extends_idents)*) { $($extends_methods)* }
+        }
+    };
+}
+
+/*
+*/

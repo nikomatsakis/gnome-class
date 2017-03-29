@@ -3,8 +3,7 @@ use std::cell::Cell;
 use ptr::Ptr;
 
 __gobject__! {
-    class (Counter, CounterFields, CounterPtr, CounterSuper)
-    {
+    class (Counter, CounterFields, CounterPtr, CounterSuper) {
         fields {
             () count: Cell<u32>
         }
