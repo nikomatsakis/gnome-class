@@ -45,7 +45,7 @@
 use g::{self, G, GObjectContents};
 use glib_sys::{GType, gpointer};
 use gobject::*;
-use gobject_sys::{self, GObject, GObjectClass, GTypeClass, GTypeFlags, GTypeInstance};
+use gobject_sys::{self, GObjectClass, GTypeFlags, GTypeInstance};
 use std::cell::Cell;
 use std::mem;
 use std::ptr;
@@ -97,54 +97,53 @@ impl CounterFields {
 }
 
 // eventually: #[repr(class)]
-trait Counter: GObjectContents {
+trait Counter: GObject {
     // ideally would be:
     // count: u32;
 
     // instead:
     fn Counter(&self) -> &CounterFields;
-    fn CounterG(&self) -> G<Counter>;
-
-    fn add(&self, a: u32) -> u32;
-
-    fn get(&self) -> u32;
 }
 
-trait CounterSuper {
-    fn add(this: &Self, a: u32) -> u32;
-    fn get(this: &Self) -> u32;
-}
-
-impl<T: ?Sized + Counter> CounterSuper for G<T> {
-    fn add(this: &Self, a: u32) -> u32 {
-        fn m(this: &G<Counter>, a: u32) -> u32 {
-            let foo = this.Counter();
-            let v = foo.count.get() + a;
-            foo.count.set(v);
-            v
-        }
-        m(&this.CounterG(), a)
-    }
-
-    fn get(this: &Self) -> u32 {
-        fn m(this: &G<Counter>) -> u32 {
-            this.Counter().count.get()
-        }
-        m(&this.CounterG())
-    }
+struct CounterClass {
+    parent_class: GObjectClass,
+    add: fn(&Counter, a: u32) -> u32,
+    get: fn(&Counter) -> u32,
 }
 
 impl Counter {
     pub fn new(f: u32, dc: DropCounter) -> G<Counter> {
-        struct Class {
-            parent_class: GObjectClass
+        mod methods {
+            use super::*;
+
+            pub(super) fn add(this: &Counter, a: u32) -> u32 {
+                fn m(this: &G<Counter>, a: u32) -> u32 {
+                    let foo = this.Counter();
+                    let v = foo.count.get() + a;
+                    foo.count.set(v);
+                    v
+                }
+                m(&g::to_ref(this), a)
+            }
+
+            pub(super) fn get(this: &Counter) -> u32 {
+                fn m(this: &G<Counter>) -> u32 {
+                    this.Counter().count.get()
+                }
+                m(&g::to_ref(this))
+            }
         }
 
-        impl Class {
+        impl CounterClass {
             extern "C" fn init(klass: gpointer, _klass_data: gpointer) {
                 unsafe {
                     let g_object_class = klass as *mut GObjectClass;
                     (*g_object_class).finalize = Some(Instance::finalize);
+
+                    let klass = klass as *mut CounterClass;
+                    let klass: &mut CounterClass = &mut *klass;
+                    klass.add = methods::add;
+                    klass.get = methods::get;
                 }
             }
         }
@@ -159,49 +158,34 @@ impl Counter {
         impl Instance {
             extern "C" fn init(_this: *mut GTypeInstance, _klass: gpointer) { }
 
-            extern "C" fn finalize(this: *mut GObject) {
+            extern "C" fn finalize(this: *mut gobject_sys::GObject) {
+                let this = this as *mut Instance;
                 unsafe {
                     {
-                        let this = &*(this as *mut Instance);
+                        let this = &*this;
                         ptr::read(&this.fields.count);
                         ptr::read(&this.fields.finalized);
                     }
 
-                    // I am a horrible monster and I pray for death:
-                    // the first field of `GObject` has type `*mut
-                    // GTypeClass`, but it is private in the
-                    // `gobject_sys` crate. Therefore, we cast this
-                    // pointer to a pointer to the first field and
-                    // read from it.
-                    let object_class = {
-                        let xxx = this as *mut *mut GTypeClass;
-                        *xxx
-                    };
-
+                    let object_class = g::get_class(&*this);
                     let parent_class = gobject_sys::g_type_class_peek_parent(object_class as gpointer);
                     let g_parent_class = parent_class as *mut GObjectClass;
                     if let Some(f) = (*g_parent_class).finalize {
-                        f(this);
+                        f(this as *mut gobject_sys::GObject);
                     }
                 }
+            }
+        }
+
+        impl GObject for Instance {
+            fn GObject(&self) -> &GObjectFields {
+                &self.fields.GObject
             }
         }
 
         impl Counter for Instance {
             fn Counter(&self) -> &CounterFields {
                 &self.fields
-            }
-
-            fn CounterG(&self) -> G<Counter> {
-                g::to_ref(self)
-            }
-
-            fn add(&self, a: u32) -> u32 {
-                CounterSuper::add(&self.CounterG(), a)
-            }
-
-            fn get(&self) -> u32 {
-                CounterSuper::get(&self.CounterG())
             }
         }
 
@@ -211,8 +195,8 @@ impl Counter {
                     gobject_sys::g_type_register_static_simple(
                         gobject_sys::g_object_get_type(),
                         b"Counter\0" as *const u8 as *const i8,
-                        mem::size_of::<Class>() as u32,
-                        Some(Class::init),
+                        mem::size_of::<CounterClass>() as u32,
+                        Some(CounterClass::init),
                         mem::size_of::<Instance>() as u32,
                         Some(Instance::init),
                         GTypeFlags::empty())
@@ -222,17 +206,12 @@ impl Counter {
 
         unsafe {
             let fields = CounterFields::new(f, dc);
-            let data: *mut GObject = gobject_sys::g_object_new(*COUNTER_GTYPE, ptr::null_mut());
+            let data: *mut gobject_sys::GObject =
+                gobject_sys::g_object_new(*COUNTER_GTYPE, ptr::null_mut());
 
             // Dirty, dirty hack. At this point, both `fields` and
-            // `data` have type `Instance`, but they have different
-            // parts initialized:
-            //
-            // ```
-            // +-------------------+
-            // | CounterFields     |
-            // | +---------------+ |
-            // | |             // ```
+            // `data` have type a complete set of `CounterFields`, but
+            // they have different parts initialized.
             //
             // In particular, in the `fields`, the `GObjectFields` at
             // the front are zeroed. In `data`, meanwhile, the gobject
@@ -259,6 +238,31 @@ impl Counter {
 
             G::new(data as *mut Instance)
         }
+    }
+
+    fn klass(&self) -> &CounterClass {
+        unsafe {
+            let klass = g::get_class(self);
+            let klass = klass as *mut CounterClass; // TODO make sure this is ok
+            &*klass
+        }
+    }
+
+    fn super_class(&self) -> &GObjectClass {
+        unsafe {
+            let my_class = self.klass() as *const CounterClass;
+            let parent_class = gobject_sys::g_type_class_peek_parent(my_class as gpointer);
+            let parent_class = parent_class as *mut GObjectClass;
+            &*parent_class
+        }
+    }
+
+    fn add(&self, a: u32) -> u32 {
+        (self.klass().add)(self, a)
+    }
+
+    fn get(&self) -> u32 {
+        (self.klass().get)(self)
     }
 }
 

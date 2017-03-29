@@ -1,4 +1,4 @@
-use gobject_sys::{self, GObject};
+use gobject_sys::{self, GObject, GTypeClass};
 use std::ops::Deref;
 
 /// A reference to a `GObject`; the `T` is the subtype of `GObject`.
@@ -60,6 +60,22 @@ pub fn to_ref<T: GObjectContents + ?Sized>(p: &T) -> G<T> {
     unsafe {
         gobject_sys::g_object_ref(to_gobject_ptr(p));
         G::new(p)
+    }
+}
+
+/// Given something that must be a `GObject`, return the class of this
+/// gobject.
+pub fn get_class<T: GObjectContents + ?Sized>(this: &T) -> *mut GTypeClass {
+    // I am a horrible monster and I pray for death:
+    // the first field of `GObject` has type `*mut
+    // GTypeClass`, but it is private in the
+    // `gobject_sys` crate. Therefore, we cast this
+    // pointer to a pointer to the first field and
+    // read from it.
+    unsafe {
+        let this: *const T = this;
+        let this = this as *const *mut GTypeClass;
+        *this
     }
 }
 

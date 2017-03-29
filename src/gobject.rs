@@ -1,10 +1,9 @@
+use g::GObjectContents;
 use gobject_sys;
-use ptr::Ptr;
 use std::mem;
 
-pub trait GObject {
+pub trait GObject: 'static + GObjectContents {
     fn GObject(&self) -> &GObjectFields;
-    fn GObjectPtr(&self) -> Ptr<GObject>;
 }
 
 pub struct GObjectFields {
