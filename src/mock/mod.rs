@@ -6,8 +6,8 @@
 //             CounterFields { count: Cell::new(f) }
 //         }
 //
-//         fn add(this, a: u32) -> u32 {
-//             let foo = this.Counter();
+//         fn add(this, a: u32) -> u32 { // this: &Ptr<Counter>
+//             let foo = this.Counter(); // foo: &CounterFields
 //             let v = foo.count.get() + a;
 //             foo.count.set(v);
 //             v
