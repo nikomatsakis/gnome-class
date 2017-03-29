@@ -30,37 +30,37 @@ __gobject__! {
     }
 }
 
-//__gobject__! {
-//    class (MultCounter, MultCounterFields, MultCounterPtr, MultCounterSuper) {
-//        fields {
-//            () mult: u32
-//        }
-//
-//        new(mult: u32) {
-//            let Counter = CounterFields::new(0);
-//            MultCounterFields { Counter, mult }
-//        }
-//
-//        methods {
-//            fn multiplier(this, ) -> u32 {
-//                this.MultCounter().mult
-//            }
-//        }
-//
-//        extends (Counter, CounterFields, CounterPtr) {
-//            extends (GObject, GObjectFields, GObjectPtr) {
-//            }
-//
-//            fn add(this, a: u32) -> u32 {
-//                let m = this.MultCounter().mult;
-//                CounterSuper::add(this, a * m)
-//            }
-//
-//            fn get(this, ) -> u32 {
-//                CounterSuper::get(this)
-//            }
-//        }
-//    }
-//}
+__gobject__! {
+    class (MultCounter, MultCounterFields, MultCounterPtr, MultCounterSuper) {
+        fields {
+            () mult: u32
+        }
+
+        new(mult: u32) {
+            let Counter = CounterFields::new(0);
+            MultCounterFields { Counter, mult }
+        }
+
+        methods {
+            fn multiplier(this, ) -> u32 {
+                this.MultCounter().mult
+            }
+        }
+
+        extends (Counter, CounterFields, CounterPtr) {
+            extends (GObject, GObjectFields, GObjectPtr) {
+            }
+
+            fn add(this, a: u32) -> u32 {
+                let m = this.MultCounter().mult;
+                CounterSuper::add(this, a * m)
+            }
+
+            fn get(this, ) -> u32 {
+                CounterSuper::get(this)
+            }
+        }
+    }
+}
 
 mod test;

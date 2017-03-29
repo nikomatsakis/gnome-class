@@ -119,13 +119,11 @@ macro_rules! __gobject__ {
                     )*
                 }
 
-                impl $SClass for Impl {
-                    fn $SClass(&self) -> &$SClassFields {
-                        &self.fields.$SClass
-                    }
-
-                    fn $SClassPtr(&self) -> Ptr<$SClass> {
-                        self.self_ref.borrow().upgrade().unwrap()
+                __gobject_make_super_impl__! {
+                    class: ($Class, $ClassFields, $ClassPtr, $ClassSuper),
+                    path: (fields),
+                    extends: ($SClass, $SClassFields, $SClassPtr) {
+                        $($SClassDecl)*
                     }
                 }
 
@@ -182,14 +180,57 @@ macro_rules! __gobject_make_super_trait__ {
             })*
         }
     ) => {
-        __gobject_flatten_methods__ {
-            class: ($($class_names)*),
-            methods: ($($accumulated)* fn $sname($sthis, $($sarg:$sarg_ty),*) -> $sret_ty {
+        __gobject_make_super_trait__! {
+            class: ($($class_names),*),
+            methods: ($($accumulated)* $(fn $sname($sthis, $($sarg:$sarg_ty),*) -> $sret_ty {
                 $($sbody)*
-            }),
+            })*),
             extends: ($($extends_idents)*) { $($extends_methods)* }
         }
     };
+}
+
+macro_rules! __gobject_make_super_impl__ {
+    (
+        class: ($Class:ident, $ClassFields:ident, $ClassPtr:ident, $ClassSuper:ident),
+        path: ($($path:tt)*),
+        extends: ($SClass:ident, $SClassFields:ident, $SClassPtr:ident) {
+            $(extends ($($extends_idents:ident),*) { $($extends_methods:tt)* })*
+
+            $(fn $sname:ident($sthis:ident, $($sarg:ident:$sarg_ty:ty),*) -> $sret_ty:ty {
+                $($sbody:tt)*
+            })*
+        }
+    ) => {
+        impl $SClass for Impl {
+            fn $SClass(&self) -> &$SClassFields {
+                &self.$($path)*.$SClass
+            }
+
+            fn $SClassPtr(&self) -> Ptr<$SClass> {
+                self.self_ref.borrow().upgrade().unwrap()
+            }
+
+            $(
+                fn $sname(&self, $($sarg: $sarg_ty),*) -> $sret_ty {
+                    $ClassSuper::$sname(&self.$ClassPtr(), $($sarg),*)
+                }
+            )*
+        }
+
+        __gobject_make_super_impl__! {
+            class: ($Class, $ClassFields, $ClassPtr, $ClassSuper),
+            path: ($($path)*.$SClass),
+            $(
+                extends: ($($extends_idents),*) { $($extends_methods)* }
+            )*
+        }
+    };
+
+    (
+        class: ($Class:ident, $ClassFields:ident, $ClassPtr:ident, $ClassSuper:ident),
+        path: ($($path:tt)*),
+    ) => { }
 }
 
 /*
