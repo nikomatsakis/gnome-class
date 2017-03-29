@@ -1,9 +1,132 @@
+macro_rules! gobject {
+    (
+        class $Class:ident {
+            $($members:tt)*
+        }
+    ) => {
+    }
+}
+
+macro_rules! __gobject_parse_member__ {
+    (
+        class: $Class:ident,
+        fields: ($(fields:tt)*),
+        new: ($(new:tt)*),
+        methods: ($($methods:tt)*),
+        extends: ($($extends:tt)*),
+        members: ()
+    ) => {
+        __gobject__! {
+            class ($class,
+                   concat_idents!($class, Fields),
+                   concat_idents!($class, Ptr),
+                   concat_idents!($class, Super)) {
+                fields { $($fields)* }
+                new $($new)*
+                methods { $($methods)* }
+                extends $($extends)*
+            }
+        }
+    };
+
+    (
+        class: $Class:ident,
+        fields: ($(fields:tt)*),
+        new: ($(new:tt)*),
+        methods: ($($methods:tt)*),
+        extends: ($($extends:tt)*),
+        members: (let pub $name:ident: $ty:ty; $($members:tt)*)
+    ) => {
+        __gobject_parse_member__! {
+            class: $Class,
+            fields: ($($fields)* (pub) $name: $ty;),
+            new: ($($new)*),
+            methods: ($($methods)*),
+            extends: ($($extends)*),
+            members: ($(members)*)
+        }
+    };
+
+    (
+        class: $Class:ident,
+        fields: ($(fields:tt)*),
+        new: ($(new:tt)*),
+        methods: ($($methods:tt)*),
+        extends: ($($extends:tt)*),
+        members: (let $name:ident: $ty:ty; $($members:tt)*)
+    ) => {
+        __gobject_parse_member__! {
+            class: $Class,
+            fields: ($($fields)* () $name: $ty;),
+            new: ($($new)*),
+            methods: ($($methods)*),
+            extends: ($($extends)*),
+            members: ($($members)*)
+        }
+    };
+
+    (
+        class: $Class:ident,
+        fields: ($(fields:tt)*),
+        new: ($(new:tt)*),
+        methods: ($($methods:tt)*),
+        extends: ($($extends:tt)*),
+        members: (fn $name:ident($($arg:tt)*) { $($body:tt)* } $($members:tt)*)
+    ) => {
+        __gobject_parse_member__! {
+            class: $Class,
+            fields: ($($fields)*),
+            new: ($($new)*),
+            methods: ($($methods)* fn $name($($arg)*) -> () { $($body)* }),
+            extends: ($($extends)*),
+            members: ($($members)*)
+        }
+    };
+
+    (
+        class: $Class:ident,
+        fields: ($(fields:tt)*),
+        new: ($(new:tt)*),
+        methods: ($($methods:tt)*),
+        extends: ($($extends:tt)*),
+        members: (fn $name:ident($($arg:tt)*) -> $ret:ty { $($body:tt)* } $($members:tt)*)
+    ) => {
+        __gobject_parse_member__! {
+            class: $Class,
+            fields: ($($fields)*),
+            new: ($($new)*),
+            methods: ($($methods)* fn $name($($arg)*) -> $ret { $($body)* }),
+            extends: ($($extends)*),
+            members: ($($members)*)
+        }
+    };
+
+    (
+        class: $Class:ident,
+        fields: ($(fields:tt)*),
+        new: ($(new:tt)*),
+        methods: ($($methods:tt)*),
+        extends: ($($extends:tt)*),
+        members: (extends $SClass:ident { $($extend:tt)* } $($members:tt)*)
+    ) => {
+        __gobject_parse_extends__! {
+            class: $Class,
+            fields: ($($fields)*),
+            new: ($($new)*),
+            methods: ($($methods)* fn $name($($arg)*) -> $ret { $($body)* }),
+            extends: ($($extends)*),
+            new_extends: (extends $SClass { $($extend)* }),
+            members: ($($members)*)
+        }
+    }
+}
+
 macro_rules! __gobject__ {
     (
         class ($Class:ident, $ClassFields:ident, $ClassPtr:ident, $ClassSuper:ident) {
             // "fields" -- the list of fields
             fields {
-                $(($($fpub:tt)*) $fname:ident: $fty:ty),*
+                $(($($fpub:tt)*) $fname:ident: $fty:ty;)*
             }
 
             // "new" -- the constructor

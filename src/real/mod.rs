@@ -5,7 +5,7 @@ use ptr::Ptr;
 __gobject__! {
     class (Counter, CounterFields, CounterPtr, CounterSuper) {
         fields {
-            () count: Cell<u32>
+            () count: Cell<u32>;
         }
 
         new(c: u32) {
@@ -33,7 +33,7 @@ __gobject__! {
 __gobject__! {
     class (MultCounter, MultCounterFields, MultCounterPtr, MultCounterSuper) {
         fields {
-            () mult: u32
+            () mult: u32;
         }
 
         new(mult: u32) {
