@@ -1,4 +1,6 @@
+use gobject_sys;
 use ptr::Ptr;
+use std::mem;
 
 pub trait GObject {
     fn GObject(&self) -> &GObjectFields;
@@ -6,11 +8,11 @@ pub trait GObject {
 }
 
 pub struct GObjectFields {
-    dummy: ()
+    fields: gobject_sys::GObject
 }
 
 impl GObjectFields {
     pub fn new() -> Self {
-        GObjectFields { dummy: () }
+        unsafe { mem::zeroed::<GObjectFields>() }
     }
 }
