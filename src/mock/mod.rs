@@ -67,7 +67,7 @@ impl CounterFields {
 }
 
 // eventually: #[repr(class)]
-trait Counter: 'static {
+trait Counter {
     // ideally would be:
     // count: u32;
 
@@ -83,10 +83,6 @@ trait Counter: 'static {
 trait CounterSuper {
     fn add(this: &Self, a: u32) -> u32;
     fn get(this: &Self) -> u32;
-}
-
-fn upcast_Counter<T: ?Sized + Counter>(p: &Ptr<T>) -> &Ptr<Counter> {
-    panic!("FIXME")
 }
 
 impl<T: ?Sized + Counter> CounterSuper for Ptr<T> {
@@ -264,3 +260,5 @@ impl MultCounter {
         ptr
     }
 }
+
+mod test;

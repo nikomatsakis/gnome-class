@@ -51,7 +51,7 @@ than one superclass, but I don't see any fundamental obstacle to that,
 it'd just make things a bit more annoying in the macro itself.
 
 ```
-class CLASS extends SUPERCLASS {
+class CLASS extends SCLASS {
     new({CARG: CARG_TY}) -> CRET_TY { CBODY }
     
     fields {
@@ -62,23 +62,49 @@ class CLASS extends SUPERCLASS {
       {fn CLASS_METHOD(CLASS_MARG: CLASS_MARG_TY) -> CLASS_MRET_TY { CLASS_MBODY }}
     }
     
-    impl SUPERCLASS {
+    impl SCLASS {
       {fn SC_METHOD(SC_MARG, SC_MARG_TY) -> SC_MRET_TY { SC_MBODY }}
     }
 }
 ```
 
-- Given a class Foo with superclass Bar
+- Given a class CLASS with superclass SCLASS
   - All classes have a superclass, but sometimes it is GObject, which has no members
-- Generate `FooFields` for user fields `{{F:TY}}` with ctor `new({{X:TY}}) { BLK }`:
-  - `struct FooFields { Bar: BarFields, {{F:TY}} }`
-  - `impl FooFields { fn new({{X:TY}}) -> Self { BLK }`
-- Given methods `fn M(this, {{X:TY}}) -> TY { ... }`, generate the `Foo` trait:
-  - `trait Foo: 'static + Bar {...}` with members:
-    - `fn Foo(&self) -> FooFields;`
-    - `fn FooPtr(&self) -> Ptr<Foo>;`
-    - `fn M(&self, {{X:TY}}) -> TY;`
-  - Inherent impl `impl Foo {..}` with members:
-    - `fn new({{X:TY}}) -> 
--     
+- Generate:
+  - `struct CLASSFields { SCLASS: SCLASSFields, {FIELD:FIELD_TYTY} }`
+  - `impl CLASSFields { fn new({CARG:CARG_TY}) -> Self { CBODY }`
+  - `trait CLASS: 'static + SCLASS {...}` with members:
+    - `fn CLASS(&self) -> &CLASSFields;`
+    - `fn CLASSPtr(&self) -> Ptr<CLASS>;`
+    - `{ fn CLASS_METHOD(&self, {CLASS_MARG: CLASS_MARG_TY}) -> CLASS_MRET_TY; }`
+  - `impl CLASS`:
+    - `fn new({CARG:CARG_TY}) -> Ptr<CLASS>`:
+      - `struct Impl { fields: CLASSFields, self_ref: RefCell<Weak<Impl>> }`
+      - `impl CLASS for Impl`:
+        - `fn CLASS(&self) -> &CLASSFields { &self.fields }`
+        - `fn CLASSPtr(&self) -> Ptr<CLASS> { self.self_ref.borrow().upgrade().unwrap() }`
+        - `{`
+          - `fn CLASS_METHOD(&self, {CLASS_MARG: CLASS_MARG_TY}) -> CLASS_MRET_TY`
+            - `CLASSSuper::CLASS_METHOD(&self.CLASSPtr(), {CLASS_MARG})`
+        - `}`
+      - `let ptr = Ptr::new(Impl { fields: CLASSFields::new(f), self_ref: RefCell::new(Weak::new()) })`
+      - link ptr
+      - `ptr`
+  - `trait CLASSSuper`:
+    - `{ fn CLASS_METHOD(this: &Self, {CLASS_MARG: CLASS_MARG_TY}) -> CLASS_MRET_TY; }`
+    - `{ fn SC_METHOD(this: &Self, {SC_MARG: SC_MARG_TY}) -> SC_MRET_TY; }`
+  - `impl<This: ?Sized + CLASS> CLASSSuper for Ptr<This>`
+    - `{`
+      - `fn CLASS_METHOD(this: &Self, {CLASS_MARG: CLASS_MARG_TY}) -> CLASS_MRET_TY`:
+        - `fn m(this: &Ptr<CLASS>, {CLASS_MARG: CLASS_MARG_TY}) -> CLASS_MRET_TY`:
+          - `CLASS_MBODY`
+        - `m(&this.CLASSPtr(), {CLASS_MARG})`
+    - `}`
+    - `{`
+      - `fn SC_METHOD(this: &Self, {SC_MARG: SC_MARG_TY}) -> SC_MRET_TY`:
+        - `fn m(this: &Ptr<SC>, {SC_MARG: SC_MARG_TY}) -> SC_MRET_TY`:
+          - `SC_MBODY`
+        - `m(&this.SCPtr(), {SC_MARG})`
+    - `}`
+    
    

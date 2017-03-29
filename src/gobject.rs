@@ -1,5 +1,8 @@
-pub struct GObject {
-    dummy: ()
+use ptr::Ptr;
+
+pub trait GObject {
+    fn GObject(&self) -> &GObjectFields;
+    fn GObjectPtr(&self) -> Ptr<GObject>;
 }
 
 pub struct GObjectFields {

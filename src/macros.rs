@@ -1,157 +1,170 @@
-/*!
+macro_rules! __gobject__ {
+    (
+        class ($Class:ident, $ClassFields:ident, $ClassPtr:ident, $ClassSuper:ident) {
+            // "fields" -- the list of fields
+            fields {
+                $(($($fpub:tt)*) $fname:ident: $fty:ty),*
+            }
 
-Example:
+            // "new" -- the constructor
+            new($($narg:ident: $narg_ty:ty),*) { $($nret_body:tt)* }
 
-```notrust
-gobject! {
-    class Foo {
-        let foo_field: u32;
+            // "methods" -- the list of methods introduced by this class
+            methods {
+                $(fn $mname:ident($mthis:ident, $($marg:ident:$marg_ty:ty),*) -> $mret_ty:ty {
+                    $($mbody:tt)*
+                })*
+            }
 
-        new(f: u32) -> FooFields {
-            FooFields { foo_field: f }
+            // "impls" -- impls of the superclass; eventually we should figure out how
+            // to supper nesting > 1
+            extends ($SClass:ident, $SClassFields:ident, $SClassPtr:ident) {
+                $(fn $sname:ident($sthis:ident, $($sarg:ident:$sarg_ty:ty),*) -> $sret_ty:ty {
+                    $($sbody:tt)*
+                })*
+            }
+        }
+    ) => {
+        // Generate the struct `ClassFields` that houses the fields of this class.
+        //
+        // e.g.:
+        //
+        // struct CounterFields {
+        //     GObject: GObjectFields,
+        //     count: Cell<u32>,
+        // }
+        struct $ClassFields {
+            $SClass: $SClassFields,
+            $($($fpub)* $fname: $fty,)*
         }
 
-        fn method() {
+        // Generate the constructor code that yields up the fields;
+        // this is only used for `super` calls, effectively, that appear
+        // in a constructor.
+        //
+        // e.g.:
+        //
+        // impl CounterFields {
+        //   pub fn new(f: u32) -> CounterFields {
+        //     CounterFields {
+        //         GObject: GObjectFields::new(),
+        //         count: Cell::new(f),
+        //     }
+        //   }
+        // }
+        impl $ClassFields {
+            pub fn new($($narg: $narg_ty),*) -> Self {
+                $($nret_body)*
+            }
         }
-    }
 
-    class Bar extends Foo {
-        pub let bar_field: String;
+        // Generate the main trait `Class` that serves for references
+        // to this class.
+        //
+        // e.g.
+        //
+        // trait Counter {
+        //     fn Counter(&self) -> &CounterFields;
+        //     fn CounterPtr(&self) -> Ptr<Counter>;
+        //     fn add(&self, a: u32) -> u32;
+        //     fn get(&self) -> u32;
+        // }
+        trait $Class: $SClass {
+            fn $Class(&self) -> &$ClassFields;
+            fn $ClassPtr(&self) -> Ptr<$Class>;
 
-        new(s: String) -> BarFields {
-            let FooFields = super(0);
-            BarFields { FooFields, bar_field: s }
+            $(
+                fn $mname(&self, $($marg: $marg_ty,)*) -> $mret_ty;
+            )*
         }
 
-        // Ideally you'd be able to "tighten these gradually".
-        // Also, it'll be a pain for us to support more than one
-        // level of inheritance to start.
-        impl Foo {
-            fn method(&self) {
+        // Generate the `ClassSuper` trait that houses the code for
+        // this class.  This contains **both** the code for methods
+        // added by this class and for methods overridden from the
+        // superclass.
+        //
+        // NB: These are specifically defined in "free fn" form.
+        trait $ClassSuper {
+            $(fn $mname($mthis: &Self, $($marg:$marg_ty,)*) -> $mret_ty;)*
+            $(fn $sname($sthis: &Self, $($sarg:$sarg_ty,)*) -> $sret_ty;)*
+        }
+
+        // Impl the `ClassSuper` trait for any `Ptr<This>` where `This: Class`.
+        impl<This: ?Sized + $Class> $ClassSuper for Ptr<This> {
+            $(
+                fn $mname($mthis: &Self, $($marg:$marg_ty,)*) -> $mret_ty {
+                    fn m($mthis: &Ptr<$Class>, $($marg:$marg_ty,)*) -> $mret_ty {
+                        $($mbody)*
+                    }
+
+                    m(&$mthis.$ClassPtr(), $($marg,)*)
+                }
+            )*
+
+            $(
+                fn $sname($sthis: &Self, $($sarg:$sarg_ty),*) -> $sret_ty {
+                    fn m($sthis: &Ptr<$Class>, $($sarg:$sarg_ty),*) -> $sret_ty {
+                        $($sbody)*
+                    }
+
+                    m(&$sthis.$ClassPtr(), $($sarg),*)
+                }
+            )*
+        }
+
+        // Add a `new` method for creating instances of this class.
+        impl $Class {
+            pub fn new($($narg: $narg_ty),*) -> Ptr<$Class> {
+                use std::cell::RefCell;
+                use std::sync::{Arc, Weak};
+
+                struct Impl {
+                    fields: $ClassFields,
+                    self_ref: RefCell<Weak<Impl>>,
+                }
+
+                impl $Class for Impl {
+                    fn $Class(&self) -> &$ClassFields {
+                        &self.fields
+                    }
+
+                    fn $ClassPtr(&self) -> Ptr<$Class> {
+                        self.self_ref.borrow().upgrade().unwrap()
+                    }
+
+                    $(
+                        fn $mname(&self, $($marg: $marg_ty),*) -> $mret_ty {
+                            $ClassSuper::$mname(&self.$ClassPtr(), $($marg),*)
+                        }
+                    )*
+                }
+
+                impl $SClass for Impl {
+                    fn $SClass(&self) -> &$SClassFields {
+                        &self.fields.$SClass
+                    }
+
+                    fn $SClassPtr(&self) -> Ptr<$SClass> {
+                        self.self_ref.borrow().upgrade().unwrap()
+                    }
+
+                    $(
+                        fn $sname(&self, $($sarg: $sarg_ty),*) -> $sret_ty {
+                            $ClassSuper::$sname(&self.$ClassPtr(), $($sarg),*)
+                        }
+                    )*
+                }
+
+                let ptr = Ptr::new(Impl {
+                    fields: $ClassFields::new($($narg),*),
+                    self_ref: RefCell::new(Weak::new())
+                });
+
+                let weak = Arc::downgrade(&ptr);
+                *ptr.self_ref.borrow_mut() = weak;
+
+                ptr
             }
         }
     }
 }
-```
-
-generates:
-
-```notrust
-// eventually: #[repr(first)]
-pub struct FooFields {
-    GObject: GObject,
-    foo_field: u32,
-}
-
-// eventually: #[repr(first)]
-pub struct BarFields {
-    FooFields: FooFields,
-    bar_field: String,
-}
-
-// eventually: #[repr(class)]
-trait Foo {
-    // ideally would be:
-    // foo_field: u32;
-
-    // instead:
-    fn Foo(&self) -> &FooFields;
-
-    // automatically added:
-    fn FooPtr(&self) -> Ptr<Foo>;
-
-    fn method(&self);
-}
-
-impl Foo {
-    fn new(f: u32) -> Ptr<Foo> {
-        struct FooImpl {
-            fields: FooFields
-        }
-
-        impl Foo for Ptr<FooImpl> {
-            fn Foo(&self) -> &FooFields {
-                &self.fields
-            }
-
-            fn FooPtr(&self) -> Ptr<Foo> {
-                self.clone()
-            }
-        }
-
-        Ptr::new(FooImpl {
-            // from user:
-            FooFields { foo_field: f }
-        })
-    }
-}
-
-// eventually: #[repr(class)]
-trait Bar: Foo {
-    // ideally would be:
-    // bar_pub: u32;
-
-    fn Bar(&self) -> &BarFields;
-    fn BarPtr(&self) -> Ptr<Bar>;
-}
-
-impl Bar {
-    fn new(f: u32) -> Ptr<Foo> {
-        struct BarImpl {
-            fields: BarFields
-        }
-
-        impl Bar for Ptr<BarImpl> {
-            fn Foo(&self) -> &FooFields {
-                &self.fields
-            }
-
-            fn FooPtr(&self) -> Ptr<Foo> {
-                self.clone()
-            }
-        }
-
-        Ptr::new(FooImpl {
-            // from user:
-            FooFields { foo_field: f }
-        })
-    }
-}
-
-// ideally would be a `default` impl,
-// but for now we won't have that option
-impl<This: Bar> Foo for Ptr<This> {
-    fn Foo(&self) -> &FooFields {
-        &self.Bar().FooFields
-    }
-
-    fn FooPtr(&self) -> Ptr<Foo> {
-    }
-
-    fn method(&self) {
-        fn user(this: &Ptr<Foo>, 
-    }
-}
-```
-
-Some open questions and obstacles:
-
-- Should we support `&mut self` in any way?
-  - Unclear that this would be useful.
-  - Probably better to just teach people to use `Cell` and `RefCell`
-- Should we handle mutability better (this is orthogonal, really)
-- How to partition the *trait* vs the `Ptr` wrapper?
-  - IOW, it might be nice for `Foo` to be a `struct Foo(Ptr<FooTrait>)`
-- Upcasting
-
-How to support **Clone** and interface around pointers?
-
-- Would be nice to support `Ptr<Self>` methods
-- Would be nice to permit `self` in a free function
-- If we want this to work most like OOP, in the default methods we
-  want `self` to have the type `Ptr<Foo>`; can this be achieved? Well,
-  certainly it should be possible. That has some advantages. For
-  example, if we `impl<T: ?Sized> Clone for Ptr<T>`, then one can just
-  `clone` the `Ptr<Foo>` no problem.
-
-*/
