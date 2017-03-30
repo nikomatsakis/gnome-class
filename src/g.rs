@@ -1,8 +1,9 @@
+use glib_sys::gpointer;
 use gobject_sys::{self, GObject, GTypeClass};
 use std::ops::Deref;
 
 /// A reference to a `GObject`; the `T` is the subtype of `GObject`.
-pub struct G<T: GObjectContents + ?Sized> {
+pub struct G<T: GInstance> {
     data: *const T
 }
 
@@ -17,10 +18,21 @@ pub struct G<T: GObjectContents + ?Sized> {
 ///   that the receiver must be allocated in an `GObject`).
 ///
 /// Note that the final point means that it is incorrect to ever
-/// implement `Clone` and `GObjectContents` together, since then safe
+/// implement `Clone` and `GInstance` together, since then safe
 /// code could take an `&Self` and produce a `Self` that is not stored
 /// in a gobject.
-pub unsafe trait GObjectContents {
+pub unsafe trait GInstance {
+    type Class: GClass;
+}
+
+/// Represents a type that is a gnome class.
+pub unsafe trait GClass {
+    type Instance: GInstance;
+}
+
+/// Represents a class that is a subclass of some other gnome class.
+pub unsafe trait GSubclass: GClass {
+    type ParentClass: GClass;
 }
 
 /// Convert `p`, which is a pointer to the contents of some `GObject`, into
@@ -31,11 +43,11 @@ pub unsafe trait GObjectContents {
 /// case, we take in a fat pointer (`*const Trait`) and return a thin
 /// pointer (`*mut GObject`) representing just the data itself,
 /// stripped of its vtable.
-fn to_gobject_ptr<T: GObjectContents + ?Sized>(p: *const T) -> *mut GObject {
+fn to_gobject_ptr<T: GInstance>(p: *const T) -> *mut GObject {
     p as *mut GObject
 }
 
-/// Given a valid pointer to a `GObjectContents`, we can convert
+/// Given a valid pointer to a `GInstance`, we can convert
 /// this into an owned `G<>` reference by incrementing the
 /// reference count.
 ///
@@ -45,53 +57,57 @@ fn to_gobject_ptr<T: GObjectContents + ?Sized>(p: *const T) -> *mut GObject {
 ///   inside some gobject allocation.
 /// - Having an `&Self` instance means that this gobject allocation
 ///   must have a valid ref-count spanning this call.
-///
-///
-/// NB: In principle, the signature of this method could be `&T ->
-/// &G<T>`, which would be nice since we would forego one
-/// ref-count. However, that doesn't work because, in the case where
-/// `T` is a trait, we would be taking in a fat pointer and returning
-/// a thin pointer that is supposed to be a pointer to the fat
-/// pointer.
-///
-/// Open question: It might be possible to take an `&&T` and return an
-/// `&G<T>` so as to avoid this.
-pub fn to_ref<T: GObjectContents + ?Sized>(p: &T) -> G<T> {
+pub fn to_object_ref<T: GInstance>(p: &T) -> &G<T> {
     unsafe {
-        gobject_sys::g_object_ref(to_gobject_ptr(p));
-        G::new(p)
+        let p = p as *const T;
+        let p = p as *const G<T>;
+        &*p
     }
 }
 
 /// Given something that must be a `GObject`, return the class of this
 /// gobject.
-pub fn get_class<T: GObjectContents + ?Sized>(this: &T) -> *mut GTypeClass {
-    // I am a horrible monster and I pray for death:
-    // the first field of `GObject` has type `*mut
-    // GTypeClass`, but it is private in the
-    // `gobject_sys` crate. Therefore, we cast this
-    // pointer to a pointer to the first field and
-    // read from it.
+pub fn get_class<T: GInstance>(this: &T) -> &T::Class {
     unsafe {
         let this: *const T = this;
-        let this = this as *const *mut GTypeClass;
-        *this
+        // [1] I am a horrible monster and I pray for death:
+        // the first field of `GObject` has type `*mut
+        // GTypeClass`, but it is private in the
+        // `gobject_sys` crate. Therefore, we cast this
+        // pointer to a pointer to the first field and
+        // read from it.
+        let this = this as *const *const GTypeClass; // [1]
+        let klass: *const GTypeClass = *this;
+        let klass: *const T::Class = klass as *const T::Class;
+        &*klass
     }
 }
 
-impl<T: GObjectContents + ?Sized> G<T> {
+pub fn get_parent_class<T: GSubclass>(this: &T) -> &T::ParentClass {
+    unsafe {
+        let this: *const T = this;
+        let parent_class = gobject_sys::g_type_class_peek_parent(this as gpointer);
+        let parent_class = parent_class as *mut T::ParentClass;
+        &*parent_class
+    }
+}
+
+impl<T: GInstance> G<T> {
     pub unsafe fn new(data: *const T) -> G<T> {
         G { data: data }
     }
 }
 
-impl<T: GObjectContents + ?Sized> Clone for G<T> {
+impl<T: GInstance> Clone for G<T> {
     fn clone(&self) -> Self {
-        unsafe { to_ref(&*self.data) }
+        unsafe {
+            gobject_sys::g_object_ref(to_gobject_ptr(self.data));
+            G::new(self.data)
+        }
     }
 }
 
-impl<T: GObjectContents + ?Sized> Deref for G<T> {
+impl<T: GInstance> Deref for G<T> {
     type Target = T;
 
     fn deref(&self) -> &T {
@@ -101,7 +117,7 @@ impl<T: GObjectContents + ?Sized> Deref for G<T> {
     }
 }
 
-impl<T: GObjectContents + ?Sized> Drop for G<T> {
+impl<T: GInstance> Drop for G<T> {
     fn drop(&mut self) {
         unsafe {
             let ptr = to_gobject_ptr(self.data);

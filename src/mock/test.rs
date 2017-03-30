@@ -8,9 +8,9 @@ fn create_counter() {
     let i = DropCounter::new();
 
     {
-        let c: G<Counter> = Counter::new(20, i.clone());
+        let c: G<Counter> = Counter::new();
         c.add(2);
-        assert_eq!(c.get(), 22);
+        assert_eq!(c.get(), 2);
         assert_eq!(i.get(), 0); // not dropped yet
     }
 

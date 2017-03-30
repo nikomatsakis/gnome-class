@@ -11,7 +11,7 @@ class Counter {
     }
     
     fn add(this, v: u32) -> u32 {
-        // Type of this: &G<Counter> ?
+        // Type of this: &Counter
         let private = this.private();
         let v = private.f.get() + v;
         private.f.set(v);

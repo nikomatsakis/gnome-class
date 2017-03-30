@@ -1,17 +1,11 @@
-use g::GObjectContents;
-use gobject_sys;
-use std::mem;
+use g::*;
+pub use gobject_sys::{GObject, GObjectClass};
 
-pub trait GObject: 'static + GObjectContents {
-    fn GObject(&self) -> &GObjectFields;
+unsafe impl GInstance for GObject {
+    type Class = GObjectClass;
 }
 
-pub struct GObjectFields {
-    fields: gobject_sys::GObject
+unsafe impl GClass for GObjectClass {
+    type Instance = GObject;
 }
 
-impl GObjectFields {
-    pub fn new() -> Self {
-        unsafe { mem::zeroed::<GObjectFields>() }
-    }
-}
