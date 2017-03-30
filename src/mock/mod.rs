@@ -46,7 +46,7 @@ use g::{self, G, GInstance, GClass, GSubclass};
 use glib_sys::{GType, gpointer};
 use gobject::*;
 use gobject_sys::{self, GObjectClass, GTypeFlags, GTypeInstance};
-use std::cell::Cell;
+use std::cell::{Cell, RefCell};
 use std::mem;
 use std::ptr;
 use std::sync::Arc;
@@ -88,14 +88,15 @@ pub struct Counter {
 
 struct CounterPrivate {
     f: Cell<u32>,
-    dc: Option<DropCounter>,
+    dc: RefCell<Option<DropCounter>>,
 }
 
 #[repr(C)]
 pub struct CounterClass {
     parent_class: GObjectClass,
-    add: extern fn(&Counter, v: u32) -> u32,
-    get: extern fn(&Counter) -> u32,
+    add: Option<extern fn(&Counter, v: u32) -> u32>,
+    get: Option<extern fn(&Counter) -> u32>,
+    set_drop_counter: Option<extern fn(&Counter, DropCounter)>,
 }
 
 unsafe impl GInstance for Counter {
@@ -137,35 +138,38 @@ impl Counter {
     }
 
     pub fn add(&self, v: u32) -> u32 {
-        println!("self={:p}", self);
-        println!("get_class={:p}", g::get_class(self));
-        (g::get_class(self).add)(self, v)
+        (g::get_class(self).add.unwrap())(self, v)
     }
 
     pub fn get(&self) -> u32 {
-        (g::get_class(self).get)(self)
+        (g::get_class(self).get.unwrap())(self)
+    }
+
+    pub fn set_drop_counter(&self, dc: DropCounter) {
+        (g::get_class(self).set_drop_counter.unwrap())(self, dc)
     }
 }
 
 impl CounterClass {
     extern "C" fn init(klass: gpointer, _klass_data: gpointer) {
-        println!("klass={:?}", klass);
-
         unsafe {
             let g_object_class = klass as *mut GObjectClass;
             (*g_object_class).finalize = Some(Counter::finalize);
 
+            gobject_sys::g_type_class_add_private(klass, mem::size_of::<CounterPrivate>());
+
             let klass = klass as *mut CounterClass;
             let klass: &mut CounterClass = &mut *klass;
-            klass.add = methods::add;
-            klass.get = methods::get;
+            klass.add = Some(methods::add);
+            klass.get = Some(methods::get);
+            klass.set_drop_counter = Some(methods::set_drop_counter);
         }
     }
 }
 
 mod methods {
     #[allow(unused_imports)]
-    use super::{Counter, CounterPrivate, CounterClass};
+    use super::{Counter, CounterPrivate, CounterClass, DropCounter};
 
     pub(super) extern fn add(this: &Counter, v: u32) -> u32 {
         let private = this.private();
@@ -177,12 +181,16 @@ mod methods {
     pub(super) extern fn get(this: &Counter) -> u32 {
         this.private().f.get()
     }
+
+    pub(super) extern fn set_drop_counter(this: &Counter, dc: DropCounter) {
+        *this.private().dc.borrow_mut() = Some(dc);
+    }
 }
 
 impl Counter {
     extern "C" fn init(this: *mut GTypeInstance, _klass: gpointer) {
         fn new() -> CounterPrivate {
-            CounterPrivate { f: Cell::new(0), dc: None }
+            CounterPrivate { f: Cell::new(0), dc: RefCell::new(None) }
         }
 
         unsafe {

@@ -1,5 +1,5 @@
 use glib_sys::gpointer;
-use gobject_sys::{self, GObject, GTypeClass};
+use gobject_sys::{self, GObject, GTypeClass, GTypeInstance};
 use std::ops::Deref;
 
 /// A reference to a `GObject`; the `T` is the subtype of `GObject`.
@@ -69,15 +69,21 @@ pub fn to_object_ref<T: GInstance>(p: &T) -> &G<T> {
 /// gobject.
 pub fn get_class<T: GInstance>(this: &T) -> &T::Class {
     unsafe {
-        let this: *const T = this;
-        // [1] I am a horrible monster and I pray for death:
-        // the first field of `GObject` has type `*mut
-        // GTypeClass`, but it is private in the
-        // `gobject_sys` crate. Therefore, we cast this
-        // pointer to a pointer to the first field and
-        // read from it.
-        let this = this as *const *const GTypeClass; // [1]
-        let klass: *const GTypeClass = *this;
+        let this: *mut GObject = to_gobject_ptr(this);
+        let type_instance: *const GTypeInstance = &(*this).g_type_instance;
+
+        /// I am a horrible monster and I pray for death: the first
+        /// field of `GTypeInstance` has type `*mut GTypeClass`, but it
+        /// is private in the `gobject_sys` crate. Therefore, we cast
+        /// this pointer to a pointer to the first field and read from
+        /// it.
+        #[repr(C)]
+        struct GTypeInstance1 {
+            g_class: *mut GTypeClass
+        }
+
+        let type_instance = type_instance as *const GTypeInstance1;
+        let klass: *mut GTypeClass = (*type_instance).g_class;
         let klass: *const T::Class = klass as *const T::Class;
         &*klass
     }
