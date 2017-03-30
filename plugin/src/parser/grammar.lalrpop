@@ -112,7 +112,7 @@ extern {
         "[" => Tok::LeftBracket,
         "]" => Tok::RightBracket,
         "(" => Tok::LeftParen,
-        ")" => Tok::LeftParen,
+        ")" => Tok::RightParen,
         "->" => Tok::ThinArrow,
         "+" => Tok::Plus,
         "," => Tok::Comma,

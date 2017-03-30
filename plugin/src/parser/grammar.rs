@@ -272,7 +272,7 @@ mod __parse__Fields {
             __last_location = __lookahead.2.clone();
             __integer = match __lookahead.1 {
                 Tok::LeftParen if true => 0,
-                Tok::LeftParen if true => 1,
+                Tok::RightParen if true => 1,
                 Tok::Plus if true => 2,
                 Tok::Comma if true => 3,
                 Tok::ThinArrow if true => 4,
@@ -307,7 +307,7 @@ mod __parse__Fields {
                             _ => unreachable!(),
                         },
                         1 => match __lookahead.1 {
-                            __tok @ Tok::LeftParen => __Symbol::Term_22_29_22(__tok),
+                            __tok @ Tok::RightParen => __Symbol::Term_22_29_22(__tok),
                             _ => unreachable!(),
                         },
                         2 => match __lookahead.1 {
@@ -2140,7 +2140,7 @@ mod __parse__Members {
             __last_location = __lookahead.2.clone();
             __integer = match __lookahead.1 {
                 Tok::LeftParen if true => 0,
-                Tok::LeftParen if true => 1,
+                Tok::RightParen if true => 1,
                 Tok::Plus if true => 2,
                 Tok::Comma if true => 3,
                 Tok::ThinArrow if true => 4,
@@ -2175,7 +2175,7 @@ mod __parse__Members {
                             _ => unreachable!(),
                         },
                         1 => match __lookahead.1 {
-                            __tok @ Tok::LeftParen => __Symbol::Term_22_29_22(__tok),
+                            __tok @ Tok::RightParen => __Symbol::Term_22_29_22(__tok),
                             _ => unreachable!(),
                         },
                         2 => match __lookahead.1 {
@@ -3838,7 +3838,7 @@ mod __parse__Program {
             __last_location = __lookahead.2.clone();
             __integer = match __lookahead.1 {
                 Tok::LeftParen if true => 0,
-                Tok::LeftParen if true => 1,
+                Tok::RightParen if true => 1,
                 Tok::Plus if true => 2,
                 Tok::Comma if true => 3,
                 Tok::ThinArrow if true => 4,
@@ -3873,7 +3873,7 @@ mod __parse__Program {
                             _ => unreachable!(),
                         },
                         1 => match __lookahead.1 {
-                            __tok @ Tok::LeftParen => __Symbol::Term_22_29_22(__tok),
+                            __tok @ Tok::RightParen => __Symbol::Term_22_29_22(__tok),
                             _ => unreachable!(),
                         },
                         2 => match __lookahead.1 {

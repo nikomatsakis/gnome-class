@@ -21,8 +21,11 @@ pub fn gobject_gen(input: TokenStream) -> TokenStream {
     let input = input.to_string();
 
     let result: Result<TokenStream> = do catch {
-        let _program = parser::parse_program(&input)?;
-        let quote = quote! { struct Dummy; };
+        let program = parser::parse_program(&input)?;
+        let program_str = format!("{:#?}", program);
+        let quote = quote! {
+            const XXX: &str = #program_str;
+        };
         Ok(quote.parse().unwrap())
     };
 
