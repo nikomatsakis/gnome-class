@@ -93,6 +93,10 @@ public class PropertyDemo : Object {
         }
     }
 
+    // this bit is from https://wiki.gnome.org/Projects/Vala/Tutorial#Properties
+    [Description(nick = "age in years", blurb = "This is the person's age in years")]
+    public int age { get; set; default = 32; }
+
     /* Creation method */
 
     public MyConstructor (int a, int b, int c) {

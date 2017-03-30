@@ -25,6 +25,27 @@ class Counter {
             }
         },
 
+        // this bit is from Vala
+        [Description(nick = "age in years", blurb = "This is the person's age in years")]
+        public int age { get; set; default = 32; }
+
+        "hello-with-dashes": i32 where min_value = 0,
+                                       max_value = 42,
+                                       default = 10 => {
+            set explicit_notify (value) {
+                if self.field != value {
+                    self.field = value;
+                    notify_property_changed ("hello-with-dashes");
+                        
+                }
+                self.field = value;
+            }
+
+            get () -> i32 {
+                self.field
+            }
+        }
+
         string_prop ("name",
 	             _("Name"),
 		     _("Full name of person"),
