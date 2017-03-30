@@ -7,20 +7,21 @@ extern crate lalrpop_util;
 #[macro_use] extern crate quote;
 extern crate regex;
 extern crate proc_macro;
-
+extern crate unicode_xid;
 use proc_macro::TokenStream;
 use errors::*;
 
 mod ast;
 mod errors;
 mod parser;
+mod tok;
 
 #[proc_macro]
 pub fn gobject_gen(input: TokenStream) -> TokenStream {
     let input = input.to_string();
 
     let result: Result<TokenStream> = do catch {
-        let program = parse_program(&input)?;
+        let _program = parse_program(&input)?;
         let quote = quote! { struct Dummy; };
         Ok(quote.parse().unwrap())
     };

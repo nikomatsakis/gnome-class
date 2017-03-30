@@ -5,7 +5,11 @@ extern crate gobject_gen;
 use gobject_gen::gobject_gen;
 
 gobject_gen! {
-    class Foo { }
+    class Counter {
+        struct CounterPrivate {
+            f: Cell<u32>
+        }
+    }
 }
 
 fn main() { }
