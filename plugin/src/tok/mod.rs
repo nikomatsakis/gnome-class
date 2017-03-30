@@ -35,6 +35,7 @@ pub enum Tok<'input> {
     Init, // `init`
     Extends, // `extends`
     Id(&'input str), // identifier
+    ThinArrow, // `->`
     Underscore, // `_`
     LeftParen, // `(`,
     RightParen, // `)`,
@@ -103,6 +104,17 @@ impl<'input> Tokenizer<'input> {
                         }
                         _ => {
                             Some(Ok((idx0, Colon, idx0+1)))
+                        }
+                    }
+                }
+                Some((idx0, '-')) => {
+                    match self.bump() {
+                        Some((idx1, '>')) => {
+                            self.bump();
+                            Some(Ok((idx0, ThinArrow, idx1+1)))
+                        }
+                        _ => {
+                            Some(unrecognized_token(idx0))
                         }
                     }
                 }

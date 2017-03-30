@@ -1,4 +1,5 @@
 use lalrpop_intern::InternedString;
+use quote::Tokens;
 
 pub struct Program {
     pub classes: Vec<Class>
@@ -12,11 +13,22 @@ pub struct Class {
 
 pub enum Member {
     PrivateStruct(PrivateStruct),
+    Init(FnDef),
 }
 
 pub struct PrivateStruct {
     pub name: InternedString,
     pub fields: Vec<Field>
+}
+
+pub struct FnSig {
+    pub args: Vec<Field>,
+    pub return_ty: Option<Type>,
+}
+
+pub struct FnDef {
+    pub sig: FnSig,
+    pub code: OpaqueTokens,
 }
 
 pub struct Field {
@@ -36,4 +48,8 @@ pub enum Type {
 
     // N + ... + N
     Sum(Vec<Type>),
+}
+
+pub struct OpaqueTokens {
+    pub tokens: Tokens,
 }

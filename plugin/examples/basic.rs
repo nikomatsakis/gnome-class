@@ -13,5 +13,5 @@ gobject_gen! {
 }
 
 fn main() {
-    Dummy;
+    let _ = Dummy;
 }

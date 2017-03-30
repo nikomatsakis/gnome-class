@@ -1,6 +1,7 @@
 use ast::*;
 use lalrpop_intern::{intern, InternedString};
 use parser;
+use quote::Tokens;
 use tok::Tok;
 
 #[LALR]
@@ -21,12 +22,17 @@ pub Members: Vec<Member> = {
     Member*
 };
 
+// Allow non-Rust keywords as contextual keywords.
 Id: InternedString = {
+    "init" => intern("init"),
+    "class" => intern("class"),
+    "extends" => intern("extends"),
     OtherId => intern(<>),
 };
 
 Member: Member = {
     PrivateStruct => Member::PrivateStruct(<>),
+    Init => Member::Init(<>),
 };
 
 PrivateStruct: PrivateStruct = {
@@ -34,6 +40,24 @@ PrivateStruct: PrivateStruct = {
         let fields = parser::parse_fields(fields, s)?;
         Ok(PrivateStruct { name, fields })
     }
+};
+
+Init: FnDef = {
+    "init" <FnDef>
+};
+
+FnDef: FnDef = {
+    <sig:FnSig> <code:CodeBlock> => FnDef { sig, code },
+};
+
+FnSig: FnSig = {
+    "(" <args:Comma<Field>> ")" <return_ty:ReturnTy> => {
+        FnSig { args, return_ty }
+    }
+};
+
+ReturnTy: Option<Type> = {
+    ("->" <Type>)?
 };
 
 pub Fields: Vec<Field> = {
@@ -53,6 +77,14 @@ Type1: Type = {
     Id => Type::Name(<>),
     <Id> "<" <Type*> ">" => Type::Args(<>),
     "[" <Type> "]" => Type::Array(Box::new(<>)),
+};
+
+CodeBlock: OpaqueTokens = {
+    "{..}" => {
+        let mut tokens = Tokens::new();
+        tokens.append(<>);
+        OpaqueTokens { tokens }
+    }
 };
 
 Comma<T>: Vec<T> = {
@@ -81,6 +113,8 @@ extern {
         "]" => Tok::RightBracket,
         "(" => Tok::LeftParen,
         ")" => Tok::LeftParen,
+        "->" => Tok::ThinArrow,
         "+" => Tok::Plus,
+        "," => Tok::Comma,
     }
 }
