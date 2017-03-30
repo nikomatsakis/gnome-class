@@ -33,6 +33,7 @@ pub enum Tok<'input> {
     Struct, // `struct`
     Fn, // `fn`
     Init, // `init`
+    Extends, // `extends`
     Id(&'input str), // identifier
     Underscore, // `_`
     LeftParen, // `(`,
@@ -47,6 +48,7 @@ pub enum Tok<'input> {
     GreaterThan, // `>`,
     Bang, // `!`
     Semi, // `;`
+    Plus, // `+`
     Block(&'input str), // {...}, balanced
 }
 
@@ -70,6 +72,7 @@ const KEYWORDS: &'static [(&'static str, Tok<'static>)] = &[
     ("struct", Struct),
     ("fn", Fn),
     ("init", Init),
+    ("extends", Extends),
     ("_", Underscore),
     ];
 
@@ -153,6 +156,10 @@ impl<'input> Tokenizer<'input> {
                 Some((idx0, ';')) => {
                     self.bump();
                     Some(Ok((idx0, Semi, idx0+1)))
+                }
+                Some((idx0, '+')) => {
+                    self.bump();
+                    Some(Ok((idx0, Plus, idx0+1)))
                 }
                 Some((idx0, '/')) => {
                     match self.bump() {

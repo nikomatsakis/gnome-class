@@ -12,4 +12,6 @@ gobject_gen! {
     }
 }
 
-fn main() { }
+fn main() {
+    Dummy;
+}

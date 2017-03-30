@@ -1,22 +1,28 @@
 use ast::*;
 use lalrpop_intern::{intern, InternedString};
+use parser;
+use tok::Tok;
 
-grammar;
+#[LALR]
+grammar<'input>;
 
 pub Program: Program = {
     Class* => Program { classes: <> }
 };
 
 Class: Class = {
-    "class" <name:Id> <extends:("extends" <Id>)?> "{"
-        <members:Member*>
-    "}" => {
-        Class { name, extends, members }
+    "class" <name:Id> <extends:("extends" <Id>)?> <b:@L> <blk:"{..}"> =>? {
+        let members = parser::parse_members(blk, b)?;
+        Ok(Class { name, extends, members })
     }
 };
 
+pub Members: Vec<Member> = {
+    Member*
+};
+
 Id: InternedString = {
-    r"[a-zA-Z_][[:word:]]*" => intern(<>),
+    OtherId => intern(<>),
 };
 
 Member: Member = {
@@ -24,9 +30,14 @@ Member: Member = {
 };
 
 PrivateStruct: PrivateStruct = {
-    "struct" <name:Id> "{" <fields:Comma<Field>> "}" => {
-        PrivateStruct { name, fields }
+    "struct" <name:Id> <s:@L> <fields:"{..}"> =>? {
+        let fields = parser::parse_fields(fields, s)?;
+        Ok(PrivateStruct { name, fields })
     }
+};
+
+pub Fields: Vec<Field> = {
+    Field*
 };
 
 Field: Field = {
@@ -51,3 +62,25 @@ Comma<T>: Vec<T> = {
         h
     }
 };
+
+extern {
+    type Location = usize;
+    type Error = ::errors::Error;
+    enum Tok<'input> {
+        "class" => Tok::Class,
+        "struct" => Tok::Struct,
+        "fn" => Tok::Fn,
+        "init" => Tok::Init,
+        "extends" => Tok::Extends,
+        "{..}" => Tok::Block(<&'input str>),
+        OtherId => Tok::Id(<&'input str>),
+        ":" => Tok::Colon,
+        "<" => Tok::LessThan,
+        ">" => Tok::GreaterThan,
+        "[" => Tok::LeftBracket,
+        "]" => Tok::RightBracket,
+        "(" => Tok::LeftParen,
+        ")" => Tok::LeftParen,
+        "+" => Tok::Plus,
+    }
+}
