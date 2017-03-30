@@ -14,6 +14,7 @@ use errors::*;
 mod ast;
 mod errors;
 mod parser;
+mod param;
 
 #[proc_macro]
 pub fn gobject_gen(input: TokenStream) -> TokenStream {
