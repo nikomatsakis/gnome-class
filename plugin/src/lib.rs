@@ -21,7 +21,7 @@ pub fn gobject_gen(input: TokenStream) -> TokenStream {
     let input = input.to_string();
 
     let result: Result<TokenStream> = do catch {
-        let _program = parse_program(&input)?;
+        let _program = parser::parse_program(&input)?;
         let quote = quote! { struct Dummy; };
         Ok(quote.parse().unwrap())
     };
@@ -35,9 +35,3 @@ pub fn gobject_gen(input: TokenStream) -> TokenStream {
     }
 }
 
-fn parse_program(input: &str) -> Result<ast::Program> {
-    match parser::parse_Program(input) {
-        Ok(p) => Ok(p),
-        Err(_) => bail!("parse error...somewhere...")
-    }
-}
