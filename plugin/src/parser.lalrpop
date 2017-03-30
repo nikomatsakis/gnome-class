@@ -1,0 +1,50 @@
+use lalrpop_intern::intern;
+
+grammar;
+
+pub Program: Program = {
+    Class* => Program { classes: <> }
+};
+
+Class: Class = {
+    "class" <name:Id> <super:("extends" <Id>)?> "{" <members:Member*> "}" => {
+        Class { name, extends, members }
+    }
+};
+
+Id: InternedString = {
+    r"[a-zA-Z_][[:word:]]*" => intern(<>),
+};
+
+Member: Member = {
+    PrivateStruct => Member::PrivateStruct(<>),
+};
+
+PrivateStruct: PrivateStruct = {
+    "struct" <name:Id> "{" <fields:Comma<Field>> "}" => {
+        Member::PrivateStruct { name, fields }
+    }
+};
+
+Field: Field = {
+    <name:Id> ":" <ty:Type> => Field { name, ty },
+};
+
+Type: Type = {
+    Type1,
+    <h:Type1> <t:("+" <Type1>)+> => Type::Sum(Some(h).into_iter().chain(t).collect()),
+};
+
+Type1: Type = {
+    Id => Type::Name(<>),
+    <Id> "<" <Type*> ">" => Type::Name(<>),
+    "[" <Type> "]" => Type::Array(Box::new(<>)),
+};
+
+Comma<T>: Vec<T> = {
+    <h:(<T> ",")*> <t:T?> => {
+        let mut h = h;
+        h.extend(t);
+        h
+    }
+};

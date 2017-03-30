@@ -1,0 +1,24 @@
+[package]
+name = "plugin"
+version = "0.1.0"
+authors = ["Niko Matsakis <niko@alum.mit.edu>"]
+build = "build.rs" # LALRPOP preprocessing
+
+[lib]
+proc-macro = true
+
+# Add a dependency on the regex crate; this is not
+# needed if you are writing your own tokenizer by
+# hand (or if you are already using the regex crate)
+[dependencies.regex]
+version = "0.2.1"
+
+# Add a dependency on the LALRPOP runtime library:
+[dependencies.lalrpop-util]
+version = "0.12.5"
+
+[build-dependencies.lalrpop]
+version = "0.12.5"
+
+[dependencies]
+lalrpop-intern = "0.12.5"
