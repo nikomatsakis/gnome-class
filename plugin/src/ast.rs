@@ -1,13 +1,13 @@
 use lalrpop_intern::InternedString;
 
 pub struct Program {
-    classes: Vec<Class>
+    pub classes: Vec<Class>
 }
 
 pub struct Class {
-    name: Id,
-    extends: Id,
-    members: Vec<Member>
+    pub name: InternedString,
+    pub extends: Option<InternedString>,
+    pub members: Vec<Member>
 }
 
 pub enum Member {
@@ -15,8 +15,8 @@ pub enum Member {
 }
 
 pub struct PrivateStruct {
-    name: InternedString,
-    fields: Vec<Field>
+    pub name: InternedString,
+    pub fields: Vec<Field>
 }
 
 pub struct Field {

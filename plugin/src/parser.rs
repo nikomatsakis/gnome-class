@@ -1,10 +1,12 @@
-use lalrpop_intern::intern;
+use ast::*;
+use lalrpop_intern::{intern, InternedString};
 extern crate lalrpop_util as __lalrpop_util;
 
 mod __parse__Program {
     #![allow(non_snake_case, non_camel_case_types, unused_mut, unused_variables, unused_imports)]
 
-    use lalrpop_intern::intern;
+    use ast::*;
+    use lalrpop_intern::{intern, InternedString};
     extern crate lalrpop_util as __lalrpop_util;
     #[allow(dead_code)]
     pub enum __Symbol<'input> {
@@ -2535,7 +2537,7 @@ pub fn __action2<
     input: &'input str,
     (_, _, _): (usize, &'input str, usize),
     (_, name, _): (usize, InternedString, usize),
-    (_, super, _): (usize, ::std::option::Option<InternedString>, usize),
+    (_, extends, _): (usize, ::std::option::Option<InternedString>, usize),
     (_, _, _): (usize, &'input str, usize),
     (_, members, _): (usize, ::std::vec::Vec<Member>, usize),
     (_, _, _): (usize, &'input str, usize),
@@ -2581,7 +2583,7 @@ pub fn __action5<
 ) -> PrivateStruct
 {
     {
-        Member::PrivateStruct { name, fields }
+        PrivateStruct { name, fields }
     }
 }
 
@@ -2643,7 +2645,7 @@ pub fn __action10<
     (_, _, _): (usize, &'input str, usize),
 ) -> Type
 {
-    Type::Name(__0, __1)
+    Type::Args(__0, __1)
 }
 
 #[allow(unused_variables)]

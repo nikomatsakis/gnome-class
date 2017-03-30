@@ -1,4 +1,5 @@
-use lalrpop_intern::intern;
+use ast::*;
+use lalrpop_intern::{intern, InternedString};
 
 grammar;
 
@@ -7,7 +8,9 @@ pub Program: Program = {
 };
 
 Class: Class = {
-    "class" <name:Id> <super:("extends" <Id>)?> "{" <members:Member*> "}" => {
+    "class" <name:Id> <extends:("extends" <Id>)?> "{"
+        <members:Member*>
+    "}" => {
         Class { name, extends, members }
     }
 };
@@ -22,7 +25,7 @@ Member: Member = {
 
 PrivateStruct: PrivateStruct = {
     "struct" <name:Id> "{" <fields:Comma<Field>> "}" => {
-        Member::PrivateStruct { name, fields }
+        PrivateStruct { name, fields }
     }
 };
 
@@ -37,7 +40,7 @@ Type: Type = {
 
 Type1: Type = {
     Id => Type::Name(<>),
-    <Id> "<" <Type*> ">" => Type::Name(<>),
+    <Id> "<" <Type*> ">" => Type::Args(<>),
     "[" <Type> "]" => Type::Array(Box::new(<>)),
 };
 
