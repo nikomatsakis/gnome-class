@@ -6,6 +6,48 @@ class Counter {
         f: Cell<u32>, dc: Option<DropCounter>
     }
 
+    properties {
+        int_prop ("age",
+	          _("Age"),
+		  _("Age of person in years"),
+		  min_value,
+		  max_value,
+		  default_value,
+		  flags | EXPLICIT_NOTIFY) {
+            set(x: u32) {
+	        println! ("extra code here");
+		self.set_age (x); // this one does the notification
+            }
+
+            get() -> u32 {
+	        println! ("extra code here");
+	        self.age
+            }
+        },
+
+        string_prop ("name",
+	             _("Name"),
+		     _("Full name of person"),
+		     nullable_default_value,
+		     flags),
+
+        enum_prop (GType for the enum), // FIXME, register an enum?
+
+	flags_prop (GType for the flags), // FIXME, register the flags?
+
+        param_prop (GType for the param), // FIXME: ?
+
+        boxed_prop (GType for the param), // FIXME: ?
+
+	value_array_prop (GParamSpec for the element spec),
+
+        object_prop (GType for object),
+
+        variant_prop (GVariantType, GVariant default_value),
+
+        // look at gparamspecs.h for the possible types
+    }
+
     init() -> CounterPrivate {
         CounterPrivate { f: Cell::new(0), dc: None }
     }
