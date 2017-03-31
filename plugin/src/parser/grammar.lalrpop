@@ -122,12 +122,19 @@ BasePath<S>: Path = {
     "self" => Path::FromSelf,
     "super" => Path::FromSuper,
     PathId<S> => Path::From(<>),
+    TraitItemId => Path::FromTraitItem(Box::new(<>)),
 };
 
 PathId<S>: PathId = {
     <name:Id> <tys:(S "<" <Comma<Type>> ">")?> => {
         let tys = tys.unwrap_or_default();
         PathId { name, tys }
+    }
+};
+
+TraitItemId: TraitItemId = {
+    "<" <self_ty:Type> "as" <trait_ref:TypePath> ">" "::" <item:Id> => {
+        TraitItemId { self_ty, trait_ref, item }
     }
 };
 
@@ -144,6 +151,7 @@ extern {
     type Error = ::errors::Error;
     enum Tok<'input> {
         "class" => Tok::ClassKeyword,
+        "as" => Tok::AsKeyword,
         "struct" => Tok::StructKeyword,
         "fn" => Tok::FnKeyword,
         "init" => Tok::InitKeyword,

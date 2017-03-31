@@ -647,6 +647,7 @@ impl<'a> ToTokens for SepPath<'a> {
             Path::FromRoot => tokens.append("::"),
             Path::FromSelf => tokens.append("self"),
             Path::FromSuper => tokens.append("super"),
+            Path::FromTraitItem(ref i) => i.to_tokens(tokens),
             Path::From(ref i) => {
                 let i = SepPathId { cc: self.cc, path_id: i};
                 i.to_tokens(tokens)
@@ -675,5 +676,13 @@ impl<'a> ToTokens for SepPathId<'a> {
             }
             quote_in!(tokens, <#(#tys),*>);
         }
+    }
+}
+
+impl ToTokens for TraitItemId {
+    fn to_tokens(&self, tokens: &mut Tokens) {
+        let &TraitItemId { ref self_ty, ref trait_ref, item } = self;
+        let trait_ref = trait_ref.ty();
+        quote_in!(tokens, < #self_ty as #trait_ref > :: #item);
     }
 }

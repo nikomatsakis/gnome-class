@@ -30,6 +30,7 @@ fn unterminated_block<T>(offset: usize) -> Result<T> {
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Tok<'input> {
     ClassKeyword, // `class`
+    AsKeyword, // `as`
     StructKeyword, // `struct`
     FnKeyword, // `fn`
     InitKeyword, // `init`
@@ -79,6 +80,7 @@ const KEYWORDS: &'static [(&'static str, Tok<'static>)] = &[
     ("extends", ExtendsKeyword),
     ("self", SelfKeyword),
     ("super", SuperKeyword),
+    ("as", AsKeyword),
     ("_", Underscore),
     ];
 

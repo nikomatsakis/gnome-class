@@ -79,6 +79,7 @@ pub enum Path {
     FromSelf,
     FromSuper,
     From(PathId),
+    FromTraitItem(Box<TraitItemId>),
     Extend(Box<Path>, PathId)
 }
 
@@ -86,4 +87,11 @@ pub enum Path {
 pub struct PathId {
     pub name: Identifier,
     pub tys: Vec<Type>
+}
+
+#[derive(Debug)]
+pub struct TraitItemId {
+    pub self_ty: Type,
+    pub trait_ref: Path,
+    pub item: Identifier,
 }
