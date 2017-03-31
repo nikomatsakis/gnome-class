@@ -15,3 +15,10 @@ mod mock;
 pub mod prelude {
     pub use ptr::Ptr;
 }
+
+pub use mock::{
+    counter_add,
+    counter_get,
+    counter_get_type,
+    counter_new,
+};
