@@ -16,7 +16,6 @@ pub fn classes(program: &Program) -> Result<Tokens> {
                    cx.gen_class()
                })
                .collect::<Result<Vec<_>>>()?;
-    println!("{:?}", class_tokens);
     Ok(quote! { #(#class_tokens)* })
 }
 
