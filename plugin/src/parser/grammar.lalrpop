@@ -51,7 +51,7 @@ PrivateStruct: PrivateStruct = {
     }
 };
 
-Init: OpaqueTokens = {
+Init: CodeBlock = {
     "init" <CodeBlock>
 };
 
@@ -96,11 +96,11 @@ Type1: Type = {
     "[" <Type> "]" => Type::Array(Box::new(<>)),
 };
 
-CodeBlock: OpaqueTokens = {
+CodeBlock: CodeBlock = {
     "{..}" => {
         let mut tokens = Tokens::new();
         tokens.append(<>);
-        OpaqueTokens { tokens }
+        CodeBlock { tokens }
     }
 };
 

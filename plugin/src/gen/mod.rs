@@ -548,7 +548,7 @@ impl ToTokens for ByteString {
     }
 }
 
-impl ToTokens for OpaqueTokens {
+impl ToTokens for CodeBlock {
     fn to_tokens(&self, tokens: &mut Tokens) {
         self.tokens.to_tokens(tokens)
     }

@@ -64,7 +64,7 @@ mod __parse__Members {
         NtClass(Class),
         NtClass_2a(::std::vec::Vec<Class>),
         NtClass_2b(::std::vec::Vec<Class>),
-        NtCodeBlock(OpaqueTokens),
+        NtCodeBlock(CodeBlock),
         NtComma_3cType_3e(Vec<Type>),
         NtComma_3cVarTy_3e(Vec<VarTy>),
         NtExprPath(Path),
@@ -73,7 +73,7 @@ mod __parse__Members {
         NtFnSig(FnSig),
         NtId(Identifier),
         NtIdStr(&'input str),
-        NtInit(OpaqueTokens),
+        NtInit(CodeBlock),
         NtMember(Member),
         NtMember_2a(::std::vec::Vec<Member>),
         NtMember_2b(::std::vec::Vec<Member>),
@@ -2339,7 +2339,7 @@ mod __parse__Members {
       'input,
     >(
         __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, OpaqueTokens, usize) {
+    ) -> (usize, CodeBlock, usize) {
         match __symbols.pop().unwrap() {
             (__l, __Symbol::NtCodeBlock(__v), __r) => (__l, __v, __r),
             _ => panic!("symbol type mismatch")
@@ -2429,7 +2429,7 @@ mod __parse__Members {
       'input,
     >(
         __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, OpaqueTokens, usize) {
+    ) -> (usize, CodeBlock, usize) {
         match __symbols.pop().unwrap() {
             (__l, __Symbol::NtInit(__v), __r) => (__l, __v, __r),
             _ => panic!("symbol type mismatch")
@@ -2717,7 +2717,7 @@ mod __parse__Program {
         NtClass(Class),
         NtClass_2a(::std::vec::Vec<Class>),
         NtClass_2b(::std::vec::Vec<Class>),
-        NtCodeBlock(OpaqueTokens),
+        NtCodeBlock(CodeBlock),
         NtComma_3cType_3e(Vec<Type>),
         NtComma_3cVarTy_3e(Vec<VarTy>),
         NtExprPath(Path),
@@ -2726,7 +2726,7 @@ mod __parse__Program {
         NtFnSig(FnSig),
         NtId(Identifier),
         NtIdStr(&'input str),
-        NtInit(OpaqueTokens),
+        NtInit(CodeBlock),
         NtMember(Member),
         NtMember_2a(::std::vec::Vec<Member>),
         NtMember_2b(::std::vec::Vec<Member>),
@@ -4857,7 +4857,7 @@ mod __parse__Program {
       'input,
     >(
         __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, OpaqueTokens, usize) {
+    ) -> (usize, CodeBlock, usize) {
         match __symbols.pop().unwrap() {
             (__l, __Symbol::NtCodeBlock(__v), __r) => (__l, __v, __r),
             _ => panic!("symbol type mismatch")
@@ -4947,7 +4947,7 @@ mod __parse__Program {
       'input,
     >(
         __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, OpaqueTokens, usize) {
+    ) -> (usize, CodeBlock, usize) {
         match __symbols.pop().unwrap() {
             (__l, __Symbol::NtInit(__v), __r) => (__l, __v, __r),
             _ => panic!("symbol type mismatch")
@@ -5235,7 +5235,7 @@ mod __parse__VarTys {
         NtClass(Class),
         NtClass_2a(::std::vec::Vec<Class>),
         NtClass_2b(::std::vec::Vec<Class>),
-        NtCodeBlock(OpaqueTokens),
+        NtCodeBlock(CodeBlock),
         NtComma_3cType_3e(Vec<Type>),
         NtComma_3cVarTy_3e(Vec<VarTy>),
         NtExprPath(Path),
@@ -5244,7 +5244,7 @@ mod __parse__VarTys {
         NtFnSig(FnSig),
         NtId(Identifier),
         NtIdStr(&'input str),
-        NtInit(OpaqueTokens),
+        NtInit(CodeBlock),
         NtMember(Member),
         NtMember_2a(::std::vec::Vec<Member>),
         NtMember_2b(::std::vec::Vec<Member>),
@@ -7360,7 +7360,7 @@ mod __parse__VarTys {
       'input,
     >(
         __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, OpaqueTokens, usize) {
+    ) -> (usize, CodeBlock, usize) {
         match __symbols.pop().unwrap() {
             (__l, __Symbol::NtCodeBlock(__v), __r) => (__l, __v, __r),
             _ => panic!("symbol type mismatch")
@@ -7450,7 +7450,7 @@ mod __parse__VarTys {
       'input,
     >(
         __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, OpaqueTokens, usize) {
+    ) -> (usize, CodeBlock, usize) {
         match __symbols.pop().unwrap() {
             (__l, __Symbol::NtInit(__v), __r) => (__l, __v, __r),
             _ => panic!("symbol type mismatch")
@@ -7806,7 +7806,7 @@ pub fn __action12<
 pub fn __action13<
     'input,
 >(
-    (_, __0, _): (usize, OpaqueTokens, usize),
+    (_, __0, _): (usize, CodeBlock, usize),
 ) -> Member
 {
     Member::Init(__0)
@@ -7840,8 +7840,8 @@ pub fn __action16<
     'input,
 >(
     (_, _, _): (usize, Tok<'input>, usize),
-    (_, __0, _): (usize, OpaqueTokens, usize),
-) -> OpaqueTokens
+    (_, __0, _): (usize, CodeBlock, usize),
+) -> CodeBlock
 {
     (__0)
 }
@@ -7863,7 +7863,7 @@ pub fn __action18<
     'input,
 >(
     (_, sig, _): (usize, FnSig, usize),
-    (_, code, _): (usize, OpaqueTokens, usize),
+    (_, code, _): (usize, CodeBlock, usize),
 ) -> FnDef
 {
     FnDef { sig, code }
@@ -7973,12 +7973,12 @@ pub fn __action28<
     'input,
 >(
     (_, __0, _): (usize, &'input str, usize),
-) -> OpaqueTokens
+) -> CodeBlock
 {
     {
         let mut tokens = Tokens::new();
         tokens.append(__0);
-        OpaqueTokens { tokens }
+        CodeBlock { tokens }
     }
 }
 

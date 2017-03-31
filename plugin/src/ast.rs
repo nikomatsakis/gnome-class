@@ -16,7 +16,7 @@ pub struct Class {
 #[derive(Debug)]
 pub enum Member {
     PrivateStruct(PrivateStruct),
-    Init(OpaqueTokens),
+    Init(CodeBlock),
     Method(Method),
 }
 
@@ -41,7 +41,7 @@ pub struct Method {
 #[derive(Debug)]
 pub struct FnDef {
     pub sig: FnSig,
-    pub code: OpaqueTokens,
+    pub code: CodeBlock,
 }
 
 #[derive(Debug)]
@@ -62,8 +62,9 @@ pub enum Type {
     Sum(Vec<Type>),
 }
 
+/// Some uninterpreted tokens that always begin/end with `{`/`}`.
 #[derive(Debug)]
-pub struct OpaqueTokens {
+pub struct CodeBlock {
     pub tokens: Tokens,
 }
 
