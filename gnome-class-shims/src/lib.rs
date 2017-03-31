@@ -1,22 +1,9 @@
 pub extern crate gobject_sys;
 pub extern crate glib_sys;
 
-use glib_sys::gpointer;
+use glib_sys::{gpointer, GType};
 use gobject_sys::{GObject, GObjectClass, GTypeClass, GTypeInstance};
 use std::ops::Deref;
-
-unsafe impl GInstance for GObject {
-    type Class = GObjectClass;
-}
-
-unsafe impl GClass for GObjectClass {
-    type Instance = GObject;
-}
-
-/// A reference to a `GObject`; the `T` is the subtype of `GObject`.
-pub struct G<T: GInstance> {
-    data: *const T
-}
 
 /// A trait that is implemented for all things that may be gobjects.
 /// This trait is unsafe because implementing it implies validating
@@ -34,6 +21,7 @@ pub struct G<T: GInstance> {
 /// in a gobject.
 pub unsafe trait GInstance {
     type Class: GClass;
+    fn get_type() -> GType;
 }
 
 /// Represents a type that is a gnome class.
@@ -44,6 +32,11 @@ pub unsafe trait GClass {
 /// Represents a class that is a subclass of some other gnome class.
 pub unsafe trait GSubclass: GClass {
     type ParentClass: GClass;
+}
+
+/// A reference to a `GObject`; the `T` is the subtype of `GObject`.
+pub struct G<T: GInstance> {
+    data: *const T
 }
 
 /// Convert `p`, which is a pointer to the contents of some `GObject`, into
@@ -141,5 +134,19 @@ impl<T: GInstance> Drop for G<T> {
             gobject_sys::g_object_unref(ptr);
         }
     }
+}
+
+unsafe impl GInstance for GObject {
+    type Class = GObjectClass;
+
+    fn get_type() -> GType {
+        unsafe {
+            gobject_sys::g_object_get_type()
+        }
+    }
+}
+
+unsafe impl GClass for GObjectClass {
+    type Instance = GObject;
 }
 

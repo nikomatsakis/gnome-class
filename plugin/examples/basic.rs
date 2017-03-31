@@ -1,9 +1,14 @@
 #![feature(proc_macro)]
 
-extern crate gobject_gen;
+// FIXME: remove the need for this
+#[macro_use] extern crate lazy_static;
+
+// FIXME: can we combine these two?
 extern crate gnome_class_shims;
+extern crate gobject_gen;
 use gobject_gen::gobject_gen;
 
+use gnome_class_shims::G;
 use std::cell::Cell;
 
 gobject_gen! {
@@ -30,4 +35,13 @@ gobject_gen! {
 }
 
 fn main() {
+    let c: G<Counter> = Counter::new();
+
+    println!("Counter has value: {}", c.get());
+
+    c.add(2);
+    c.add(20);
+    assert_eq!(c.get(), 22);
+
+    println!("Counter has value: {}", c.get());
 }

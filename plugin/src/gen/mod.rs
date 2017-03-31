@@ -93,7 +93,6 @@ impl<'ast> ClassContext<'ast> {
             self.methods_declared_in_instance(),
             self.always_impl(),
             self.method_redirects(),
-            self.gclass_impl(),
             self.c_symbols(),
         ];
 
@@ -141,9 +140,13 @@ impl<'ast> ClassContext<'ast> {
         let GClassName = self.GClassName;
         let ParentGClass = &self.ParentGClass;
 
+        let get_type_fn = self.get_type_fn();
+
         quote! {
             unsafe impl ::gnome_class_shims::GInstance for #InstanceName {
                 type Class = #GClassName;
+
+                #get_type_fn
             }
 
             unsafe impl ::gnome_class_shims::GClass for #GClassName {
@@ -194,7 +197,7 @@ impl<'ast> ClassContext<'ast> {
         self.method_names()
             .iter()
             .map(|method_name| {
-                quote! { klass.#method_name = <#InstanceName as #MethodsFrom>::#method_name; }
+                quote! { klass.#method_name = Some(<#InstanceName as #MethodsFrom>::#method_name); }
             })
             .collect()
     }
@@ -235,7 +238,7 @@ impl<'ast> ClassContext<'ast> {
                 let arg_decls = method.fn_def.sig.arg_decls();
                 let return_ty = method.fn_def.sig.return_ty();
                 quote! {
-                    fn #name(&self, #arg_decls) #return_ty;
+                    extern fn #name(&self, #arg_decls) #return_ty;
                 }
             })
             .collect()
@@ -249,7 +252,7 @@ impl<'ast> ClassContext<'ast> {
                 let return_ty = method.fn_def.sig.return_ty();
                 let code = &method.fn_def.code;
                 quote! {
-                    fn #name(&self, #arg_decls) #return_ty #code
+                    extern fn #name(&self, #arg_decls) #return_ty #code
                 }
             })
             .collect()
@@ -257,7 +260,6 @@ impl<'ast> ClassContext<'ast> {
 
     fn always_impl(&self) -> Tokens {
         let InstanceName = self.class.name;
-        let GClassName = self.GClassName;
         let PrivateName = self.private_struct.name;
         let ParentInstance = &self.ParentInstance;
 
@@ -265,6 +267,7 @@ impl<'ast> ClassContext<'ast> {
             impl #InstanceName {
                 pub fn new() -> ::gnome_class_shims::G<#InstanceName> {
                     use gnome_class_shims::G;
+                    use gnome_class_shims::GInstance;
                     use gnome_class_shims::gobject_sys::{self, GObject};
                     use std::ptr;
 
@@ -278,11 +281,12 @@ impl<'ast> ClassContext<'ast> {
                 }
 
                 fn private(&self) -> &#PrivateName {
+                    use gnome_class_shims::GInstance;
                     use gnome_class_shims::gobject_sys::{self, GTypeInstance};
 
                     unsafe {
                         let this = self as *const #InstanceName as *mut GTypeInstance;
-                        let private = gobject_sys::g_type_instance_get_private(this, #GClassName::class());
+                        let private = gobject_sys::g_type_instance_get_private(this, #InstanceName::get_type());
                         let private = private as *const #PrivateName;
                         &*private
                     }
@@ -326,7 +330,12 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn lower_case_class_name(&self) -> String {
-        format!("{}", self.class.name.str) // XXX fix
+        lalrpop_intern::read(|interner| {
+            let name_str = interner.data(self.class.name.str);
+            let mut name_chars = name_str.chars();
+            let first_char: char = name_chars.next().unwrap();
+            first_char.to_lowercase().chain(name_chars).collect()
+        })
     }
 
     fn c_symbols(&self) -> Tokens {
@@ -358,6 +367,7 @@ impl<'ast> ClassContext<'ast> {
             #[no_mangle]
             pub extern fn #get_type_name() -> ::gnome_class_shims::glib_sys::GType
             {
+                use gnome_class_shims::GInstance;
                 #InstanceName::get_type()
             }
 
@@ -365,7 +375,7 @@ impl<'ast> ClassContext<'ast> {
         }
     }
 
-    fn gclass_impl(&self) -> Tokens {
+    fn get_type_fn(&self) -> Tokens {
         let InstanceName = self.class.name;
         let GClassName = self.GClassName;
         let ParentInstance = &self.ParentInstance;
@@ -378,7 +388,7 @@ impl<'ast> ClassContext<'ast> {
                                     _klass: gpointer)
             {
                 unsafe {
-                    let private = gobject_sys::g_type_instance_get_private(this, #GClassName::get_type());
+                    let private = gobject_sys::g_type_instance_get_private(this, #InstanceName::get_type());
                     let private = private as *mut #PrivateName;
                     ptr::write(private, #PrivateName::new());
                 }
@@ -433,7 +443,7 @@ impl<'ast> ClassContext<'ast> {
                 unsafe {
                     gobject_sys::g_type_register_static_simple(
                         #ParentInstance::get_type(),
-                        #byte_string,
+                        #byte_string as *const u8 as *const i8,
                         mem::size_of::<#GClassName>() as u32,
                         Some(class_init),
                         mem::size_of::<#InstanceName>() as u32,
@@ -444,31 +454,29 @@ impl<'ast> ClassContext<'ast> {
         };
 
         quote! {
-            impl #InstanceName {
-                pub fn get_type() -> ::gnome_class_shims::glib_sys::GType {
-                    use gnome_class_shims as shims;
-                    use gnome_class_shims::gobject_sys::{self,
-                                                         GObject,
-                                                         GObjectClass,
-                                                         GTypeInstance,
-                                                         GTypeFlags};
-                    use gnome_class_shims::glib_sys::{GType, gpointer};
-                    use std::{mem, ptr};
+            fn get_type() -> ::gnome_class_shims::glib_sys::GType {
+                use gnome_class_shims as shims;
+                use gnome_class_shims::gobject_sys::{self,
+                                                     GObject,
+                                                     GObjectClass,
+                                                     GTypeInstance,
+                                                     GTypeFlags};
+                use gnome_class_shims::glib_sys::{GType, gpointer};
+                use std::{mem, ptr};
 
-                    // All these helper functions are intentionally
-                    // hidden inside of `get_type` so as not to
-                    // pollute the user's namespace.
-                    #instance_init
-                    #finalize
-                    #class_init
-                    #register
+                // All these helper functions are intentionally
+                // hidden inside of `get_type` so as not to
+                // pollute the user's namespace.
+                #instance_init
+                #finalize
+                #class_init
+                #register
 
-                    lazy_static! {
-                        static ref GTYPE: GType = register();
-                    }
-
-                    *GTYPE
+                lazy_static! {
+                    static ref GTYPE: GType = register();
                 }
+
+                *GTYPE
             }
         }
     }
@@ -518,9 +526,11 @@ impl ToTokens for ByteString {
             // Because we are converting a legal identifier, we don't
             // have to worry about it having escape characters in it
             // or anything else:
-            tokens.append("b\"");
-            tokens.append(interner.data(self.0.str));
-            tokens.append("\0\"");
+            let mut s = String::new();
+            s.push_str("b\"");
+            s.push_str(interner.data(self.0.str));
+            s.push_str("\\0\"");
+            tokens.append(&s);
         })
     }
 }
@@ -592,7 +602,7 @@ struct ArgNames<'ast> {
 
 impl<'ast> ToTokens for ArgNames<'ast> {
     fn to_tokens(&self, tokens: &mut Tokens) {
-        let args = self.sig.args.iter();
+        let args = self.sig.args.iter().map(|arg| arg.name);
         let q = quote! { #(#args),* };
         tokens.append_all(Some(q));
     }
