@@ -1,0 +1,135 @@
+use ast::*;
+use lalrpop_intern::intern;
+use parser;
+use quote::Tokens;
+use tok::Tok;
+
+#[LALR]
+grammar<'input>;
+
+pub Program: Program = {
+    Class* => Program { classes: <> }
+};
+
+Class: Class = {
+    "class" <name:Id> <extends:("extends" <Id>)?> <b:@L> <blk:"{..}"> =>? {
+        let members = parser::parse_members(blk, b)?;
+        Ok(Class { name, extends, members })
+    }
+};
+
+pub Members: Vec<Member> = {
+    Member*
+};
+
+// Allow non-Rust keywords as contextual keywords.
+Id: Identifier = {
+    IdStr => Identifier { str: intern(<>) }
+};
+
+IdStr: &'input str = {
+    "init" => "init",
+    "class" => "class",
+    "extends" => "extends",
+    OtherId => <>,
+};
+
+Member: Member = {
+    PrivateStruct => Member::PrivateStruct(<>),
+    Init => Member::Init(<>),
+    Method => Member::Method(<>),
+};
+
+PrivateStruct: PrivateStruct = {
+    "struct" <name:Id> <s:@L> <fields:"{..}"> =>? {
+        let fields = parser::parse_fields(fields, s)?;
+        Ok(PrivateStruct { name, fields })
+    }
+};
+
+Init: OpaqueTokens = {
+    "init" <CodeBlock>
+};
+
+Method: Method = {
+    "fn" <name:Id> <fn_def:FnDef> => {
+        Method { name, fn_def }
+    }
+};
+
+FnDef: FnDef = {
+    <sig:FnSig> <code:CodeBlock> => FnDef { sig, code },
+};
+
+FnSig: FnSig = {
+    "(" "this" ")" <return_ty:ReturnTy> => {
+        FnSig { args: vec![], return_ty }
+    },
+    "(" "this" "," <args:Comma<Field>> ")" <return_ty:ReturnTy> => {
+        FnSig { args, return_ty }
+    },
+};
+
+ReturnTy: Option<Type> = {
+    ("->" <Type>)?
+};
+
+pub Fields: Vec<Field> = {
+    Field*
+};
+
+Field: Field = {
+    <name:Id> ":" <ty:Type> => Field { name, ty },
+};
+
+Type: Type = {
+    Type1,
+    <h:Type1> <t:("+" <Type1>)+> => Type::Sum(Some(h).into_iter().chain(t).collect()),
+};
+
+Type1: Type = {
+    Id => Type::Name(<>),
+    <Id> "<" <Type*> ">" => Type::Args(<>),
+    "[" <Type> "]" => Type::Array(Box::new(<>)),
+};
+
+CodeBlock: OpaqueTokens = {
+    "{..}" => {
+        let mut tokens = Tokens::new();
+        tokens.append(<>);
+        OpaqueTokens { tokens }
+    }
+};
+
+Comma<T>: Vec<T> = {
+    <h:(<T> ",")*> <t:T?> => {
+        let mut h = h;
+        h.extend(t);
+        h
+    }
+};
+
+extern {
+    type Location = usize;
+    type Error = ::errors::Error;
+    enum Tok<'input> {
+        "class" => Tok::Class,
+        "struct" => Tok::Struct,
+        "fn" => Tok::Fn,
+        "init" => Tok::Init,
+        "this" => Tok::This,
+        "extends" => Tok::Extends,
+        "{..}" => Tok::Block(<&'input str>),
+        OtherId => Tok::Id(<&'input str>),
+        ":" => Tok::Colon,
+        "<" => Tok::LessThan,
+        ">" => Tok::GreaterThan,
+        "[" => Tok::LeftBracket,
+        "]" => Tok::RightBracket,
+        "(" => Tok::LeftParen,
+        ")" => Tok::RightParen,
+        "->" => Tok::ThinArrow,
+        "+" => Tok::Plus,
+        "," => Tok::Comma,
+    }
+}

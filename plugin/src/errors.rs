@@ -7,4 +7,15 @@ error_chain! {
     types {
         Error, ErrorKind, ResultExt, Result;
     }
+
+    foreign_links {
+        Io(::std::io::Error) #[cfg(unix)];
+    }
+
+    errors {
+        LexError(offset: usize, msg: &'static str) {
+            description("invalid token in the input")
+            display("invalid token at offset {}: {}", offset, msg)
+        }
+    }
 }
