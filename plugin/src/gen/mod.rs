@@ -78,6 +78,12 @@ impl<'ast> ClassContext<'ast> {
                 #(#private_struct_fields),*
             }
 
+            impl #PrivateName {
+                pub fn new() -> Self {
+                    #init_fn
+                }
+            }
+
             pub struct #GClassName {
                 parent_class: #ParentGClass,
                 #(#method_names: Option<#method_fn_tys>,)*
@@ -123,53 +129,69 @@ impl<'ast> ClassContext<'ast> {
                     ::g::to_object_ref(self).clone()
                 }
 
-                pub fn upcast(&self) -> &::gobject_sys::GObject {
+                pub fn upcast(&self) -> &#ParentInstance {
                     &self.parent
                 }
 
                 #(#method_redirects)*
-
-                extern fn init(this: *mut GTypeInstance,
-                               _klass: gpointer)
-                {
-                    fn new() -> #PrivateName {
-                        #init_fn
-                    }
-
-                    unsafe {
-                        extern crate gobject_sys;
-                        use std::ptr;
-
-                        let private = gobject_sys::g_type_instance_get_private(this, #GClassName::gtype());
-                        let private = private as *mut #PrivateName;
-                        ptr::write(private, new());
-                    }
-                }
             }
 
             #(#method_free_fns)*
 
             impl #GClassName {
-                extern "C" fn init(klass: gpointer,
-                                   _klass_data: gpointer) {
-                    use gobject_sys::{self, GObjectClass};
+                pub fn gtype() -> GType {
+                    use gobject_sys;
 
-                    extern "C" fn finalize(this: *mut ::gobject_sys::GObject) {
-                        // TODO
+                    extern fn instance_init(this: *mut GTypeInstance,
+                                            _klass: gpointer)
+                    {
+                        unsafe {
+                            extern crate gobject_sys;
+                            use std::ptr;
+
+                            let private = gobject_sys::g_type_instance_get_private(this, #GClassName::gtype());
+                            let private = private as *mut #PrivateName;
+                            ptr::write(private, #PrivateName::new());
+                        }
                     }
 
-                    unsafe {
-                        let g_object_class = klass as *mut GObjectClass;
-                        (*g_object_class).finalize = Some(finalize);
+                    extern fn class_init(klass: gpointer,
+                                         _klass_data: gpointer)
+                    {
+                        extern "C" fn finalize(this: *mut gobject_sys::GObject) {
+                            // TODO finalize fields
+                        }
 
-                        gobject_sys::g_type_class_add_private(
-                            klass,
-                            mem::size_of::<#PrivateName>());
+                        unsafe {
+                            let g_object_class = klass as *mut GObjectClass;
+                            (*g_object_class).finalize = Some(finalize);
 
-                        let klass = klass as *mut #GClassName;
-                        let klass: &mut #GClassName = &mut *klass;
-                        #(klass.#method_names = self::#method_names1;)*
+                            gobject_sys::g_type_class_add_private(
+                                klass,
+                                mem::size_of::<#PrivateName>());
+
+                            let klass = klass as *mut #GClassName;
+                            let klass: &mut #GClassName = &mut *klass;
+                            #(klass.#method_names = self::#method_names1;)*
+                        }
                     }
+
+                    lazy_static! {
+                        static ref GTYPE: GType = {
+                            unsafe {
+                                gobject_sys::g_type_register_static_simple(
+                                    #ParentGClass::gtype(),
+                                    XXX, //b"Counter\0" as *const u8 as *const i8,
+                                    mem::size_of::<#GClassName>() as u32,
+                                    Some(class_init),
+                                    mem::size_of::<#InstanceName>() as u32,
+                                    Some(instance_init),
+                                    GTypeFlags::empty())
+                            }
+                        };
+                    }
+
+                    *GTYPE
                 }
             }
         })
