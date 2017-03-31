@@ -14,18 +14,18 @@ use std::cell::Cell;
 gobject_gen! {
     class Counter {
         struct CounterPrivate {
-            f: Cell<u32>
+            f: u32
         }
 
         fn add(&self, x: u32) -> u32 {
-            let private = self.private();
-            let v = private.f.get() + x;
-            private.f.set(v);
+            let mut private = self.private_mut();
+            let v = private.f + x;
+            private.f = v;
             v
         }
 
         fn get(&self) -> u32 {
-            self.private().f.get()
+            self.private().f
         }
     }
 }

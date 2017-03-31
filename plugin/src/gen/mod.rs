@@ -133,7 +133,7 @@ impl<'ast> ClassContext<'ast> {
                 parent: #ParentInstance,
 
                 // The GObject runtime will store some private data in here.
-                _phantom: ::std::marker::PhantomData<#PrivateName>,
+                _phantom: ::std::marker::PhantomData<::std::cell::RefCell<#PrivateName>>,
 
                 // This type, while zero-sized, is not constructible.
                 // This assures that no Rust code can ever create an
@@ -351,15 +351,30 @@ impl<'ast> ClassContext<'ast> {
                 }
 
                 #[allow(dead_code)]
-                fn private(&self) -> &#PrivateName {
+                fn private(&self) -> ::std::cell::Ref<#PrivateName> {
                     use gnome_class_shims::GInstance;
                     use gnome_class_shims::gobject_sys::{self, GTypeInstance};
+                    use std::cell::RefCell;
 
                     unsafe {
                         let this = self as *const #InstanceName as *mut GTypeInstance;
                         let private = gobject_sys::g_type_instance_get_private(this, #InstanceName::get_type());
-                        let private = private as *const #PrivateName;
-                        &*private
+                        let private = private as *const RefCell<#PrivateName>;
+                        (*private).borrow()
+                    }
+                }
+
+                #[allow(dead_code)]
+                fn private_mut(&self) -> ::std::cell::RefMut<#PrivateName> {
+                    use gnome_class_shims::GInstance;
+                    use gnome_class_shims::gobject_sys::{self, GTypeInstance};
+                    use std::cell::RefCell;
+
+                    unsafe {
+                        let this = self as *const #InstanceName as *mut GTypeInstance;
+                        let private = gobject_sys::g_type_instance_get_private(this, #InstanceName::get_type());
+                        let private = private as *const RefCell<#PrivateName>;
+                        (*private).borrow_mut()
                     }
                 }
 
@@ -458,10 +473,11 @@ impl<'ast> ClassContext<'ast> {
             extern fn instance_init(this: *mut GTypeInstance,
                                     _klass: gpointer)
             {
+                use std::cell::RefCell;
                 unsafe {
                     let private = gobject_sys::g_type_instance_get_private(this, #InstanceName::get_type());
-                    let private = private as *mut #PrivateName;
-                    ptr::write(private, #PrivateName::new());
+                    let private = private as *mut RefCell<#PrivateName>;
+                    ptr::write(private, RefCell::new(#PrivateName::new()));
                 }
             }
         };
@@ -471,9 +487,15 @@ impl<'ast> ClassContext<'ast> {
         // class struct).
         let finalize = quote! {
             extern fn finalize(this: *mut GObject) {
+                use std::cell::RefCell;
+
                 let this = this as *mut #InstanceName;
                 unsafe {
-                    ptr::read((*this).private());
+                    let private = gobject_sys::g_type_instance_get_private(
+                        this as *const #InstanceName as *mut GTypeInstance,
+                        #InstanceName::get_type());
+                    let private = private as *const RefCell<#PrivateName>;
+                    ptr::read(private);
 
                     let object_class = shims::get_class(&*this);
                     let parent_class = shims::get_parent_class(object_class);
@@ -491,13 +513,14 @@ impl<'ast> ClassContext<'ast> {
             extern fn class_init(klass: gpointer,
                                  _klass_data: gpointer)
             {
+                use std::cell::RefCell;
                 unsafe {
                     let g_object_class = klass as *mut GObjectClass;
                     (*g_object_class).finalize = Some(finalize);
 
                     gobject_sys::g_type_class_add_private(
                         klass,
-                        mem::size_of::<#PrivateName>());
+                        mem::size_of::<RefCell<#PrivateName>>());
 
                     let klass = klass as *mut #GClassName;
                     let klass: &mut #GClassName = &mut *klass;

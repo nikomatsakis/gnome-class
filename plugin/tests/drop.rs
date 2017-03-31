@@ -36,18 +36,18 @@ impl Drop for DropCounter {
 gobject_gen! {
     class Dummy {
         struct DummyPrivate {
-            dc: RefCell<DropCounter>
+            dc: DropCounter
         }
 
         init {
             DummyPrivate {
-                dc: RefCell::new(DropCounter::new())
+                dc: DropCounter::new()
             }
         }
 
         fn set_dc(&self, dc: DropCounter) {
-            let mut self_dc = self.private().dc.borrow_mut();
-            *self_dc = dc;
+            let mut private = self.private_mut();
+            private.dc = dc;
         }
     }
 }
