@@ -25,3 +25,8 @@ lalrpop-intern = "0.12.5"
 error-chain = "0.10.0"
 quote = "0.3.15"
 unicode-xid = "0.0.4"
+
+[dev-dependencies]
+glib-sys = "0.3.1"
+lazy_static = "0.2.2"
+gobject-sys = "0.3.3"

@@ -1,5 +1,5 @@
 use ast::*;
-use lalrpop_intern::{intern, InternedString};
+use lalrpop_intern::intern;
 use parser;
 use quote::Tokens;
 use tok::Tok;
@@ -23,16 +23,21 @@ pub Members: Vec<Member> = {
 };
 
 // Allow non-Rust keywords as contextual keywords.
-Id: InternedString = {
-    "init" => intern("init"),
-    "class" => intern("class"),
-    "extends" => intern("extends"),
-    OtherId => intern(<>),
+Id: Identifier = {
+    IdStr => Identifier { str: intern(<>) }
+};
+
+IdStr: &'input str = {
+    "init" => "init",
+    "class" => "class",
+    "extends" => "extends",
+    OtherId => <>,
 };
 
 Member: Member = {
     PrivateStruct => Member::PrivateStruct(<>),
     Init => Member::Init(<>),
+    Method => Member::Method(<>),
 };
 
 PrivateStruct: PrivateStruct = {
@@ -42,8 +47,14 @@ PrivateStruct: PrivateStruct = {
     }
 };
 
-Init: FnDef = {
-    "init" <FnDef>
+Init: OpaqueTokens = {
+    "init" <CodeBlock>
+};
+
+Method: Method = {
+    "fn" <name:Id> <fn_def:FnDef> => {
+        Method { name, fn_def }
+    }
 };
 
 FnDef: FnDef = {
@@ -51,9 +62,12 @@ FnDef: FnDef = {
 };
 
 FnSig: FnSig = {
-    "(" <args:Comma<Field>> ")" <return_ty:ReturnTy> => {
+    "(" "this" ")" <return_ty:ReturnTy> => {
+        FnSig { args: vec![], return_ty }
+    },
+    "(" "this" "," <args:Comma<Field>> ")" <return_ty:ReturnTy> => {
         FnSig { args, return_ty }
-    }
+    },
 };
 
 ReturnTy: Option<Type> = {
@@ -103,6 +117,7 @@ extern {
         "struct" => Tok::Struct,
         "fn" => Tok::Fn,
         "init" => Tok::Init,
+        "this" => Tok::This,
         "extends" => Tok::Extends,
         "{..}" => Tok::Block(<&'input str>),
         OtherId => Tok::Id(<&'input str>),

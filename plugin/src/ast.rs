@@ -8,20 +8,21 @@ pub struct Program {
 
 #[derive(Debug)]
 pub struct Class {
-    pub name: InternedString,
-    pub extends: Option<InternedString>,
+    pub name: Identifier,
+    pub extends: Option<Identifier>,
     pub members: Vec<Member>
 }
 
 #[derive(Debug)]
 pub enum Member {
     PrivateStruct(PrivateStruct),
-    Init(FnDef),
+    Init(OpaqueTokens),
+    Method(Method),
 }
 
 #[derive(Debug)]
 pub struct PrivateStruct {
-    pub name: InternedString,
+    pub name: Identifier,
     pub fields: Vec<Field>
 }
 
@@ -32,6 +33,12 @@ pub struct FnSig {
 }
 
 #[derive(Debug)]
+pub struct Method {
+    pub name: Identifier,
+    pub fn_def: FnDef,
+}
+
+#[derive(Debug)]
 pub struct FnDef {
     pub sig: FnSig,
     pub code: OpaqueTokens,
@@ -39,17 +46,17 @@ pub struct FnDef {
 
 #[derive(Debug)]
 pub struct Field {
-    pub name: InternedString,
+    pub name: Identifier,
     pub ty: Type,
 }
 
 #[derive(Debug)]
 pub enum Type {
     // N
-    Name(InternedString),
+    Name(Identifier),
 
     // N<>
-    Args(InternedString, Vec<Type>),
+    Args(Identifier, Vec<Type>),
 
     // [N]
     Array(Box<Type>),
@@ -61,4 +68,9 @@ pub enum Type {
 #[derive(Debug)]
 pub struct OpaqueTokens {
     pub tokens: Tokens,
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub struct Identifier {
+    pub str: InternedString
 }

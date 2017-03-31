@@ -8,6 +8,10 @@ error_chain! {
         Error, ErrorKind, ResultExt, Result;
     }
 
+    foreign_links {
+        Io(::std::io::Error) #[cfg(unix)];
+    }
+
     errors {
         LexError(offset: usize, msg: &'static str) {
             description("invalid token in the input")

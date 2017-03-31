@@ -33,6 +33,7 @@ pub enum Tok<'input> {
     Struct, // `struct`
     Fn, // `fn`
     Init, // `init`
+    This, // `this`
     Extends, // `extends`
     Id(&'input str), // identifier
     ThinArrow, // `->`
@@ -74,6 +75,7 @@ const KEYWORDS: &'static [(&'static str, Tok<'static>)] = &[
     ("fn", Fn),
     ("init", Init),
     ("extends", Extends),
+    ("this", This),
     ("_", Underscore),
     ];
 
