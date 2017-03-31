@@ -57,9 +57,11 @@ impl<'ast> ClassContext<'ast> {
 
         let private_struct_fields = &self.private_struct.fields;
         let init_fn = self.init_fn();
-        let method_names = self.method_names();
-        let method_fn_tys = self.method_fn_tys();
-        let method_redirects = self.method_redirects();
+        let method_names = &self.method_names();
+        let method_names1 = method_names;
+        let method_fn_tys = &self.method_fn_tys();
+        let method_redirects = &self.method_redirects();
+        let method_free_fns = &self.method_free_fns();
 
         // GObject is hardcoded in various places below
         assert!(self.class.extends.is_none());
@@ -145,6 +147,32 @@ impl<'ast> ClassContext<'ast> {
                     }
                 }
             }
+
+            #(#method_free_fns)*
+
+            impl #GClassName {
+                extern "C" fn init(klass: gpointer,
+                                   _klass_data: gpointer) {
+                    use gobject_sys::{self, GObjectClass};
+
+                    extern "C" fn finalize(this: *mut ::gobject_sys::GObject) {
+                        // TODO
+                    }
+
+                    unsafe {
+                        let g_object_class = klass as *mut GObjectClass;
+                        (*g_object_class).finalize = Some(finalize);
+
+                        gobject_sys::g_type_class_add_private(
+                            klass,
+                            mem::size_of::<#PrivateName>());
+
+                        let klass = klass as *mut #GClassName;
+                        let klass: &mut #GClassName = &mut *klass;
+                        #(klass.#method_names = self::#method_names1;)*
+                    }
+                }
+            }
         })
     }
 
@@ -205,6 +233,25 @@ impl<'ast> ClassContext<'ast> {
                         (::g::get_class(self).#name.unwrap())(
                             self, #(#args),*
                         )
+                    }
+                }
+            })
+            .collect()
+    }
+
+    pub fn method_free_fns(&self) -> Vec<Tokens> {
+        let InstanceName = self.class.name;
+        self.methods()
+            .map(|method| {
+                let name = method.name;
+                let args = &method.fn_def.sig.args;
+                let return_ty = ReturnTy {
+                    ty: method.fn_def.sig.return_ty.as_ref()
+                };
+                let code = &method.fn_def.code;
+                quote! {
+                    pub fn #name(this: &#InstanceName, #(#args),*) #return_ty {
+                        #code
                     }
                 }
             })
