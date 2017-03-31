@@ -30,7 +30,8 @@ gobject_gen! {
     }
 }
 
-fn main() {
+#[test]
+fn test() {
     let c: G<Counter> = Counter::new();
 
     println!("Counter has value: {}", c.get());

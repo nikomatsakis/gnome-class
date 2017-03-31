@@ -53,7 +53,8 @@ gobject_gen! {
     }
 }
 
-fn main() {
+#[test]
+fn check() {
     let dc = DropCounter::new();
 
     {
