@@ -124,7 +124,16 @@ impl<'ast> ClassContext<'ast> {
             #[repr(C)]
             pub struct #InstanceName {
                 parent: #ParentInstance,
-                // FIXME: We need to add some way here to ensure that
+
+                // The GObject runtime will store some private data in here.
+                _phantom: ::std::marker::PhantomData<#PrivateName>,
+
+                // This type, while zero-sized, is not constructible.
+                // This assures that no Rust code can ever create an
+                // instance of `#InstanceName` -- the only instances
+                // are created by the GObject runtime. This is
+                // important for the `GInstance` impl.
+                _no_construct: ::gnome_class_shims::NoConstruct,
             }
 
             struct #PrivateName {

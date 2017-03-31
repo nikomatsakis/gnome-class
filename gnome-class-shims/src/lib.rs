@@ -150,3 +150,9 @@ unsafe impl GClass for GObjectClass {
     type Instance = GObject;
 }
 
+/// An intentionally unconstructable zero-sized type.  This is used by
+/// the GObject integration code to declare types that can never be
+/// manually constructed by an end-user.
+pub struct NoConstruct {
+    _dummy: ()
+}
