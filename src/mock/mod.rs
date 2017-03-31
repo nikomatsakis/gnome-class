@@ -54,27 +54,6 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 
 //
 
-#[derive(Clone)]
-pub struct DropCounter {
-    counter: Arc<AtomicUsize>
-}
-
-impl DropCounter {
-    pub fn new() -> Self {
-        DropCounter { counter: Arc::new(AtomicUsize::new(0)) }
-    }
-
-    pub fn get(&self) -> usize {
-        self.counter.load(Ordering::SeqCst)
-    }
-}
-
-impl Drop for DropCounter {
-    fn drop(&mut self) {
-        self.counter.fetch_add(1, Ordering::SeqCst);
-    }
-}
-
 ///////////////////////////////////////////////////////////////////////////
 // Counter
 

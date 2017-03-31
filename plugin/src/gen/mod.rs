@@ -171,7 +171,17 @@ impl<'ast> ClassContext<'ast> {
             quote! { #i }
         } else {
             let PrivateName = self.private_struct.name;
-            quote! { #PrivateName::default() }
+            let private_struct_field_names =
+                self.private_struct.fields
+                                   .iter()
+                                   .map(|f| f.name);
+            quote! {
+                {
+                    #PrivateName {
+                        #(#private_struct_field_names: Default::default()),*
+                    }
+                }
+            }
         }
     }
 

@@ -17,10 +17,6 @@ gobject_gen! {
             f: Cell<u32>
         }
 
-        init {
-            CounterPrivate { f: Cell::new(0) }
-        }
-
         fn add(&self, x: u32) -> u32 {
             let private = self.private();
             let v = private.f.get() + x;
