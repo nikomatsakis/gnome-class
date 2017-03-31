@@ -307,6 +307,7 @@ impl<'ast> ClassContext<'ast> {
                     }
                 }
 
+                #[allow(dead_code)]
                 fn private(&self) -> &#PrivateName {
                     use gnome_class_shims::GInstance;
                     use gnome_class_shims::gobject_sys::{self, GTypeInstance};
@@ -319,10 +320,12 @@ impl<'ast> ClassContext<'ast> {
                     }
                 }
 
+                #[allow(dead_code)]
                 pub fn to_ref(&self) -> ::gnome_class_shims::G<#InstanceName> {
                     ::gnome_class_shims::to_object_ref(self).clone()
                 }
 
+                #[allow(dead_code)]
                 pub fn upcast(&self) -> &#ParentInstance {
                     &self.parent
                 }
