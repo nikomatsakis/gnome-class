@@ -9,7 +9,6 @@ extern crate gobject_gen;
 use gobject_gen::gobject_gen;
 
 use gnome_class_shims::G;
-use std::cell::RefCell;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
