@@ -16,15 +16,15 @@ gobject_gen! {
             CounterPrivate { f: Cell::new(0) }
         }
 
-        fn add(this, x: u32) -> u32 {
-            let private = this.private();
-            let v = private.f.get() + v;
+        fn add(&self, x: u32) -> u32 {
+            let private = self.private();
+            let v = private.f.get() + x;
             private.f.set(v);
             v
         }
 
-        fn get(this) -> u32 {
-            this.private().f.get()
+        fn get(&self) -> u32 {
+            self.private().f.get()
         }
     }
 }

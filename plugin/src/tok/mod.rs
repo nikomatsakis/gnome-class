@@ -33,7 +33,7 @@ pub enum Tok<'input> {
     Struct, // `struct`
     Fn, // `fn`
     Init, // `init`
-    This, // `this`
+    SelfKw, // `self`
     Extends, // `extends`
     Id(&'input str), // identifier
     ThinArrow, // `->`
@@ -52,6 +52,7 @@ pub enum Tok<'input> {
     Semi, // `;`
     Plus, // `+`
     Block(&'input str), // {...}, balanced
+    Ampersand, // `&`
 }
 
 pub struct Tokenizer<'input> {
@@ -75,7 +76,7 @@ const KEYWORDS: &'static [(&'static str, Tok<'static>)] = &[
     ("fn", Fn),
     ("init", Init),
     ("extends", Extends),
-    ("this", This),
+    ("self", SelfKw),
     ("_", Underscore),
     ];
 
@@ -170,6 +171,10 @@ impl<'input> Tokenizer<'input> {
                 Some((idx0, ';')) => {
                     self.bump();
                     Some(Ok((idx0, Semi, idx0+1)))
+                }
+                Some((idx0, '&')) => {
+                    self.bump();
+                    Some(Ok((idx0, Ampersand, idx0+1)))
                 }
                 Some((idx0, '+')) => {
                     self.bump();
