@@ -59,6 +59,7 @@ impl<'ast> ClassContext<'ast> {
         let init_fn = self.init_fn();
         let method_names = self.method_names();
         let method_fn_tys = self.method_fn_tys();
+        let method_redirects = self.method_redirects();
 
         // GObject is hardcoded in various places below
         assert!(self.class.extends.is_none());
@@ -81,7 +82,52 @@ impl<'ast> ClassContext<'ast> {
                 #(#method_names: Option<#method_fn_tys>,)*
             }
 
+            unsafe impl GInstance for #InstanceName {
+                type Class = #GClassName;
+            }
+
+            unsafe impl GClass for #GClassName {
+                type Instance = #InstanceName;
+            }
+
+            unsafe impl GSubclass for #GClassName {
+                type ParentClass = #ParentGClass;
+            }
+
             impl #InstanceName {
+                pub fn new() -> G<#InstanceName> {
+                    use gobject_sys::GObject;
+                    use std::ptr;
+
+                    unsafe {
+                        let data: *mut GObject =
+                            gobject_sys::g_object_new(#GClassName::class(),
+                                                      ptr::null_mut());
+                        G::new(data as *mut #InstanceName)
+                    }
+                }
+
+                fn private(&self) -> &#PrivateName {
+                    use gobject_sys::{self, GTypeInstance};
+
+                    unsafe {
+                        let this = self as *const #InstanceName as *mut GTypeInstance;
+                        let private = gobject_sys::g_type_instance_get_private(this, #GClassName::class());
+                        let private = private as *const #PrivateName;
+                        &*private
+                    }
+                }
+
+                pub fn to_ref(&self) -> G<#InstanceName> {
+                    ::g::to_object_ref(self).clone()
+                }
+
+                pub fn upcast(&self) -> &::gobject_sys::GObject {
+                    &self.parent
+                }
+
+                #(#method_redirects)*
+
                 extern fn init(this: *mut GTypeInstance,
                                _klass: gpointer)
                 {
@@ -142,6 +188,25 @@ impl<'ast> ClassContext<'ast> {
                     sig: &method.fn_def.sig
                 };
                 quote! { #method_fn_ty }
+            })
+            .collect()
+    }
+
+    pub fn method_redirects(&self) -> Vec<Tokens> {
+        self.methods()
+            .map(|method| {
+                let name = method.name;
+                let args = &method.fn_def.sig.args;
+                let return_ty = ReturnTy {
+                    ty: method.fn_def.sig.return_ty.as_ref()
+                };
+                quote! {
+                    pub fn #name(&self, #(#args),*) #return_ty {
+                        (::g::get_class(self).#name.unwrap())(
+                            self, #(#args),*
+                        )
+                    }
+                }
             })
             .collect()
     }
@@ -207,10 +272,22 @@ impl<'ast> ToTokens for MethodTy<'ast> {
             tokens.append(", ");
         }
         tokens.append(")");
-        if let Some(ref return_ty) = self.sig.return_ty {
+
+        ReturnTy {
+            ty: self.sig.return_ty.as_ref()
+        }.to_tokens(tokens);
+    }
+}
+
+struct ReturnTy<'ast> {
+    ty: Option<&'ast Type>,
+}
+
+impl<'ast> ToTokens for ReturnTy<'ast> {
+    fn to_tokens(&self, tokens: &mut Tokens) {
+        if let Some(return_ty) = self.ty {
             tokens.append("->");
             return_ty.to_tokens(tokens);
         }
     }
 }
-
