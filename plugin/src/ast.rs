@@ -23,12 +23,12 @@ pub enum Member {
 #[derive(Debug)]
 pub struct PrivateStruct {
     pub name: Identifier,
-    pub fields: Vec<Field>
+    pub fields: Vec<VarTy>
 }
 
 #[derive(Debug)]
 pub struct FnSig {
-    pub args: Vec<Field>,
+    pub args: Vec<VarTy>,
     pub return_ty: Option<Type>,
 }
 
@@ -45,7 +45,7 @@ pub struct FnDef {
 }
 
 #[derive(Debug)]
-pub struct Field {
+pub struct VarTy {
     pub name: Identifier,
     pub ty: Type,
 }

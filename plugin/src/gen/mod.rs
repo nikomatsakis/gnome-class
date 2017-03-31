@@ -500,9 +500,9 @@ impl<'ast> ClassContext<'ast> {
     }
 }
 
-impl ToTokens for Field {
+impl ToTokens for VarTy {
     fn to_tokens(&self, tokens: &mut Tokens) {
-        let &Field { name, ref ty } = self;
+        let &VarTy { name, ref ty } = self;
         quote_in!(tokens, #name: #ty)
     }
 }

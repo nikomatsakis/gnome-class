@@ -27,13 +27,13 @@ fn parse_members(input: &str,
     grammar::parse_Members(tokenizer)
 }
 
-fn parse_fields(input: &str,
-                offset: usize)
-                 -> ParseResult<Vec<ast::Field>> {
+fn parse_var_tys(input: &str,
+                 offset: usize)
+                 -> ParseResult<Vec<ast::VarTy>> {
     assert_eq!(input.chars().next(), Some('{'));
     assert!(input.len() >= 2); // at least `{}`
     let len = input.len();
     let contents = &input[1..len - 1];
     let tokenizer = tok::Tokenizer::new(contents, offset + 1);
-    grammar::parse_Fields(tokenizer)
+    grammar::parse_VarTys(tokenizer)
 }

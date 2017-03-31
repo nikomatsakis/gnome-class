@@ -5,2509 +5,6 @@ use quote::Tokens;
 use tok::Tok;
 extern crate lalrpop_util as __lalrpop_util;
 
-mod __parse__Fields {
-    #![allow(non_snake_case, non_camel_case_types, unused_mut, unused_variables, unused_imports)]
-
-    use ast::*;
-    use lalrpop_intern::intern;
-    use parser;
-    use quote::Tokens;
-    use tok::Tok;
-    extern crate lalrpop_util as __lalrpop_util;
-    use super::__ToTriple;
-    #[allow(dead_code)]
-    pub enum __Symbol<'input> {
-        Term_22_26_22(Tok<'input>),
-        Term_22_28_22(Tok<'input>),
-        Term_22_29_22(Tok<'input>),
-        Term_22_2b_22(Tok<'input>),
-        Term_22_2c_22(Tok<'input>),
-        Term_22_2d_3e_22(Tok<'input>),
-        Term_22_3a_22(Tok<'input>),
-        Term_22_3a_3a_22(Tok<'input>),
-        Term_22_3c_22(Tok<'input>),
-        Term_22_3e_22(Tok<'input>),
-        Term_22_5b_22(Tok<'input>),
-        Term_22_5d_22(Tok<'input>),
-        Term_22class_22(Tok<'input>),
-        Term_22extends_22(Tok<'input>),
-        Term_22fn_22(Tok<'input>),
-        Term_22init_22(Tok<'input>),
-        Term_22self_22(Tok<'input>),
-        Term_22struct_22(Tok<'input>),
-        Term_22super_22(Tok<'input>),
-        Term_22_7b_2e_2e_7d_22(&'input str),
-        TermOtherId(&'input str),
-        Termerror(__lalrpop_util::ErrorRecovery<usize, Tok<'input>, ::errors::Error>),
-        Nt_28_22_2b_22_20_3cType1_3e_29(Type),
-        Nt_28_22_2b_22_20_3cType1_3e_29_2b(::std::vec::Vec<Type>),
-        Nt_28_22_2d_3e_22_20_3cType_3e_29(Type),
-        Nt_28_22_2d_3e_22_20_3cType_3e_29_3f(::std::option::Option<Type>),
-        Nt_28_22_3a_3a_22_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29(Vec<Type>),
-        Nt_28_22_3a_3a_22_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29_3f(::std::option::Option<Vec<Type>>),
-        Nt_28_22extends_22_20_3cTypePath_3e_29(Path),
-        Nt_28_22extends_22_20_3cTypePath_3e_29_3f(::std::option::Option<Path>),
-        Nt_28_28_29_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29(Vec<Type>),
-        Nt_28_28_29_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29_3f(::std::option::Option<Vec<Type>>),
-        Nt_28_29(()),
-        Nt_28_3cField_3e_20_22_2c_22_29(Field),
-        Nt_28_3cField_3e_20_22_2c_22_29_2a(::std::vec::Vec<Field>),
-        Nt_28_3cField_3e_20_22_2c_22_29_2b(::std::vec::Vec<Field>),
-        Nt_28_3cType_3e_20_22_2c_22_29(Type),
-        Nt_28_3cType_3e_20_22_2c_22_29_2a(::std::vec::Vec<Type>),
-        Nt_28_3cType_3e_20_22_2c_22_29_2b(::std::vec::Vec<Type>),
-        Nt_40L(usize),
-        NtAnyPath_3c_22_3a_3a_22_3e(Path),
-        NtAnyPath_3c_28_29_3e(Path),
-        NtBasePath_3c_22_3a_3a_22_3e(Path),
-        NtBasePath_3c_28_29_3e(Path),
-        NtClass(Class),
-        NtClass_2a(::std::vec::Vec<Class>),
-        NtClass_2b(::std::vec::Vec<Class>),
-        NtCodeBlock(OpaqueTokens),
-        NtComma_3cField_3e(Vec<Field>),
-        NtComma_3cType_3e(Vec<Type>),
-        NtExprPath(Path),
-        NtExtends(Option<Path>),
-        NtField(Field),
-        NtField_2a(::std::vec::Vec<Field>),
-        NtField_2b(::std::vec::Vec<Field>),
-        NtField_3f(::std::option::Option<Field>),
-        NtFields(Vec<Field>),
-        NtFnDef(FnDef),
-        NtFnSig(FnSig),
-        NtId(Identifier),
-        NtIdStr(&'input str),
-        NtInit(OpaqueTokens),
-        NtMember(Member),
-        NtMember_2a(::std::vec::Vec<Member>),
-        NtMember_2b(::std::vec::Vec<Member>),
-        NtMembers(Vec<Member>),
-        NtMethod(Method),
-        NtPathId_3c_22_3a_3a_22_3e(PathId),
-        NtPathId_3c_28_29_3e(PathId),
-        NtPrivateStruct(PrivateStruct),
-        NtProgram(Program),
-        NtReturnTy(Option<Type>),
-        NtType(Type),
-        NtType1(Type),
-        NtType_3f(::std::option::Option<Type>),
-        NtTypePath(Path),
-        Nt____Fields(Vec<Field>),
-        Nt____Members(Vec<Member>),
-        Nt____Program(Program),
-    }
-    const __ACTION: &'static [i32] = &[
-        // State 0
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 8, 0, 9, 0, 0, 0, 0, 10, 0,
-        // State 1
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -60, -60, 0, -60, 0, 0, 0, 0, -60, 0,
-        // State 2
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 8, 0, 9, 0, 0, 0, 0, 10, 0,
-        // State 3
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 4
-        0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 5
-        0, 0, 0, -69, -69, 0, -69, -69, -69, -69, 0, -69, -69, -69, 0, -69, 0, 0, 0, 0, -69, 0,
-        // State 6
-        0, 0, 0, -71, -71, 0, -71, -71, -71, -71, 0, -71, -71, -71, 0, -71, 0, 0, 0, 0, -71, 0,
-        // State 7
-        0, 0, 0, -72, -72, 0, -72, -72, -72, -72, 0, -72, -72, -72, 0, -72, 0, 0, 0, 0, -72, 0,
-        // State 8
-        0, 0, 0, -70, -70, 0, -70, -70, -70, -70, 0, -70, -70, -70, 0, -70, 0, 0, 0, 0, -70, 0,
-        // State 9
-        0, 0, 0, -73, -73, 0, -73, -73, -73, -73, 0, -73, -73, -73, 0, -73, 0, 0, 0, 0, -73, 0,
-        // State 10
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -61, -61, 0, -61, 0, 0, 0, 0, -61, 0,
-        // State 11
-        0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 21, 0, 7, 8, 0, 9, 22, 0, 23, 0, 10, 0,
-        // State 12
-        0, 0, 0, -100, -100, 0, 0, 24, 0, -100, 0, -100, -100, -100, 0, -100, 0, 0, 0, 0, -100, 0,
-        // State 13
-        0, 0, 0, -30, -30, 0, 0, -30, 0, -30, 0, -30, -30, -30, 0, -30, 0, 0, 0, 0, -30, 0,
-        // State 14
-        0, 0, 0, -88, -88, 0, 0, -88, 25, -88, 0, -88, -88, -88, 0, -88, 0, 0, 0, 0, -88, 0,
-        // State 15
-        0, 0, 0, -39, -39, 0, 0, -39, 0, -39, 0, -39, -39, -39, 0, -39, 0, 0, 0, 0, -39, 0,
-        // State 16
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -57, -57, 0, -57, 0, 0, 0, 0, -57, 0,
-        // State 17
-        0, 0, 0, 27, -94, 0, 0, 0, 0, -94, 0, -94, -94, -94, 0, -94, 0, 0, 0, 0, -94, 0,
-        // State 18
-        0, 0, 0, -96, -96, 0, 0, 0, 0, -96, 0, -96, -96, -96, 0, -96, 0, 0, 0, 0, -96, 0,
-        // State 19
-        0, 0, 0, -36, -36, 0, 0, -36, 0, -36, 0, -36, -36, -36, 0, -36, 0, 0, 0, 0, -36, 0,
-        // State 20
-        0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 21, 0, 7, 8, 0, 9, 22, 0, 23, 0, 10, 0,
-        // State 21
-        0, 0, 0, -37, -37, 0, 0, -37, 0, -37, 0, -37, -37, -37, 0, -37, 0, 0, 0, 0, -37, 0,
-        // State 22
-        0, 0, 0, -38, -38, 0, 0, -38, 0, -38, 0, -38, -38, -38, 0, -38, 0, 0, 0, 0, -38, 0,
-        // State 23
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 8, 0, 9, 0, 0, 0, 0, 10, 0,
-        // State 24
-        0, 0, 0, 0, 0, 0, 0, 20, 0, -51, 21, 0, 7, 8, 0, 9, 22, 0, 23, 0, 10, 0,
-        // State 25
-        0, 0, 0, 33, -95, 0, 0, 0, 0, -95, 0, -95, -95, -95, 0, -95, 0, 0, 0, 0, -95, 0,
-        // State 26
-        0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 21, 0, 7, 8, 0, 9, 22, 0, 23, 0, 10, 0,
-        // State 27
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 28
-        0, 0, 0, -31, -31, 0, 0, -31, 0, -31, 0, -31, -31, -31, 0, -31, 0, 0, 0, 0, -31, 0,
-        // State 29
-        0, 0, 0, 0, 0, 0, 0, 20, 0, -53, 21, 0, 7, 8, 0, 9, 22, 0, 23, 0, 10, 0,
-        // State 30
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 31
-        0, 0, 0, 0, 38, 0, 0, 0, 0, -50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 32
-        0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 21, 0, 7, 8, 0, 9, 22, 0, 23, 0, 10, 0,
-        // State 33
-        0, 0, 0, -2, -2, 0, 0, 0, 0, -2, 0, -2, -2, -2, 0, -2, 0, 0, 0, 0, -2, 0,
-        // State 34
-        0, 0, 0, -97, -97, 0, 0, 0, 0, -97, 0, -97, -97, -97, 0, -97, 0, 0, 0, 0, -97, 0,
-        // State 35
-        0, 0, 0, 0, 40, 0, 0, 0, 0, -52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 36
-        0, 0, 0, -87, -87, 0, 0, -87, 0, -87, 0, -87, -87, -87, 0, -87, 0, 0, 0, 0, -87, 0,
-        // State 37
-        0, 0, 0, 0, 0, 0, 0, -25, 0, -25, -25, 0, -25, -25, 0, -25, -25, 0, -25, 0, -25, 0,
-        // State 38
-        0, 0, 0, -3, -3, 0, 0, 0, 0, -3, 0, -3, -3, -3, 0, -3, 0, 0, 0, 0, -3, 0,
-        // State 39
-        0, 0, 0, 0, 0, 0, 0, -26, 0, -26, -26, 0, -26, -26, 0, -26, -26, 0, -26, 0, -26, 0,
-    ];
-    const __EOF_ACTION: &'static [i32] = &[
-        -64,
-        -60,
-        -65,
-        -101,
-        0,
-        -69,
-        -71,
-        -72,
-        -70,
-        -73,
-        -61,
-        0,
-        -100,
-        -30,
-        -88,
-        -39,
-        -57,
-        -94,
-        -96,
-        -36,
-        0,
-        -37,
-        -38,
-        0,
-        0,
-        -95,
-        0,
-        0,
-        -31,
-        0,
-        0,
-        0,
-        0,
-        -2,
-        -97,
-        0,
-        -87,
-        0,
-        -3,
-        0,
-    ];
-    const __GOTO: &'static [i32] = &[
-        // State 0
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 3, 0, 4, 0, 0, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 1
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 2
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 3
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 4
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 5
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 6
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 7
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 8
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 9
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 10
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 11
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 6, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 17, 18, 0, 19, 0, 0, 0,
-        // State 12
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 13
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 14
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 15
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 16
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 17
-        0, 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 18
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 19
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 20
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 6, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 28, 18, 0, 19, 0, 0, 0,
-        // State 21
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 22
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 23
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 6, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 24
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, 13, 0, 14, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 6, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 32, 18, 0, 19, 0, 0, 0,
-        // State 25
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 26
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 6, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 34, 0, 19, 0, 0, 0,
-        // State 27
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 28
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 29
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 6, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 36, 18, 0, 19, 0, 0, 0,
-        // State 30
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 31
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 32
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 6, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 39, 0, 19, 0, 0, 0,
-        // State 33
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 34
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 35
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 36
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 37
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 38
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        // State 39
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    ];
-    fn __expected_tokens(__state: usize) -> Vec<::std::string::String> {
-        const __TERMINAL: &'static [&'static str] = &[
-            r###""&""###,
-            r###""(""###,
-            r###"")""###,
-            r###""+""###,
-            r###"",""###,
-            r###""->""###,
-            r###"":""###,
-            r###""::""###,
-            r###""<""###,
-            r###"">""###,
-            r###""[""###,
-            r###""]""###,
-            r###""class""###,
-            r###""extends""###,
-            r###""fn""###,
-            r###""init""###,
-            r###""self""###,
-            r###""struct""###,
-            r###""super""###,
-            r###""{..}""###,
-            r###"OtherId"###,
-        ];
-        __ACTION[(__state * 22)..].iter().zip(__TERMINAL).filter_map(|(&state, terminal)| {
-            if state == 0 {
-                None
-            } else {
-                Some(terminal.to_string())
-            }
-        }).collect()
-    }
-    pub fn parse_Fields<
-        'input,
-        __TOKEN: __ToTriple<'input, Error=::errors::Error>,
-        __TOKENS: IntoIterator<Item=__TOKEN>,
-    >(
-        __tokens0: __TOKENS,
-    ) -> Result<Vec<Field>, __lalrpop_util::ParseError<usize, Tok<'input>, ::errors::Error>>
-    {
-        let __tokens = __tokens0.into_iter();
-        let mut __tokens = __tokens.map(|t| __ToTriple::to_triple(t));
-        let mut __states = vec![0_i32];
-        let mut __symbols = vec![];
-        let mut __integer;
-        let mut __lookahead;
-        let mut __last_location = Default::default();
-        '__shift: loop {
-            __lookahead = match __tokens.next() {
-                Some(Ok(v)) => v,
-                None => break '__shift,
-                Some(Err(e)) => return Err(__lalrpop_util::ParseError::User { error: e }),
-            };
-            __last_location = __lookahead.2.clone();
-            __integer = match __lookahead.1 {
-                Tok::Ampersand if true => 0,
-                Tok::LeftParen if true => 1,
-                Tok::RightParen if true => 2,
-                Tok::Plus if true => 3,
-                Tok::Comma if true => 4,
-                Tok::ThinArrow if true => 5,
-                Tok::Colon if true => 6,
-                Tok::ColonColon if true => 7,
-                Tok::LessThan if true => 8,
-                Tok::GreaterThan if true => 9,
-                Tok::LeftBracket if true => 10,
-                Tok::RightBracket if true => 11,
-                Tok::ClassKeyword if true => 12,
-                Tok::ExtendsKeyword if true => 13,
-                Tok::FnKeyword if true => 14,
-                Tok::InitKeyword if true => 15,
-                Tok::SelfKeyword if true => 16,
-                Tok::StructKeyword if true => 17,
-                Tok::SuperKeyword if true => 18,
-                Tok::Block(_) if true => 19,
-                Tok::Id(_) if true => 20,
-                _ => {
-                    let __state = *__states.last().unwrap() as usize;
-                    let __error = __lalrpop_util::ParseError::UnrecognizedToken {
-                        token: Some(__lookahead),
-                        expected: __expected_tokens(__state),
-                    };
-                    return Err(__error);
-                }
-            };
-            '__inner: loop {
-                let __state = *__states.last().unwrap() as usize;
-                let __action = __ACTION[__state * 22 + __integer];
-                if __action > 0 {
-                    let __symbol = match __integer {
-                        0 => match __lookahead.1 {
-                            __tok @ Tok::Ampersand => __Symbol::Term_22_26_22(__tok),
-                            _ => unreachable!(),
-                        },
-                        1 => match __lookahead.1 {
-                            __tok @ Tok::LeftParen => __Symbol::Term_22_28_22(__tok),
-                            _ => unreachable!(),
-                        },
-                        2 => match __lookahead.1 {
-                            __tok @ Tok::RightParen => __Symbol::Term_22_29_22(__tok),
-                            _ => unreachable!(),
-                        },
-                        3 => match __lookahead.1 {
-                            __tok @ Tok::Plus => __Symbol::Term_22_2b_22(__tok),
-                            _ => unreachable!(),
-                        },
-                        4 => match __lookahead.1 {
-                            __tok @ Tok::Comma => __Symbol::Term_22_2c_22(__tok),
-                            _ => unreachable!(),
-                        },
-                        5 => match __lookahead.1 {
-                            __tok @ Tok::ThinArrow => __Symbol::Term_22_2d_3e_22(__tok),
-                            _ => unreachable!(),
-                        },
-                        6 => match __lookahead.1 {
-                            __tok @ Tok::Colon => __Symbol::Term_22_3a_22(__tok),
-                            _ => unreachable!(),
-                        },
-                        7 => match __lookahead.1 {
-                            __tok @ Tok::ColonColon => __Symbol::Term_22_3a_3a_22(__tok),
-                            _ => unreachable!(),
-                        },
-                        8 => match __lookahead.1 {
-                            __tok @ Tok::LessThan => __Symbol::Term_22_3c_22(__tok),
-                            _ => unreachable!(),
-                        },
-                        9 => match __lookahead.1 {
-                            __tok @ Tok::GreaterThan => __Symbol::Term_22_3e_22(__tok),
-                            _ => unreachable!(),
-                        },
-                        10 => match __lookahead.1 {
-                            __tok @ Tok::LeftBracket => __Symbol::Term_22_5b_22(__tok),
-                            _ => unreachable!(),
-                        },
-                        11 => match __lookahead.1 {
-                            __tok @ Tok::RightBracket => __Symbol::Term_22_5d_22(__tok),
-                            _ => unreachable!(),
-                        },
-                        12 => match __lookahead.1 {
-                            __tok @ Tok::ClassKeyword => __Symbol::Term_22class_22(__tok),
-                            _ => unreachable!(),
-                        },
-                        13 => match __lookahead.1 {
-                            __tok @ Tok::ExtendsKeyword => __Symbol::Term_22extends_22(__tok),
-                            _ => unreachable!(),
-                        },
-                        14 => match __lookahead.1 {
-                            __tok @ Tok::FnKeyword => __Symbol::Term_22fn_22(__tok),
-                            _ => unreachable!(),
-                        },
-                        15 => match __lookahead.1 {
-                            __tok @ Tok::InitKeyword => __Symbol::Term_22init_22(__tok),
-                            _ => unreachable!(),
-                        },
-                        16 => match __lookahead.1 {
-                            __tok @ Tok::SelfKeyword => __Symbol::Term_22self_22(__tok),
-                            _ => unreachable!(),
-                        },
-                        17 => match __lookahead.1 {
-                            __tok @ Tok::StructKeyword => __Symbol::Term_22struct_22(__tok),
-                            _ => unreachable!(),
-                        },
-                        18 => match __lookahead.1 {
-                            __tok @ Tok::SuperKeyword => __Symbol::Term_22super_22(__tok),
-                            _ => unreachable!(),
-                        },
-                        19 => match __lookahead.1 {
-                            Tok::Block(__tok0) => __Symbol::Term_22_7b_2e_2e_7d_22(__tok0),
-                            _ => unreachable!(),
-                        },
-                        20 => match __lookahead.1 {
-                            Tok::Id(__tok0) => __Symbol::TermOtherId(__tok0),
-                            _ => unreachable!(),
-                        },
-                        _ => unreachable!(),
-                    };
-                    __states.push(__action - 1);
-                    __symbols.push((__lookahead.0, __symbol, __lookahead.2));
-                    continue '__shift;
-                } else if __action < 0 {
-                    if let Some(r) = __reduce(__action, Some(&__lookahead.0), &mut __states, &mut __symbols, ::std::marker::PhantomData::<()>) {
-                        return r;
-                    }
-                } else {
-                    let __state = *__states.last().unwrap() as usize;
-                    let __error = __lalrpop_util::ParseError::UnrecognizedToken {
-                        token: Some(__lookahead),
-                        expected: __expected_tokens(__state),
-                    };
-                    return Err(__error)
-                }
-            }
-        }
-        loop {
-            let __state = *__states.last().unwrap() as usize;
-            let __action = __EOF_ACTION[__state];
-            if __action < 0 {
-                if let Some(r) = __reduce(__action, None, &mut __states, &mut __symbols, ::std::marker::PhantomData::<()>) {
-                    return r;
-                }
-            } else {
-                let __state = *__states.last().unwrap() as usize;
-                let __error = __lalrpop_util::ParseError::UnrecognizedToken {
-                    token: None,
-                    expected: __expected_tokens(__state),
-                };
-                return Err(__error);
-            }
-        }
-    }
-    pub fn __reduce<
-        'input,
-    >(
-        __action: i32,
-        __lookahead_start: Option<&usize>,
-        __states: &mut ::std::vec::Vec<i32>,
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>,
-        _: ::std::marker::PhantomData<()>,
-    ) -> Option<Result<Vec<Field>,__lalrpop_util::ParseError<usize, Tok<'input>, ::errors::Error>>>
-    {
-        let __nonterminal = match -__action {
-            1 => {
-                // ("+" <Type1>) = "+", Type1 => ActionFn(38);
-                let __sym1 = __pop_NtType1(__symbols);
-                let __sym0 = __pop_Term_22_2b_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action38::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::Nt_28_22_2b_22_20_3cType1_3e_29(__nt), __end));
-                0
-            }
-            2 => {
-                // ("+" <Type1>)+ = "+", Type1 => ActionFn(90);
-                let __sym1 = __pop_NtType1(__symbols);
-                let __sym0 = __pop_Term_22_2b_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action90::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::Nt_28_22_2b_22_20_3cType1_3e_29_2b(__nt), __end));
-                1
-            }
-            3 => {
-                // ("+" <Type1>)+ = ("+" <Type1>)+, "+", Type1 => ActionFn(91);
-                let __sym2 = __pop_NtType1(__symbols);
-                let __sym1 = __pop_Term_22_2b_22(__symbols);
-                let __sym0 = __pop_Nt_28_22_2b_22_20_3cType1_3e_29_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym2.2.clone();
-                let __nt = super::__action91::<>(__sym0, __sym1, __sym2);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 3);
-                __symbols.push((__start, __Symbol::Nt_28_22_2b_22_20_3cType1_3e_29_2b(__nt), __end));
-                1
-            }
-            4 => {
-                // ("->" <Type>) = "->", Type => ActionFn(43);
-                let __sym1 = __pop_NtType(__symbols);
-                let __sym0 = __pop_Term_22_2d_3e_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action43::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::Nt_28_22_2d_3e_22_20_3cType_3e_29(__nt), __end));
-                2
-            }
-            5 => {
-                // ("->" <Type>)? = "->", Type => ActionFn(92);
-                let __sym1 = __pop_NtType(__symbols);
-                let __sym0 = __pop_Term_22_2d_3e_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action92::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::Nt_28_22_2d_3e_22_20_3cType_3e_29_3f(__nt), __end));
-                3
-            }
-            6 => {
-                // ("->" <Type>)? =  => ActionFn(42);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action42::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::Nt_28_22_2d_3e_22_20_3cType_3e_29_3f(__nt), __end));
-                3
-            }
-            7 => {
-                // ("::" "<" <Comma<Type>> ">") = "::", "<", Comma<Type>, ">" => ActionFn(79);
-                let __sym3 = __pop_Term_22_3e_22(__symbols);
-                let __sym2 = __pop_NtComma_3cType_3e(__symbols);
-                let __sym1 = __pop_Term_22_3c_22(__symbols);
-                let __sym0 = __pop_Term_22_3a_3a_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym3.2.clone();
-                let __nt = super::__action79::<>(__sym0, __sym1, __sym2, __sym3);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 4);
-                __symbols.push((__start, __Symbol::Nt_28_22_3a_3a_22_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29(__nt), __end));
-                4
-            }
-            8 => {
-                // ("::" "<" <Comma<Type>> ">")? = "::", "<", Comma<Type>, ">" => ActionFn(95);
-                let __sym3 = __pop_Term_22_3e_22(__symbols);
-                let __sym2 = __pop_NtComma_3cType_3e(__symbols);
-                let __sym1 = __pop_Term_22_3c_22(__symbols);
-                let __sym0 = __pop_Term_22_3a_3a_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym3.2.clone();
-                let __nt = super::__action95::<>(__sym0, __sym1, __sym2, __sym3);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 4);
-                __symbols.push((__start, __Symbol::Nt_28_22_3a_3a_22_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29_3f(__nt), __end));
-                5
-            }
-            9 => {
-                // ("::" "<" <Comma<Type>> ">")? =  => ActionFn(78);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action78::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::Nt_28_22_3a_3a_22_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29_3f(__nt), __end));
-                5
-            }
-            10 => {
-                // ("extends" <TypePath>) = "extends", TypePath => ActionFn(49);
-                let __sym1 = __pop_NtTypePath(__symbols);
-                let __sym0 = __pop_Term_22extends_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action49::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::Nt_28_22extends_22_20_3cTypePath_3e_29(__nt), __end));
-                6
-            }
-            11 => {
-                // ("extends" <TypePath>)? = "extends", TypePath => ActionFn(98);
-                let __sym1 = __pop_NtTypePath(__symbols);
-                let __sym0 = __pop_Term_22extends_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action98::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::Nt_28_22extends_22_20_3cTypePath_3e_29_3f(__nt), __end));
-                7
-            }
-            12 => {
-                // ("extends" <TypePath>)? =  => ActionFn(48);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action48::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::Nt_28_22extends_22_20_3cTypePath_3e_29_3f(__nt), __end));
-                7
-            }
-            13 => {
-                // (() "<" <Comma<Type>> ">") = "<", Comma<Type>, ">" => ActionFn(101);
-                let __sym2 = __pop_Term_22_3e_22(__symbols);
-                let __sym1 = __pop_NtComma_3cType_3e(__symbols);
-                let __sym0 = __pop_Term_22_3c_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym2.2.clone();
-                let __nt = super::__action101::<>(__sym0, __sym1, __sym2);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 3);
-                __symbols.push((__start, __Symbol::Nt_28_28_29_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29(__nt), __end));
-                8
-            }
-            14 => {
-                // (() "<" <Comma<Type>> ">")? = "<", Comma<Type>, ">" => ActionFn(102);
-                let __sym2 = __pop_Term_22_3e_22(__symbols);
-                let __sym1 = __pop_NtComma_3cType_3e(__symbols);
-                let __sym0 = __pop_Term_22_3c_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym2.2.clone();
-                let __nt = super::__action102::<>(__sym0, __sym1, __sym2);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 3);
-                __symbols.push((__start, __Symbol::Nt_28_28_29_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29_3f(__nt), __end));
-                9
-            }
-            15 => {
-                // (() "<" <Comma<Type>> ">")? =  => ActionFn(75);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action75::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::Nt_28_28_29_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29_3f(__nt), __end));
-                9
-            }
-            16 => {
-                // () =  => ActionFn(33);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action33::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::Nt_28_29(__nt), __end));
-                10
-            }
-            17 => {
-                // (<Field> ",") = Field, "," => ActionFn(61);
-                let __sym1 = __pop_Term_22_2c_22(__symbols);
-                let __sym0 = __pop_NtField(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action61::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29(__nt), __end));
-                11
-            }
-            18 => {
-                // (<Field> ",")* =  => ActionFn(59);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action59::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29_2a(__nt), __end));
-                12
-            }
-            19 => {
-                // (<Field> ",")* = (<Field> ",")+ => ActionFn(60);
-                let __sym0 = __pop_Nt_28_3cField_3e_20_22_2c_22_29_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action60::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29_2a(__nt), __end));
-                12
-            }
-            20 => {
-                // (<Field> ",")+ = Field, "," => ActionFn(105);
-                let __sym1 = __pop_Term_22_2c_22(__symbols);
-                let __sym0 = __pop_NtField(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action105::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29_2b(__nt), __end));
-                13
-            }
-            21 => {
-                // (<Field> ",")+ = (<Field> ",")+, Field, "," => ActionFn(106);
-                let __sym2 = __pop_Term_22_2c_22(__symbols);
-                let __sym1 = __pop_NtField(__symbols);
-                let __sym0 = __pop_Nt_28_3cField_3e_20_22_2c_22_29_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym2.2.clone();
-                let __nt = super::__action106::<>(__sym0, __sym1, __sym2);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 3);
-                __symbols.push((__start, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29_2b(__nt), __end));
-                13
-            }
-            22 => {
-                // (<Type> ",") = Type, "," => ActionFn(87);
-                let __sym1 = __pop_Term_22_2c_22(__symbols);
-                let __sym0 = __pop_NtType(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action87::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29(__nt), __end));
-                14
-            }
-            23 => {
-                // (<Type> ",")* =  => ActionFn(85);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action85::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29_2a(__nt), __end));
-                15
-            }
-            24 => {
-                // (<Type> ",")* = (<Type> ",")+ => ActionFn(86);
-                let __sym0 = __pop_Nt_28_3cType_3e_20_22_2c_22_29_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action86::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29_2a(__nt), __end));
-                15
-            }
-            25 => {
-                // (<Type> ",")+ = Type, "," => ActionFn(109);
-                let __sym1 = __pop_Term_22_2c_22(__symbols);
-                let __sym0 = __pop_NtType(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action109::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29_2b(__nt), __end));
-                16
-            }
-            26 => {
-                // (<Type> ",")+ = (<Type> ",")+, Type, "," => ActionFn(110);
-                let __sym2 = __pop_Term_22_2c_22(__symbols);
-                let __sym1 = __pop_NtType(__symbols);
-                let __sym0 = __pop_Nt_28_3cType_3e_20_22_2c_22_29_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym2.2.clone();
-                let __nt = super::__action110::<>(__sym0, __sym1, __sym2);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 3);
-                __symbols.push((__start, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29_2b(__nt), __end));
-                16
-            }
-            27 => {
-                // @L =  => ActionFn(50);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action50::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::Nt_40L(__nt), __end));
-                17
-            }
-            28 => {
-                // AnyPath<"::"> = BasePath<"::"> => ActionFn(34);
-                let __sym0 = __pop_NtBasePath_3c_22_3a_3a_22_3e(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action34::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtAnyPath_3c_22_3a_3a_22_3e(__nt), __end));
-                18
-            }
-            29 => {
-                // AnyPath<"::"> = AnyPath<"::">, "::", PathId<"::"> => ActionFn(35);
-                let __sym2 = __pop_NtPathId_3c_22_3a_3a_22_3e(__symbols);
-                let __sym1 = __pop_Term_22_3a_3a_22(__symbols);
-                let __sym0 = __pop_NtAnyPath_3c_22_3a_3a_22_3e(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym2.2.clone();
-                let __nt = super::__action35::<>(__sym0, __sym1, __sym2);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 3);
-                __symbols.push((__start, __Symbol::NtAnyPath_3c_22_3a_3a_22_3e(__nt), __end));
-                18
-            }
-            30 => {
-                // AnyPath<()> = BasePath<()> => ActionFn(31);
-                let __sym0 = __pop_NtBasePath_3c_28_29_3e(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action31::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtAnyPath_3c_28_29_3e(__nt), __end));
-                19
-            }
-            31 => {
-                // AnyPath<()> = AnyPath<()>, "::", PathId<()> => ActionFn(32);
-                let __sym2 = __pop_NtPathId_3c_28_29_3e(__symbols);
-                let __sym1 = __pop_Term_22_3a_3a_22(__symbols);
-                let __sym0 = __pop_NtAnyPath_3c_28_29_3e(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym2.2.clone();
-                let __nt = super::__action32::<>(__sym0, __sym1, __sym2);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 3);
-                __symbols.push((__start, __Symbol::NtAnyPath_3c_28_29_3e(__nt), __end));
-                19
-            }
-            32 => {
-                // BasePath<"::"> = "::" => ActionFn(65);
-                let __sym0 = __pop_Term_22_3a_3a_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action65::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtBasePath_3c_22_3a_3a_22_3e(__nt), __end));
-                20
-            }
-            33 => {
-                // BasePath<"::"> = "self" => ActionFn(66);
-                let __sym0 = __pop_Term_22self_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action66::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtBasePath_3c_22_3a_3a_22_3e(__nt), __end));
-                20
-            }
-            34 => {
-                // BasePath<"::"> = "super" => ActionFn(67);
-                let __sym0 = __pop_Term_22super_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action67::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtBasePath_3c_22_3a_3a_22_3e(__nt), __end));
-                20
-            }
-            35 => {
-                // BasePath<"::"> = PathId<"::"> => ActionFn(68);
-                let __sym0 = __pop_NtPathId_3c_22_3a_3a_22_3e(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action68::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtBasePath_3c_22_3a_3a_22_3e(__nt), __end));
-                20
-            }
-            36 => {
-                // BasePath<()> = "::" => ActionFn(70);
-                let __sym0 = __pop_Term_22_3a_3a_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action70::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtBasePath_3c_28_29_3e(__nt), __end));
-                21
-            }
-            37 => {
-                // BasePath<()> = "self" => ActionFn(71);
-                let __sym0 = __pop_Term_22self_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action71::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtBasePath_3c_28_29_3e(__nt), __end));
-                21
-            }
-            38 => {
-                // BasePath<()> = "super" => ActionFn(72);
-                let __sym0 = __pop_Term_22super_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action72::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtBasePath_3c_28_29_3e(__nt), __end));
-                21
-            }
-            39 => {
-                // BasePath<()> = PathId<()> => ActionFn(73);
-                let __sym0 = __pop_NtPathId_3c_28_29_3e(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action73::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtBasePath_3c_28_29_3e(__nt), __end));
-                21
-            }
-            40 => {
-                // Class = "class", Id, Extends, "{..}" => ActionFn(113);
-                let __sym3 = __pop_Term_22_7b_2e_2e_7d_22(__symbols);
-                let __sym2 = __pop_NtExtends(__symbols);
-                let __sym1 = __pop_NtId(__symbols);
-                let __sym0 = __pop_Term_22class_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym3.2.clone();
-                let __nt = match super::__action113::<>(__sym0, __sym1, __sym2, __sym3) {
-                    Ok(v) => v,
-                    Err(e) => return Some(Err(e)),
-                };
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 4);
-                __symbols.push((__start, __Symbol::NtClass(__nt), __end));
-                22
-            }
-            41 => {
-                // Class* =  => ActionFn(51);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action51::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::NtClass_2a(__nt), __end));
-                23
-            }
-            42 => {
-                // Class* = Class+ => ActionFn(52);
-                let __sym0 = __pop_NtClass_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action52::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtClass_2a(__nt), __end));
-                23
-            }
-            43 => {
-                // Class+ = Class => ActionFn(53);
-                let __sym0 = __pop_NtClass(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action53::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtClass_2b(__nt), __end));
-                24
-            }
-            44 => {
-                // Class+ = Class+, Class => ActionFn(54);
-                let __sym1 = __pop_NtClass(__symbols);
-                let __sym0 = __pop_NtClass_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action54::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::NtClass_2b(__nt), __end));
-                24
-            }
-            45 => {
-                // CodeBlock = "{..}" => ActionFn(28);
-                let __sym0 = __pop_Term_22_7b_2e_2e_7d_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action28::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtCodeBlock(__nt), __end));
-                25
-            }
-            46 => {
-                // Comma<Field> = Field => ActionFn(119);
-                let __sym0 = __pop_NtField(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action119::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtComma_3cField_3e(__nt), __end));
-                26
-            }
-            47 => {
-                // Comma<Field> =  => ActionFn(120);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action120::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::NtComma_3cField_3e(__nt), __end));
-                26
-            }
-            48 => {
-                // Comma<Field> = (<Field> ",")+, Field => ActionFn(121);
-                let __sym1 = __pop_NtField(__symbols);
-                let __sym0 = __pop_Nt_28_3cField_3e_20_22_2c_22_29_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action121::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::NtComma_3cField_3e(__nt), __end));
-                26
-            }
-            49 => {
-                // Comma<Field> = (<Field> ",")+ => ActionFn(122);
-                let __sym0 = __pop_Nt_28_3cField_3e_20_22_2c_22_29_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action122::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtComma_3cField_3e(__nt), __end));
-                26
-            }
-            50 => {
-                // Comma<Type> = Type => ActionFn(125);
-                let __sym0 = __pop_NtType(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action125::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
-                27
-            }
-            51 => {
-                // Comma<Type> =  => ActionFn(126);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action126::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
-                27
-            }
-            52 => {
-                // Comma<Type> = (<Type> ",")+, Type => ActionFn(127);
-                let __sym1 = __pop_NtType(__symbols);
-                let __sym0 = __pop_Nt_28_3cType_3e_20_22_2c_22_29_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action127::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
-                27
-            }
-            53 => {
-                // Comma<Type> = (<Type> ",")+ => ActionFn(128);
-                let __sym0 = __pop_Nt_28_3cType_3e_20_22_2c_22_29_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action128::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
-                27
-            }
-            54 => {
-                // ExprPath = AnyPath<"::"> => ActionFn(29);
-                let __sym0 = __pop_NtAnyPath_3c_22_3a_3a_22_3e(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action29::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtExprPath(__nt), __end));
-                28
-            }
-            55 => {
-                // Extends = "extends", TypePath => ActionFn(99);
-                let __sym1 = __pop_NtTypePath(__symbols);
-                let __sym0 = __pop_Term_22extends_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action99::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::NtExtends(__nt), __end));
-                29
-            }
-            56 => {
-                // Extends =  => ActionFn(100);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action100::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::NtExtends(__nt), __end));
-                29
-            }
-            57 => {
-                // Field = Id, ":", Type => ActionFn(23);
-                let __sym2 = __pop_NtType(__symbols);
-                let __sym1 = __pop_Term_22_3a_22(__symbols);
-                let __sym0 = __pop_NtId(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym2.2.clone();
-                let __nt = super::__action23::<>(__sym0, __sym1, __sym2);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 3);
-                __symbols.push((__start, __Symbol::NtField(__nt), __end));
-                30
-            }
-            58 => {
-                // Field* =  => ActionFn(39);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action39::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::NtField_2a(__nt), __end));
-                31
-            }
-            59 => {
-                // Field* = Field+ => ActionFn(40);
-                let __sym0 = __pop_NtField_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action40::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtField_2a(__nt), __end));
-                31
-            }
-            60 => {
-                // Field+ = Field => ActionFn(62);
-                let __sym0 = __pop_NtField(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action62::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtField_2b(__nt), __end));
-                32
-            }
-            61 => {
-                // Field+ = Field+, Field => ActionFn(63);
-                let __sym1 = __pop_NtField(__symbols);
-                let __sym0 = __pop_NtField_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action63::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::NtField_2b(__nt), __end));
-                32
-            }
-            62 => {
-                // Field? = Field => ActionFn(57);
-                let __sym0 = __pop_NtField(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action57::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtField_3f(__nt), __end));
-                33
-            }
-            63 => {
-                // Field? =  => ActionFn(58);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action58::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::NtField_3f(__nt), __end));
-                33
-            }
-            64 => {
-                // Fields =  => ActionFn(117);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action117::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::NtFields(__nt), __end));
-                34
-            }
-            65 => {
-                // Fields = Field+ => ActionFn(118);
-                let __sym0 = __pop_NtField_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action118::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtFields(__nt), __end));
-                34
-            }
-            66 => {
-                // FnDef = FnSig, CodeBlock => ActionFn(18);
-                let __sym1 = __pop_NtCodeBlock(__symbols);
-                let __sym0 = __pop_NtFnSig(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action18::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::NtFnDef(__nt), __end));
-                35
-            }
-            67 => {
-                // FnSig = "(", "&", "self", ")", ReturnTy => ActionFn(19);
-                let __sym4 = __pop_NtReturnTy(__symbols);
-                let __sym3 = __pop_Term_22_29_22(__symbols);
-                let __sym2 = __pop_Term_22self_22(__symbols);
-                let __sym1 = __pop_Term_22_26_22(__symbols);
-                let __sym0 = __pop_Term_22_28_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym4.2.clone();
-                let __nt = super::__action19::<>(__sym0, __sym1, __sym2, __sym3, __sym4);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 5);
-                __symbols.push((__start, __Symbol::NtFnSig(__nt), __end));
-                36
-            }
-            68 => {
-                // FnSig = "(", "&", "self", ",", Comma<Field>, ")", ReturnTy => ActionFn(20);
-                let __sym6 = __pop_NtReturnTy(__symbols);
-                let __sym5 = __pop_Term_22_29_22(__symbols);
-                let __sym4 = __pop_NtComma_3cField_3e(__symbols);
-                let __sym3 = __pop_Term_22_2c_22(__symbols);
-                let __sym2 = __pop_Term_22self_22(__symbols);
-                let __sym1 = __pop_Term_22_26_22(__symbols);
-                let __sym0 = __pop_Term_22_28_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym6.2.clone();
-                let __nt = super::__action20::<>(__sym0, __sym1, __sym2, __sym3, __sym4, __sym5, __sym6);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 7);
-                __symbols.push((__start, __Symbol::NtFnSig(__nt), __end));
-                36
-            }
-            69 => {
-                // Id = IdStr => ActionFn(7);
-                let __sym0 = __pop_NtIdStr(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action7::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtId(__nt), __end));
-                37
-            }
-            70 => {
-                // IdStr = "init" => ActionFn(8);
-                let __sym0 = __pop_Term_22init_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action8::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtIdStr(__nt), __end));
-                38
-            }
-            71 => {
-                // IdStr = "class" => ActionFn(9);
-                let __sym0 = __pop_Term_22class_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action9::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtIdStr(__nt), __end));
-                38
-            }
-            72 => {
-                // IdStr = "extends" => ActionFn(10);
-                let __sym0 = __pop_Term_22extends_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action10::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtIdStr(__nt), __end));
-                38
-            }
-            73 => {
-                // IdStr = OtherId => ActionFn(11);
-                let __sym0 = __pop_TermOtherId(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action11::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtIdStr(__nt), __end));
-                38
-            }
-            74 => {
-                // Init = "init", CodeBlock => ActionFn(16);
-                let __sym1 = __pop_NtCodeBlock(__symbols);
-                let __sym0 = __pop_Term_22init_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action16::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::NtInit(__nt), __end));
-                39
-            }
-            75 => {
-                // Member = PrivateStruct => ActionFn(12);
-                let __sym0 = __pop_NtPrivateStruct(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action12::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtMember(__nt), __end));
-                40
-            }
-            76 => {
-                // Member = Init => ActionFn(13);
-                let __sym0 = __pop_NtInit(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action13::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtMember(__nt), __end));
-                40
-            }
-            77 => {
-                // Member = Method => ActionFn(14);
-                let __sym0 = __pop_NtMethod(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action14::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtMember(__nt), __end));
-                40
-            }
-            78 => {
-                // Member* =  => ActionFn(45);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action45::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::NtMember_2a(__nt), __end));
-                41
-            }
-            79 => {
-                // Member* = Member+ => ActionFn(46);
-                let __sym0 = __pop_NtMember_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action46::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtMember_2a(__nt), __end));
-                41
-            }
-            80 => {
-                // Member+ = Member => ActionFn(55);
-                let __sym0 = __pop_NtMember(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action55::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtMember_2b(__nt), __end));
-                42
-            }
-            81 => {
-                // Member+ = Member+, Member => ActionFn(56);
-                let __sym1 = __pop_NtMember(__symbols);
-                let __sym0 = __pop_NtMember_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action56::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::NtMember_2b(__nt), __end));
-                42
-            }
-            82 => {
-                // Members =  => ActionFn(123);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action123::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::NtMembers(__nt), __end));
-                43
-            }
-            83 => {
-                // Members = Member+ => ActionFn(124);
-                let __sym0 = __pop_NtMember_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action124::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtMembers(__nt), __end));
-                43
-            }
-            84 => {
-                // Method = "fn", Id, FnDef => ActionFn(17);
-                let __sym2 = __pop_NtFnDef(__symbols);
-                let __sym1 = __pop_NtId(__symbols);
-                let __sym0 = __pop_Term_22fn_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym2.2.clone();
-                let __nt = super::__action17::<>(__sym0, __sym1, __sym2);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 3);
-                __symbols.push((__start, __Symbol::NtMethod(__nt), __end));
-                44
-            }
-            85 => {
-                // PathId<"::"> = Id, "::", "<", Comma<Type>, ">" => ActionFn(96);
-                let __sym4 = __pop_Term_22_3e_22(__symbols);
-                let __sym3 = __pop_NtComma_3cType_3e(__symbols);
-                let __sym2 = __pop_Term_22_3c_22(__symbols);
-                let __sym1 = __pop_Term_22_3a_3a_22(__symbols);
-                let __sym0 = __pop_NtId(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym4.2.clone();
-                let __nt = super::__action96::<>(__sym0, __sym1, __sym2, __sym3, __sym4);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 5);
-                __symbols.push((__start, __Symbol::NtPathId_3c_22_3a_3a_22_3e(__nt), __end));
-                45
-            }
-            86 => {
-                // PathId<"::"> = Id => ActionFn(97);
-                let __sym0 = __pop_NtId(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action97::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtPathId_3c_22_3a_3a_22_3e(__nt), __end));
-                45
-            }
-            87 => {
-                // PathId<()> = Id, "<", Comma<Type>, ">" => ActionFn(103);
-                let __sym3 = __pop_Term_22_3e_22(__symbols);
-                let __sym2 = __pop_NtComma_3cType_3e(__symbols);
-                let __sym1 = __pop_Term_22_3c_22(__symbols);
-                let __sym0 = __pop_NtId(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym3.2.clone();
-                let __nt = super::__action103::<>(__sym0, __sym1, __sym2, __sym3);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 4);
-                __symbols.push((__start, __Symbol::NtPathId_3c_28_29_3e(__nt), __end));
-                46
-            }
-            88 => {
-                // PathId<()> = Id => ActionFn(104);
-                let __sym0 = __pop_NtId(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action104::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtPathId_3c_28_29_3e(__nt), __end));
-                46
-            }
-            89 => {
-                // PrivateStruct = "struct", Id, "{..}" => ActionFn(114);
-                let __sym2 = __pop_Term_22_7b_2e_2e_7d_22(__symbols);
-                let __sym1 = __pop_NtId(__symbols);
-                let __sym0 = __pop_Term_22struct_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym2.2.clone();
-                let __nt = match super::__action114::<>(__sym0, __sym1, __sym2) {
-                    Ok(v) => v,
-                    Err(e) => return Some(Err(e)),
-                };
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 3);
-                __symbols.push((__start, __Symbol::NtPrivateStruct(__nt), __end));
-                47
-            }
-            90 => {
-                // Program =  => ActionFn(115);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action115::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::NtProgram(__nt), __end));
-                48
-            }
-            91 => {
-                // Program = Class+ => ActionFn(116);
-                let __sym0 = __pop_NtClass_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action116::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtProgram(__nt), __end));
-                48
-            }
-            92 => {
-                // ReturnTy = "->", Type => ActionFn(93);
-                let __sym1 = __pop_NtType(__symbols);
-                let __sym0 = __pop_Term_22_2d_3e_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action93::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::NtReturnTy(__nt), __end));
-                49
-            }
-            93 => {
-                // ReturnTy =  => ActionFn(94);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action94::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::NtReturnTy(__nt), __end));
-                49
-            }
-            94 => {
-                // Type = Type1 => ActionFn(24);
-                let __sym0 = __pop_NtType1(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action24::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtType(__nt), __end));
-                50
-            }
-            95 => {
-                // Type = Type1, ("+" <Type1>)+ => ActionFn(25);
-                let __sym1 = __pop_Nt_28_22_2b_22_20_3cType1_3e_29_2b(__symbols);
-                let __sym0 = __pop_NtType1(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action25::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::NtType(__nt), __end));
-                50
-            }
-            96 => {
-                // Type1 = TypePath => ActionFn(26);
-                let __sym0 = __pop_NtTypePath(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action26::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtType1(__nt), __end));
-                51
-            }
-            97 => {
-                // Type1 = "[", Type, "]" => ActionFn(27);
-                let __sym2 = __pop_Term_22_5d_22(__symbols);
-                let __sym1 = __pop_NtType(__symbols);
-                let __sym0 = __pop_Term_22_5b_22(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym2.2.clone();
-                let __nt = super::__action27::<>(__sym0, __sym1, __sym2);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 3);
-                __symbols.push((__start, __Symbol::NtType1(__nt), __end));
-                51
-            }
-            98 => {
-                // Type? = Type => ActionFn(83);
-                let __sym0 = __pop_NtType(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action83::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtType_3f(__nt), __end));
-                52
-            }
-            99 => {
-                // Type? =  => ActionFn(84);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action84::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::NtType_3f(__nt), __end));
-                52
-            }
-            100 => {
-                // TypePath = AnyPath<()> => ActionFn(30);
-                let __sym0 = __pop_NtAnyPath_3c_28_29_3e(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action30::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtTypePath(__nt), __end));
-                53
-            }
-            101 => {
-                // __Fields = Fields => ActionFn(2);
-                let __sym0 = __pop_NtFields(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action2::<>(__sym0);
-                return Some(Ok(__nt));
-            }
-            102 => {
-                // __Members = Members => ActionFn(1);
-                let __sym0 = __pop_NtMembers(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action1::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::Nt____Members(__nt), __end));
-                55
-            }
-            103 => {
-                // __Program = Program => ActionFn(0);
-                let __sym0 = __pop_NtProgram(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action0::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::Nt____Program(__nt), __end));
-                56
-            }
-            _ => panic!("invalid action code {}", __action)
-        };
-        let __state = *__states.last().unwrap() as usize;
-        let __next_state = __GOTO[__state * 57 + __nonterminal] - 1;
-        __states.push(__next_state);
-        None
-    }
-    fn __pop_Term_22_26_22<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Tok<'input>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Term_22_26_22(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Term_22_28_22<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Tok<'input>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Term_22_28_22(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Term_22_29_22<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Tok<'input>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Term_22_29_22(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Term_22_2b_22<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Tok<'input>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Term_22_2b_22(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Term_22_2c_22<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Tok<'input>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Term_22_2c_22(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Term_22_2d_3e_22<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Tok<'input>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Term_22_2d_3e_22(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Term_22_3a_22<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Tok<'input>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Term_22_3a_22(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Term_22_3a_3a_22<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Tok<'input>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Term_22_3a_3a_22(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Term_22_3c_22<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Tok<'input>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Term_22_3c_22(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Term_22_3e_22<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Tok<'input>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Term_22_3e_22(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Term_22_5b_22<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Tok<'input>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Term_22_5b_22(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Term_22_5d_22<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Tok<'input>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Term_22_5d_22(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Term_22class_22<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Tok<'input>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Term_22class_22(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Term_22extends_22<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Tok<'input>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Term_22extends_22(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Term_22fn_22<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Tok<'input>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Term_22fn_22(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Term_22init_22<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Tok<'input>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Term_22init_22(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Term_22self_22<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Tok<'input>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Term_22self_22(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Term_22struct_22<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Tok<'input>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Term_22struct_22(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Term_22super_22<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Tok<'input>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Term_22super_22(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Term_22_7b_2e_2e_7d_22<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, &'input str, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Term_22_7b_2e_2e_7d_22(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_TermOtherId<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, &'input str, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::TermOtherId(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Termerror<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, __lalrpop_util::ErrorRecovery<usize, Tok<'input>, ::errors::Error>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Termerror(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt_28_22_2b_22_20_3cType1_3e_29<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Type, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_22_2b_22_20_3cType1_3e_29(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt_28_22_2b_22_20_3cType1_3e_29_2b<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::vec::Vec<Type>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_22_2b_22_20_3cType1_3e_29_2b(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt_28_22_2d_3e_22_20_3cType_3e_29<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Type, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_22_2d_3e_22_20_3cType_3e_29(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt_28_22_2d_3e_22_20_3cType_3e_29_3f<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::option::Option<Type>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_22_2d_3e_22_20_3cType_3e_29_3f(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt_28_22_3a_3a_22_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Vec<Type>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_22_3a_3a_22_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt_28_22_3a_3a_22_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29_3f<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::option::Option<Vec<Type>>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_22_3a_3a_22_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29_3f(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt_28_22extends_22_20_3cTypePath_3e_29<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Path, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_22extends_22_20_3cTypePath_3e_29(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt_28_22extends_22_20_3cTypePath_3e_29_3f<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::option::Option<Path>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_22extends_22_20_3cTypePath_3e_29_3f(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt_28_28_29_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Vec<Type>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_28_29_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt_28_28_29_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29_3f<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::option::Option<Vec<Type>>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_28_29_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29_3f(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt_28_29<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, (), usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_29(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt_28_3cField_3e_20_22_2c_22_29<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Field, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt_28_3cField_3e_20_22_2c_22_29_2a<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::vec::Vec<Field>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29_2a(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt_28_3cField_3e_20_22_2c_22_29_2b<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::vec::Vec<Field>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29_2b(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt_28_3cType_3e_20_22_2c_22_29<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Type, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt_28_3cType_3e_20_22_2c_22_29_2a<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::vec::Vec<Type>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29_2a(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt_28_3cType_3e_20_22_2c_22_29_2b<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::vec::Vec<Type>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29_2b(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt_40L<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, usize, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_40L(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtAnyPath_3c_22_3a_3a_22_3e<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Path, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtAnyPath_3c_22_3a_3a_22_3e(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtAnyPath_3c_28_29_3e<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Path, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtAnyPath_3c_28_29_3e(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtBasePath_3c_22_3a_3a_22_3e<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Path, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtBasePath_3c_22_3a_3a_22_3e(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtBasePath_3c_28_29_3e<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Path, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtBasePath_3c_28_29_3e(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtClass<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Class, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtClass(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtClass_2a<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::vec::Vec<Class>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtClass_2a(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtClass_2b<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::vec::Vec<Class>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtClass_2b(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtCodeBlock<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, OpaqueTokens, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtCodeBlock(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtComma_3cField_3e<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Vec<Field>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtComma_3cField_3e(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtComma_3cType_3e<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Vec<Type>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtComma_3cType_3e(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtExprPath<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Path, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtExprPath(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtExtends<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Option<Path>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtExtends(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtField<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Field, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtField(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtField_2a<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::vec::Vec<Field>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtField_2a(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtField_2b<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::vec::Vec<Field>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtField_2b(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtField_3f<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::option::Option<Field>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtField_3f(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtFields<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Vec<Field>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtFields(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtFnDef<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, FnDef, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtFnDef(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtFnSig<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, FnSig, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtFnSig(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtId<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Identifier, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtId(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtIdStr<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, &'input str, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtIdStr(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtInit<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, OpaqueTokens, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtInit(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtMember<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Member, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtMember(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtMember_2a<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::vec::Vec<Member>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtMember_2a(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtMember_2b<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::vec::Vec<Member>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtMember_2b(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtMembers<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Vec<Member>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtMembers(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtMethod<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Method, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtMethod(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtPathId_3c_22_3a_3a_22_3e<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, PathId, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtPathId_3c_22_3a_3a_22_3e(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtPathId_3c_28_29_3e<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, PathId, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtPathId_3c_28_29_3e(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtPrivateStruct<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, PrivateStruct, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtPrivateStruct(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtProgram<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Program, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtProgram(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtReturnTy<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Option<Type>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtReturnTy(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtType<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Type, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtType(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtType1<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Type, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtType1(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtType_3f<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::option::Option<Type>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtType_3f(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtTypePath<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Path, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtTypePath(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt____Fields<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Vec<Field>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt____Fields(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt____Members<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Vec<Member>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt____Members(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt____Program<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Program, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt____Program(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-}
-pub use self::__parse__Fields::parse_Fields;
-
 mod __parse__Members {
     #![allow(non_snake_case, non_camel_case_types, unused_mut, unused_variables, unused_imports)]
 
@@ -2553,12 +50,12 @@ mod __parse__Members {
         Nt_28_28_29_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29(Vec<Type>),
         Nt_28_28_29_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29_3f(::std::option::Option<Vec<Type>>),
         Nt_28_29(()),
-        Nt_28_3cField_3e_20_22_2c_22_29(Field),
-        Nt_28_3cField_3e_20_22_2c_22_29_2a(::std::vec::Vec<Field>),
-        Nt_28_3cField_3e_20_22_2c_22_29_2b(::std::vec::Vec<Field>),
         Nt_28_3cType_3e_20_22_2c_22_29(Type),
         Nt_28_3cType_3e_20_22_2c_22_29_2a(::std::vec::Vec<Type>),
         Nt_28_3cType_3e_20_22_2c_22_29_2b(::std::vec::Vec<Type>),
+        Nt_28_3cVarTy_3e_20_22_2c_22_29(VarTy),
+        Nt_28_3cVarTy_3e_20_22_2c_22_29_2a(::std::vec::Vec<VarTy>),
+        Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(::std::vec::Vec<VarTy>),
         Nt_40L(usize),
         NtAnyPath_3c_22_3a_3a_22_3e(Path),
         NtAnyPath_3c_28_29_3e(Path),
@@ -2568,15 +65,10 @@ mod __parse__Members {
         NtClass_2a(::std::vec::Vec<Class>),
         NtClass_2b(::std::vec::Vec<Class>),
         NtCodeBlock(OpaqueTokens),
-        NtComma_3cField_3e(Vec<Field>),
         NtComma_3cType_3e(Vec<Type>),
+        NtComma_3cVarTy_3e(Vec<VarTy>),
         NtExprPath(Path),
         NtExtends(Option<Path>),
-        NtField(Field),
-        NtField_2a(::std::vec::Vec<Field>),
-        NtField_2b(::std::vec::Vec<Field>),
-        NtField_3f(::std::option::Option<Field>),
-        NtFields(Vec<Field>),
         NtFnDef(FnDef),
         NtFnSig(FnSig),
         NtId(Identifier),
@@ -2596,25 +88,30 @@ mod __parse__Members {
         NtType1(Type),
         NtType_3f(::std::option::Option<Type>),
         NtTypePath(Path),
-        Nt____Fields(Vec<Field>),
+        NtVarTy(VarTy),
+        NtVarTy_2a(::std::vec::Vec<VarTy>),
+        NtVarTy_2b(::std::vec::Vec<VarTy>),
+        NtVarTy_3f(::std::option::Option<VarTy>),
+        NtVarTys(Vec<VarTy>),
         Nt____Members(Vec<Member>),
         Nt____Program(Program),
+        Nt____VarTys(Vec<VarTy>),
     }
     const __ACTION: &'static [i32] = &[
         // State 0
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 9, 0, 10, 0, 0, 0, 0,
         // State 1
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -76, -76, 0, -76, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -67, -67, 0, -67, 0, 0, 0, 0,
         // State 2
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -80, -80, 0, -80, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -71, -71, 0, -71, 0, 0, 0, 0,
         // State 3
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 9, 0, 10, 0, 0, 0, 0,
         // State 4
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 5
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -77, -77, 0, -77, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -68, -68, 0, -68, 0, 0, 0, 0,
         // State 6
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -75, -75, 0, -75, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -66, -66, 0, -66, 0, 0, 0, 0,
         // State 7
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 15, 0, 16, 0, 0, 0, 0, 17, 0,
         // State 8
@@ -2622,69 +119,69 @@ mod __parse__Members {
         // State 9
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 15, 0, 16, 0, 0, 0, 0, 17, 0,
         // State 10
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -81, -81, 0, -81, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -72, -72, 0, -72, 0, 0, 0, 0,
         // State 11
         0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 12
-        0, -69, -69, -69, -69, 0, -69, -69, -69, -69, 0, -69, 0, 0, 0, 0, 0, 0, 0, -69, 0, 0,
+        0, -60, -60, -60, -60, 0, -60, -60, -60, -60, 0, -60, 0, 0, 0, 0, 0, 0, 0, -60, 0, 0,
         // State 13
-        0, -71, -71, -71, -71, 0, -71, -71, -71, -71, 0, -71, 0, 0, 0, 0, 0, 0, 0, -71, 0, 0,
+        0, -62, -62, -62, -62, 0, -62, -62, -62, -62, 0, -62, 0, 0, 0, 0, 0, 0, 0, -62, 0, 0,
         // State 14
-        0, -72, -72, -72, -72, 0, -72, -72, -72, -72, 0, -72, 0, 0, 0, 0, 0, 0, 0, -72, 0, 0,
+        0, -63, -63, -63, -63, 0, -63, -63, -63, -63, 0, -63, 0, 0, 0, 0, 0, 0, 0, -63, 0, 0,
         // State 15
-        0, -70, -70, -70, -70, 0, -70, -70, -70, -70, 0, -70, 0, 0, 0, 0, 0, 0, 0, -70, 0, 0,
+        0, -61, -61, -61, -61, 0, -61, -61, -61, -61, 0, -61, 0, 0, 0, 0, 0, 0, 0, -61, 0, 0,
         // State 16
-        0, -73, -73, -73, -73, 0, -73, -73, -73, -73, 0, -73, 0, 0, 0, 0, 0, 0, 0, -73, 0, 0,
+        0, -64, -64, -64, -64, 0, -64, -64, -64, -64, 0, -64, 0, 0, 0, 0, 0, 0, 0, -64, 0, 0,
         // State 17
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -74, -74, 0, -74, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -65, -65, 0, -65, 0, 0, 0, 0,
         // State 18
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -45, -45, 0, -45, 0, 0, 0, 0,
         // State 19
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0,
         // State 20
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -84, -84, 0, -84, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -75, -75, 0, -75, 0, 0, 0, 0,
         // State 21
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0,
         // State 22
         26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 23
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -89, -89, 0, -89, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -80, -80, 0, -80, 0, 0, 0, 0,
         // State 24
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -66, -66, 0, -66, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -57, -57, 0, -57, 0, 0, 0, 0,
         // State 25
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0,
         // State 26
         0, 0, 28, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 27
-        0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -93, 0, 0,
+        0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -84, 0, 0,
         // State 28
-        0, 0, -47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 15, 0, 16, 0, 0, 0, 0, 17, 0,
+        0, 0, -51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 15, 0, 16, 0, 0, 0, 0, 17, 0,
         // State 29
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -67, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -58, 0, 0,
         // State 30
         0, 0, 0, 0, 0, 0, 0, 43, 0, 0, 44, 0, 14, 15, 0, 16, 45, 0, 46, 0, 17, 0,
         // State 31
-        0, 0, -49, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 15, 0, 16, 0, 0, 0, 0, 17, 0,
+        0, 0, -53, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 15, 0, 16, 0, 0, 0, 0, 17, 0,
         // State 32
         0, 0, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 33
-        0, 0, -46, 0, 49, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 34
-        0, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, -50, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 35
-        0, 0, -100, -100, -100, 0, 0, 51, 0, -100, 0, -100, 0, 0, 0, 0, 0, 0, 0, -100, 0, 0,
+        0, 0, -91, -91, -91, 0, 0, 51, 0, -91, 0, -91, 0, 0, 0, 0, 0, 0, 0, -91, 0, 0,
         // State 36
         0, 0, -30, -30, -30, 0, 0, -30, 0, -30, 0, -30, 0, 0, 0, 0, 0, 0, 0, -30, 0, 0,
         // State 37
-        0, 0, -88, -88, -88, 0, 0, -88, 52, -88, 0, -88, 0, 0, 0, 0, 0, 0, 0, -88, 0, 0,
+        0, 0, -79, -79, -79, 0, 0, -79, 52, -79, 0, -79, 0, 0, 0, 0, 0, 0, 0, -79, 0, 0,
         // State 38
         0, 0, -39, -39, -39, 0, 0, -39, 0, -39, 0, -39, 0, 0, 0, 0, 0, 0, 0, -39, 0, 0,
         // State 39
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -92, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -83, 0, 0,
         // State 40
-        0, 0, -94, 54, -94, 0, 0, 0, 0, -94, 0, -94, 0, 0, 0, 0, 0, 0, 0, -94, 0, 0,
+        0, 0, -85, 54, -85, 0, 0, 0, 0, -85, 0, -85, 0, 0, 0, 0, 0, 0, 0, -85, 0, 0,
         // State 41
-        0, 0, -96, -96, -96, 0, 0, 0, 0, -96, 0, -96, 0, 0, 0, 0, 0, 0, 0, -96, 0, 0,
+        0, 0, -87, -87, -87, 0, 0, 0, 0, -87, 0, -87, 0, 0, 0, 0, 0, 0, 0, -87, 0, 0,
         // State 42
         0, 0, -36, -36, -36, 0, 0, -36, 0, -36, 0, -36, 0, 0, 0, 0, 0, 0, 0, -36, 0, 0,
         // State 43
@@ -2694,80 +191,80 @@ mod __parse__Members {
         // State 45
         0, 0, -38, -38, -38, 0, 0, -38, 0, -38, 0, -38, 0, 0, 0, 0, 0, 0, 0, -38, 0, 0,
         // State 46
-        0, 0, -48, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, -52, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 47
-        0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -93, 0, 0,
+        0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -84, 0, 0,
         // State 48
-        0, 0, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, -20, -20, 0, -20, 0, 0, 0, 0, -20, 0,
-        // State 49
         0, 0, 0, 0, 0, 0, 0, 43, 0, 0, 44, 0, 14, 15, 0, 16, 45, 0, 46, 0, 17, 0,
+        // State 49
+        0, 0, -25, 0, 0, 0, 0, 0, 0, 0, 0, 0, -25, -25, 0, -25, 0, 0, 0, 0, -25, 0,
         // State 50
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 15, 0, 16, 0, 0, 0, 0, 17, 0,
         // State 51
-        0, 0, 0, 0, 0, 0, 0, 43, 0, -51, 44, 0, 14, 15, 0, 16, 45, 0, 46, 0, 17, 0,
+        0, 0, 0, 0, 0, 0, 0, 43, 0, -47, 44, 0, 14, 15, 0, 16, 45, 0, 46, 0, 17, 0,
         // State 52
-        0, 0, -95, 63, -95, 0, 0, 0, 0, -95, 0, -95, 0, 0, 0, 0, 0, 0, 0, -95, 0, 0,
+        0, 0, -86, 63, -86, 0, 0, 0, 0, -86, 0, -86, 0, 0, 0, 0, 0, 0, 0, -86, 0, 0,
         // State 53
         0, 0, 0, 0, 0, 0, 0, 43, 0, 0, 44, 0, 14, 15, 0, 16, 45, 0, 46, 0, 17, 0,
         // State 54
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 55
-        0, 0, -21, 0, 0, 0, 0, 0, 0, 0, 0, 0, -21, -21, 0, -21, 0, 0, 0, 0, -21, 0,
+        0, 0, -26, 0, 0, 0, 0, 0, 0, 0, 0, 0, -26, -26, 0, -26, 0, 0, 0, 0, -26, 0,
         // State 56
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -68, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -59, 0, 0,
         // State 57
-        0, 0, -57, 0, -57, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, -92, 0, -92, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 58
         0, 0, -31, -31, -31, 0, 0, -31, 0, -31, 0, -31, 0, 0, 0, 0, 0, 0, 0, -31, 0, 0,
         // State 59
-        0, 0, 0, 0, 0, 0, 0, 43, 0, -53, 44, 0, 14, 15, 0, 16, 45, 0, 46, 0, 17, 0,
+        0, 0, 0, 0, 0, 0, 0, 43, 0, -49, 44, 0, 14, 15, 0, 16, 45, 0, 46, 0, 17, 0,
         // State 60
         0, 0, 0, 0, 0, 0, 0, 0, 0, 67, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 61
-        0, 0, 0, 0, 68, 0, 0, 0, 0, -50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 68, 0, 0, 0, 0, -46, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 62
         0, 0, 0, 0, 0, 0, 0, 43, 0, 0, 44, 0, 14, 15, 0, 16, 45, 0, 46, 0, 17, 0,
         // State 63
         0, 0, -2, -2, -2, 0, 0, 0, 0, -2, 0, -2, 0, 0, 0, 0, 0, 0, 0, -2, 0, 0,
         // State 64
-        0, 0, -97, -97, -97, 0, 0, 0, 0, -97, 0, -97, 0, 0, 0, 0, 0, 0, 0, -97, 0, 0,
+        0, 0, -88, -88, -88, 0, 0, 0, 0, -88, 0, -88, 0, 0, 0, 0, 0, 0, 0, -88, 0, 0,
         // State 65
-        0, 0, 0, 0, 70, 0, 0, 0, 0, -52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 70, 0, 0, 0, 0, -48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 66
-        0, 0, -87, -87, -87, 0, 0, -87, 0, -87, 0, -87, 0, 0, 0, 0, 0, 0, 0, -87, 0, 0,
+        0, 0, -78, -78, -78, 0, 0, -78, 0, -78, 0, -78, 0, 0, 0, 0, 0, 0, 0, -78, 0, 0,
         // State 67
-        0, 0, 0, 0, 0, 0, 0, -25, 0, -25, -25, 0, -25, -25, 0, -25, -25, 0, -25, 0, -25, 0,
+        0, 0, 0, 0, 0, 0, 0, -20, 0, -20, -20, 0, -20, -20, 0, -20, -20, 0, -20, 0, -20, 0,
         // State 68
         0, 0, -3, -3, -3, 0, 0, 0, 0, -3, 0, -3, 0, 0, 0, 0, 0, 0, 0, -3, 0, 0,
         // State 69
-        0, 0, 0, 0, 0, 0, 0, -26, 0, -26, -26, 0, -26, -26, 0, -26, -26, 0, -26, 0, -26, 0,
+        0, 0, 0, 0, 0, 0, 0, -21, 0, -21, -21, 0, -21, -21, 0, -21, -21, 0, -21, 0, -21, 0,
     ];
     const __EOF_ACTION: &'static [i32] = &[
-        -82,
-        -76,
-        -80,
-        -83,
-        -102,
-        -77,
+        -73,
+        -67,
+        -71,
+        -74,
+        -101,
+        -68,
+        -66,
+        0,
+        0,
+        0,
+        -72,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        -65,
+        -45,
+        0,
         -75,
         0,
         0,
-        0,
-        -81,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        -74,
-        -45,
-        0,
-        -84,
-        0,
-        0,
-        -89,
-        -66,
+        -80,
+        -57,
         0,
         0,
         0,
@@ -2816,13 +313,13 @@ mod __parse__Members {
     ];
     const __GOTO: &'static [i32] = &[
         // State 0
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 0, 4, 5, 6, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 0, 4, 5, 6, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 1
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 2
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 3
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 11, 0, 0, 0, 6, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 11, 0, 0, 0, 6, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 4
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 5
@@ -2830,15 +327,15 @@ mod __parse__Members {
         // State 6
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 7
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 8
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 9
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 10
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 11
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 12
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 13
@@ -2870,15 +367,15 @@ mod __parse__Members {
         // State 26
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 27
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 28
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 34, 0, 0, 0, 0, 0, 0, 35, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 34, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0,
         // State 29
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 30
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 13, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 40, 41, 0, 42, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 13, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 40, 41, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 31
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 47, 0, 0, 0, 0, 0, 0, 35, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 34, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 47, 0, 0, 0, 0, 0, 0, 0,
         // State 32
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 33
@@ -2902,7 +399,7 @@ mod __parse__Members {
         // State 42
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 43
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 13, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 55, 41, 0, 42, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 13, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 55, 41, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 44
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 45
@@ -2910,19 +407,19 @@ mod __parse__Members {
         // State 46
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 47
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 57, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 57, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 48
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 13, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 58, 41, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 49
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 13, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 58, 41, 0, 42, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 50
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 13, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 13, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 51
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60, 0, 0, 36, 0, 37, 0, 0, 0, 0, 0, 61, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 13, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 62, 41, 0, 42, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60, 0, 0, 0, 0, 0, 36, 0, 37, 0, 0, 0, 0, 61, 0, 0, 0, 0, 0, 38, 13, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 62, 41, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 52
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 53
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 13, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 0, 64, 0, 42, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 13, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 0, 64, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 54
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 55
@@ -2934,13 +431,13 @@ mod __parse__Members {
         // State 58
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 59
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 13, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 66, 41, 0, 42, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 13, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 66, 41, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 60
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 61
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 62
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 13, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 0, 69, 0, 42, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 13, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 0, 69, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 63
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 64
@@ -3367,64 +864,6 @@ mod __parse__Members {
                 10
             }
             17 => {
-                // (<Field> ",") = Field, "," => ActionFn(61);
-                let __sym1 = __pop_Term_22_2c_22(__symbols);
-                let __sym0 = __pop_NtField(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action61::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29(__nt), __end));
-                11
-            }
-            18 => {
-                // (<Field> ",")* =  => ActionFn(59);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action59::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29_2a(__nt), __end));
-                12
-            }
-            19 => {
-                // (<Field> ",")* = (<Field> ",")+ => ActionFn(60);
-                let __sym0 = __pop_Nt_28_3cField_3e_20_22_2c_22_29_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action60::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29_2a(__nt), __end));
-                12
-            }
-            20 => {
-                // (<Field> ",")+ = Field, "," => ActionFn(105);
-                let __sym1 = __pop_Term_22_2c_22(__symbols);
-                let __sym0 = __pop_NtField(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action105::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29_2b(__nt), __end));
-                13
-            }
-            21 => {
-                // (<Field> ",")+ = (<Field> ",")+, Field, "," => ActionFn(106);
-                let __sym2 = __pop_Term_22_2c_22(__symbols);
-                let __sym1 = __pop_NtField(__symbols);
-                let __sym0 = __pop_Nt_28_3cField_3e_20_22_2c_22_29_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym2.2.clone();
-                let __nt = super::__action106::<>(__sym0, __sym1, __sym2);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 3);
-                __symbols.push((__start, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29_2b(__nt), __end));
-                13
-            }
-            22 => {
                 // (<Type> ",") = Type, "," => ActionFn(87);
                 let __sym1 = __pop_Term_22_2c_22(__symbols);
                 let __sym0 = __pop_NtType(__symbols);
@@ -3434,9 +873,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 2);
                 __symbols.push((__start, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29(__nt), __end));
-                14
+                11
             }
-            23 => {
+            18 => {
                 // (<Type> ",")* =  => ActionFn(85);
                 let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
                 let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
@@ -3444,9 +883,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 0);
                 __symbols.push((__start, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29_2a(__nt), __end));
-                15
+                12
             }
-            24 => {
+            19 => {
                 // (<Type> ",")* = (<Type> ",")+ => ActionFn(86);
                 let __sym0 = __pop_Nt_28_3cType_3e_20_22_2c_22_29_2b(__symbols);
                 let __start = __sym0.0.clone();
@@ -3455,31 +894,89 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29_2a(__nt), __end));
-                15
+                12
             }
-            25 => {
-                // (<Type> ",")+ = Type, "," => ActionFn(109);
+            20 => {
+                // (<Type> ",")+ = Type, "," => ActionFn(105);
                 let __sym1 = __pop_Term_22_2c_22(__symbols);
                 let __sym0 = __pop_NtType(__symbols);
                 let __start = __sym0.0.clone();
                 let __end = __sym1.2.clone();
-                let __nt = super::__action109::<>(__sym0, __sym1);
+                let __nt = super::__action105::<>(__sym0, __sym1);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 2);
                 __symbols.push((__start, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29_2b(__nt), __end));
-                16
+                13
             }
-            26 => {
-                // (<Type> ",")+ = (<Type> ",")+, Type, "," => ActionFn(110);
+            21 => {
+                // (<Type> ",")+ = (<Type> ",")+, Type, "," => ActionFn(106);
                 let __sym2 = __pop_Term_22_2c_22(__symbols);
                 let __sym1 = __pop_NtType(__symbols);
                 let __sym0 = __pop_Nt_28_3cType_3e_20_22_2c_22_29_2b(__symbols);
                 let __start = __sym0.0.clone();
                 let __end = __sym2.2.clone();
-                let __nt = super::__action110::<>(__sym0, __sym1, __sym2);
+                let __nt = super::__action106::<>(__sym0, __sym1, __sym2);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 3);
                 __symbols.push((__start, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29_2b(__nt), __end));
+                13
+            }
+            22 => {
+                // (<VarTy> ",") = VarTy, "," => ActionFn(61);
+                let __sym1 = __pop_Term_22_2c_22(__symbols);
+                let __sym0 = __pop_NtVarTy(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action61::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29(__nt), __end));
+                14
+            }
+            23 => {
+                // (<VarTy> ",")* =  => ActionFn(59);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action59::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29_2a(__nt), __end));
+                15
+            }
+            24 => {
+                // (<VarTy> ",")* = (<VarTy> ",")+ => ActionFn(60);
+                let __sym0 = __pop_Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action60::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29_2a(__nt), __end));
+                15
+            }
+            25 => {
+                // (<VarTy> ",")+ = VarTy, "," => ActionFn(109);
+                let __sym1 = __pop_Term_22_2c_22(__symbols);
+                let __sym0 = __pop_NtVarTy(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action109::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(__nt), __end));
+                16
+            }
+            26 => {
+                // (<VarTy> ",")+ = (<VarTy> ",")+, VarTy, "," => ActionFn(110);
+                let __sym2 = __pop_Term_22_2c_22(__symbols);
+                let __sym1 = __pop_NtVarTy(__symbols);
+                let __sym0 = __pop_Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym2.2.clone();
+                let __nt = super::__action110::<>(__sym0, __sym1, __sym2);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 3);
+                __symbols.push((__start, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(__nt), __end));
                 16
             }
             27 => {
@@ -3701,91 +1198,91 @@ mod __parse__Members {
                 25
             }
             46 => {
-                // Comma<Field> = Field => ActionFn(119);
-                let __sym0 = __pop_NtField(__symbols);
+                // Comma<Type> = Type => ActionFn(119);
+                let __sym0 = __pop_NtType(__symbols);
                 let __start = __sym0.0.clone();
                 let __end = __sym0.2.clone();
                 let __nt = super::__action119::<>(__sym0);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtComma_3cField_3e(__nt), __end));
+                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
                 26
             }
             47 => {
-                // Comma<Field> =  => ActionFn(120);
+                // Comma<Type> =  => ActionFn(120);
                 let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
                 let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
                 let __nt = super::__action120::<>(&__start, &__end);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::NtComma_3cField_3e(__nt), __end));
+                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
                 26
             }
             48 => {
-                // Comma<Field> = (<Field> ",")+, Field => ActionFn(121);
-                let __sym1 = __pop_NtField(__symbols);
-                let __sym0 = __pop_Nt_28_3cField_3e_20_22_2c_22_29_2b(__symbols);
+                // Comma<Type> = (<Type> ",")+, Type => ActionFn(121);
+                let __sym1 = __pop_NtType(__symbols);
+                let __sym0 = __pop_Nt_28_3cType_3e_20_22_2c_22_29_2b(__symbols);
                 let __start = __sym0.0.clone();
                 let __end = __sym1.2.clone();
                 let __nt = super::__action121::<>(__sym0, __sym1);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::NtComma_3cField_3e(__nt), __end));
+                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
                 26
             }
             49 => {
-                // Comma<Field> = (<Field> ",")+ => ActionFn(122);
-                let __sym0 = __pop_Nt_28_3cField_3e_20_22_2c_22_29_2b(__symbols);
+                // Comma<Type> = (<Type> ",")+ => ActionFn(122);
+                let __sym0 = __pop_Nt_28_3cType_3e_20_22_2c_22_29_2b(__symbols);
                 let __start = __sym0.0.clone();
                 let __end = __sym0.2.clone();
                 let __nt = super::__action122::<>(__sym0);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtComma_3cField_3e(__nt), __end));
+                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
                 26
             }
             50 => {
-                // Comma<Type> = Type => ActionFn(125);
-                let __sym0 = __pop_NtType(__symbols);
+                // Comma<VarTy> = VarTy => ActionFn(125);
+                let __sym0 = __pop_NtVarTy(__symbols);
                 let __start = __sym0.0.clone();
                 let __end = __sym0.2.clone();
                 let __nt = super::__action125::<>(__sym0);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
+                __symbols.push((__start, __Symbol::NtComma_3cVarTy_3e(__nt), __end));
                 27
             }
             51 => {
-                // Comma<Type> =  => ActionFn(126);
+                // Comma<VarTy> =  => ActionFn(126);
                 let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
                 let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
                 let __nt = super::__action126::<>(&__start, &__end);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
+                __symbols.push((__start, __Symbol::NtComma_3cVarTy_3e(__nt), __end));
                 27
             }
             52 => {
-                // Comma<Type> = (<Type> ",")+, Type => ActionFn(127);
-                let __sym1 = __pop_NtType(__symbols);
-                let __sym0 = __pop_Nt_28_3cType_3e_20_22_2c_22_29_2b(__symbols);
+                // Comma<VarTy> = (<VarTy> ",")+, VarTy => ActionFn(127);
+                let __sym1 = __pop_NtVarTy(__symbols);
+                let __sym0 = __pop_Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(__symbols);
                 let __start = __sym0.0.clone();
                 let __end = __sym1.2.clone();
                 let __nt = super::__action127::<>(__sym0, __sym1);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
+                __symbols.push((__start, __Symbol::NtComma_3cVarTy_3e(__nt), __end));
                 27
             }
             53 => {
-                // Comma<Type> = (<Type> ",")+ => ActionFn(128);
-                let __sym0 = __pop_Nt_28_3cType_3e_20_22_2c_22_29_2b(__symbols);
+                // Comma<VarTy> = (<VarTy> ",")+ => ActionFn(128);
+                let __sym0 = __pop_Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(__symbols);
                 let __start = __sym0.0.clone();
                 let __end = __sym0.2.clone();
                 let __nt = super::__action128::<>(__sym0);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
+                __symbols.push((__start, __Symbol::NtComma_3cVarTy_3e(__nt), __end));
                 27
             }
             54 => {
@@ -3822,105 +1319,6 @@ mod __parse__Members {
                 29
             }
             57 => {
-                // Field = Id, ":", Type => ActionFn(23);
-                let __sym2 = __pop_NtType(__symbols);
-                let __sym1 = __pop_Term_22_3a_22(__symbols);
-                let __sym0 = __pop_NtId(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym2.2.clone();
-                let __nt = super::__action23::<>(__sym0, __sym1, __sym2);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 3);
-                __symbols.push((__start, __Symbol::NtField(__nt), __end));
-                30
-            }
-            58 => {
-                // Field* =  => ActionFn(39);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action39::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::NtField_2a(__nt), __end));
-                31
-            }
-            59 => {
-                // Field* = Field+ => ActionFn(40);
-                let __sym0 = __pop_NtField_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action40::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtField_2a(__nt), __end));
-                31
-            }
-            60 => {
-                // Field+ = Field => ActionFn(62);
-                let __sym0 = __pop_NtField(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action62::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtField_2b(__nt), __end));
-                32
-            }
-            61 => {
-                // Field+ = Field+, Field => ActionFn(63);
-                let __sym1 = __pop_NtField(__symbols);
-                let __sym0 = __pop_NtField_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action63::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::NtField_2b(__nt), __end));
-                32
-            }
-            62 => {
-                // Field? = Field => ActionFn(57);
-                let __sym0 = __pop_NtField(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action57::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtField_3f(__nt), __end));
-                33
-            }
-            63 => {
-                // Field? =  => ActionFn(58);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action58::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::NtField_3f(__nt), __end));
-                33
-            }
-            64 => {
-                // Fields =  => ActionFn(117);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action117::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::NtFields(__nt), __end));
-                34
-            }
-            65 => {
-                // Fields = Field+ => ActionFn(118);
-                let __sym0 = __pop_NtField_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action118::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtFields(__nt), __end));
-                34
-            }
-            66 => {
                 // FnDef = FnSig, CodeBlock => ActionFn(18);
                 let __sym1 = __pop_NtCodeBlock(__symbols);
                 let __sym0 = __pop_NtFnSig(__symbols);
@@ -3930,9 +1328,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 2);
                 __symbols.push((__start, __Symbol::NtFnDef(__nt), __end));
-                35
+                30
             }
-            67 => {
+            58 => {
                 // FnSig = "(", "&", "self", ")", ReturnTy => ActionFn(19);
                 let __sym4 = __pop_NtReturnTy(__symbols);
                 let __sym3 = __pop_Term_22_29_22(__symbols);
@@ -3945,13 +1343,13 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 5);
                 __symbols.push((__start, __Symbol::NtFnSig(__nt), __end));
-                36
+                31
             }
-            68 => {
-                // FnSig = "(", "&", "self", ",", Comma<Field>, ")", ReturnTy => ActionFn(20);
+            59 => {
+                // FnSig = "(", "&", "self", ",", Comma<VarTy>, ")", ReturnTy => ActionFn(20);
                 let __sym6 = __pop_NtReturnTy(__symbols);
                 let __sym5 = __pop_Term_22_29_22(__symbols);
-                let __sym4 = __pop_NtComma_3cField_3e(__symbols);
+                let __sym4 = __pop_NtComma_3cVarTy_3e(__symbols);
                 let __sym3 = __pop_Term_22_2c_22(__symbols);
                 let __sym2 = __pop_Term_22self_22(__symbols);
                 let __sym1 = __pop_Term_22_26_22(__symbols);
@@ -3962,9 +1360,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 7);
                 __symbols.push((__start, __Symbol::NtFnSig(__nt), __end));
-                36
+                31
             }
-            69 => {
+            60 => {
                 // Id = IdStr => ActionFn(7);
                 let __sym0 = __pop_NtIdStr(__symbols);
                 let __start = __sym0.0.clone();
@@ -3973,9 +1371,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtId(__nt), __end));
-                37
+                32
             }
-            70 => {
+            61 => {
                 // IdStr = "init" => ActionFn(8);
                 let __sym0 = __pop_Term_22init_22(__symbols);
                 let __start = __sym0.0.clone();
@@ -3984,9 +1382,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtIdStr(__nt), __end));
-                38
+                33
             }
-            71 => {
+            62 => {
                 // IdStr = "class" => ActionFn(9);
                 let __sym0 = __pop_Term_22class_22(__symbols);
                 let __start = __sym0.0.clone();
@@ -3995,9 +1393,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtIdStr(__nt), __end));
-                38
+                33
             }
-            72 => {
+            63 => {
                 // IdStr = "extends" => ActionFn(10);
                 let __sym0 = __pop_Term_22extends_22(__symbols);
                 let __start = __sym0.0.clone();
@@ -4006,9 +1404,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtIdStr(__nt), __end));
-                38
+                33
             }
-            73 => {
+            64 => {
                 // IdStr = OtherId => ActionFn(11);
                 let __sym0 = __pop_TermOtherId(__symbols);
                 let __start = __sym0.0.clone();
@@ -4017,9 +1415,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtIdStr(__nt), __end));
-                38
+                33
             }
-            74 => {
+            65 => {
                 // Init = "init", CodeBlock => ActionFn(16);
                 let __sym1 = __pop_NtCodeBlock(__symbols);
                 let __sym0 = __pop_Term_22init_22(__symbols);
@@ -4029,9 +1427,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 2);
                 __symbols.push((__start, __Symbol::NtInit(__nt), __end));
-                39
+                34
             }
-            75 => {
+            66 => {
                 // Member = PrivateStruct => ActionFn(12);
                 let __sym0 = __pop_NtPrivateStruct(__symbols);
                 let __start = __sym0.0.clone();
@@ -4040,9 +1438,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtMember(__nt), __end));
-                40
+                35
             }
-            76 => {
+            67 => {
                 // Member = Init => ActionFn(13);
                 let __sym0 = __pop_NtInit(__symbols);
                 let __start = __sym0.0.clone();
@@ -4051,9 +1449,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtMember(__nt), __end));
-                40
+                35
             }
-            77 => {
+            68 => {
                 // Member = Method => ActionFn(14);
                 let __sym0 = __pop_NtMethod(__symbols);
                 let __start = __sym0.0.clone();
@@ -4062,9 +1460,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtMember(__nt), __end));
-                40
+                35
             }
-            78 => {
+            69 => {
                 // Member* =  => ActionFn(45);
                 let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
                 let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
@@ -4072,9 +1470,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 0);
                 __symbols.push((__start, __Symbol::NtMember_2a(__nt), __end));
-                41
+                36
             }
-            79 => {
+            70 => {
                 // Member* = Member+ => ActionFn(46);
                 let __sym0 = __pop_NtMember_2b(__symbols);
                 let __start = __sym0.0.clone();
@@ -4083,9 +1481,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtMember_2a(__nt), __end));
-                41
+                36
             }
-            80 => {
+            71 => {
                 // Member+ = Member => ActionFn(55);
                 let __sym0 = __pop_NtMember(__symbols);
                 let __start = __sym0.0.clone();
@@ -4094,9 +1492,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtMember_2b(__nt), __end));
-                42
+                37
             }
-            81 => {
+            72 => {
                 // Member+ = Member+, Member => ActionFn(56);
                 let __sym1 = __pop_NtMember(__symbols);
                 let __sym0 = __pop_NtMember_2b(__symbols);
@@ -4106,30 +1504,30 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 2);
                 __symbols.push((__start, __Symbol::NtMember_2b(__nt), __end));
-                42
+                37
             }
-            82 => {
-                // Members =  => ActionFn(123);
+            73 => {
+                // Members =  => ActionFn(117);
                 let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
                 let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action123::<>(&__start, &__end);
+                let __nt = super::__action117::<>(&__start, &__end);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 0);
                 __symbols.push((__start, __Symbol::NtMembers(__nt), __end));
-                43
+                38
             }
-            83 => {
-                // Members = Member+ => ActionFn(124);
+            74 => {
+                // Members = Member+ => ActionFn(118);
                 let __sym0 = __pop_NtMember_2b(__symbols);
                 let __start = __sym0.0.clone();
                 let __end = __sym0.2.clone();
-                let __nt = super::__action124::<>(__sym0);
+                let __nt = super::__action118::<>(__sym0);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtMembers(__nt), __end));
-                43
+                38
             }
-            84 => {
+            75 => {
                 // Method = "fn", Id, FnDef => ActionFn(17);
                 let __sym2 = __pop_NtFnDef(__symbols);
                 let __sym1 = __pop_NtId(__symbols);
@@ -4140,9 +1538,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 3);
                 __symbols.push((__start, __Symbol::NtMethod(__nt), __end));
-                44
+                39
             }
-            85 => {
+            76 => {
                 // PathId<"::"> = Id, "::", "<", Comma<Type>, ">" => ActionFn(96);
                 let __sym4 = __pop_Term_22_3e_22(__symbols);
                 let __sym3 = __pop_NtComma_3cType_3e(__symbols);
@@ -4155,9 +1553,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 5);
                 __symbols.push((__start, __Symbol::NtPathId_3c_22_3a_3a_22_3e(__nt), __end));
-                45
+                40
             }
-            86 => {
+            77 => {
                 // PathId<"::"> = Id => ActionFn(97);
                 let __sym0 = __pop_NtId(__symbols);
                 let __start = __sym0.0.clone();
@@ -4166,9 +1564,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtPathId_3c_22_3a_3a_22_3e(__nt), __end));
-                45
+                40
             }
-            87 => {
+            78 => {
                 // PathId<()> = Id, "<", Comma<Type>, ">" => ActionFn(103);
                 let __sym3 = __pop_Term_22_3e_22(__symbols);
                 let __sym2 = __pop_NtComma_3cType_3e(__symbols);
@@ -4180,9 +1578,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 4);
                 __symbols.push((__start, __Symbol::NtPathId_3c_28_29_3e(__nt), __end));
-                46
+                41
             }
-            88 => {
+            79 => {
                 // PathId<()> = Id => ActionFn(104);
                 let __sym0 = __pop_NtId(__symbols);
                 let __start = __sym0.0.clone();
@@ -4191,9 +1589,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtPathId_3c_28_29_3e(__nt), __end));
-                46
+                41
             }
-            89 => {
+            80 => {
                 // PrivateStruct = "struct", Id, "{..}" => ActionFn(114);
                 let __sym2 = __pop_Term_22_7b_2e_2e_7d_22(__symbols);
                 let __sym1 = __pop_NtId(__symbols);
@@ -4207,9 +1605,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 3);
                 __symbols.push((__start, __Symbol::NtPrivateStruct(__nt), __end));
-                47
+                42
             }
-            90 => {
+            81 => {
                 // Program =  => ActionFn(115);
                 let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
                 let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
@@ -4217,9 +1615,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 0);
                 __symbols.push((__start, __Symbol::NtProgram(__nt), __end));
-                48
+                43
             }
-            91 => {
+            82 => {
                 // Program = Class+ => ActionFn(116);
                 let __sym0 = __pop_NtClass_2b(__symbols);
                 let __start = __sym0.0.clone();
@@ -4228,9 +1626,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtProgram(__nt), __end));
-                48
+                43
             }
-            92 => {
+            83 => {
                 // ReturnTy = "->", Type => ActionFn(93);
                 let __sym1 = __pop_NtType(__symbols);
                 let __sym0 = __pop_Term_22_2d_3e_22(__symbols);
@@ -4240,9 +1638,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 2);
                 __symbols.push((__start, __Symbol::NtReturnTy(__nt), __end));
-                49
+                44
             }
-            93 => {
+            84 => {
                 // ReturnTy =  => ActionFn(94);
                 let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
                 let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
@@ -4250,9 +1648,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 0);
                 __symbols.push((__start, __Symbol::NtReturnTy(__nt), __end));
-                49
+                44
             }
-            94 => {
+            85 => {
                 // Type = Type1 => ActionFn(24);
                 let __sym0 = __pop_NtType1(__symbols);
                 let __start = __sym0.0.clone();
@@ -4261,9 +1659,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtType(__nt), __end));
-                50
+                45
             }
-            95 => {
+            86 => {
                 // Type = Type1, ("+" <Type1>)+ => ActionFn(25);
                 let __sym1 = __pop_Nt_28_22_2b_22_20_3cType1_3e_29_2b(__symbols);
                 let __sym0 = __pop_NtType1(__symbols);
@@ -4273,9 +1671,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 2);
                 __symbols.push((__start, __Symbol::NtType(__nt), __end));
-                50
+                45
             }
-            96 => {
+            87 => {
                 // Type1 = TypePath => ActionFn(26);
                 let __sym0 = __pop_NtTypePath(__symbols);
                 let __start = __sym0.0.clone();
@@ -4284,9 +1682,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtType1(__nt), __end));
-                51
+                46
             }
-            97 => {
+            88 => {
                 // Type1 = "[", Type, "]" => ActionFn(27);
                 let __sym2 = __pop_Term_22_5d_22(__symbols);
                 let __sym1 = __pop_NtType(__symbols);
@@ -4297,9 +1695,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 3);
                 __symbols.push((__start, __Symbol::NtType1(__nt), __end));
-                51
+                46
             }
-            98 => {
+            89 => {
                 // Type? = Type => ActionFn(83);
                 let __sym0 = __pop_NtType(__symbols);
                 let __start = __sym0.0.clone();
@@ -4308,9 +1706,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtType_3f(__nt), __end));
-                52
+                47
             }
-            99 => {
+            90 => {
                 // Type? =  => ActionFn(84);
                 let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
                 let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
@@ -4318,9 +1716,9 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 0);
                 __symbols.push((__start, __Symbol::NtType_3f(__nt), __end));
-                52
+                47
             }
-            100 => {
+            91 => {
                 // TypePath = AnyPath<()> => ActionFn(30);
                 let __sym0 = __pop_NtAnyPath_3c_28_29_3e(__symbols);
                 let __start = __sym0.0.clone();
@@ -4329,20 +1727,108 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtTypePath(__nt), __end));
+                48
+            }
+            92 => {
+                // VarTy = Id, ":", Type => ActionFn(23);
+                let __sym2 = __pop_NtType(__symbols);
+                let __sym1 = __pop_Term_22_3a_22(__symbols);
+                let __sym0 = __pop_NtId(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym2.2.clone();
+                let __nt = super::__action23::<>(__sym0, __sym1, __sym2);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 3);
+                __symbols.push((__start, __Symbol::NtVarTy(__nt), __end));
+                49
+            }
+            93 => {
+                // VarTy* =  => ActionFn(39);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action39::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::NtVarTy_2a(__nt), __end));
+                50
+            }
+            94 => {
+                // VarTy* = VarTy+ => ActionFn(40);
+                let __sym0 = __pop_NtVarTy_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action40::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtVarTy_2a(__nt), __end));
+                50
+            }
+            95 => {
+                // VarTy+ = VarTy => ActionFn(62);
+                let __sym0 = __pop_NtVarTy(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action62::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtVarTy_2b(__nt), __end));
+                51
+            }
+            96 => {
+                // VarTy+ = VarTy+, VarTy => ActionFn(63);
+                let __sym1 = __pop_NtVarTy(__symbols);
+                let __sym0 = __pop_NtVarTy_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action63::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::NtVarTy_2b(__nt), __end));
+                51
+            }
+            97 => {
+                // VarTy? = VarTy => ActionFn(57);
+                let __sym0 = __pop_NtVarTy(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action57::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtVarTy_3f(__nt), __end));
+                52
+            }
+            98 => {
+                // VarTy? =  => ActionFn(58);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action58::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::NtVarTy_3f(__nt), __end));
+                52
+            }
+            99 => {
+                // VarTys =  => ActionFn(123);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action123::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::NtVarTys(__nt), __end));
+                53
+            }
+            100 => {
+                // VarTys = VarTy+ => ActionFn(124);
+                let __sym0 = __pop_NtVarTy_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action124::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtVarTys(__nt), __end));
                 53
             }
             101 => {
-                // __Fields = Fields => ActionFn(2);
-                let __sym0 = __pop_NtFields(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action2::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::Nt____Fields(__nt), __end));
-                54
-            }
-            102 => {
                 // __Members = Members => ActionFn(1);
                 let __sym0 = __pop_NtMembers(__symbols);
                 let __start = __sym0.0.clone();
@@ -4350,7 +1836,7 @@ mod __parse__Members {
                 let __nt = super::__action1::<>(__sym0);
                 return Some(Ok(__nt));
             }
-            103 => {
+            102 => {
                 // __Program = Program => ActionFn(0);
                 let __sym0 = __pop_NtProgram(__symbols);
                 let __start = __sym0.0.clone();
@@ -4359,6 +1845,17 @@ mod __parse__Members {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::Nt____Program(__nt), __end));
+                55
+            }
+            103 => {
+                // __VarTys = VarTys => ActionFn(2);
+                let __sym0 = __pop_NtVarTys(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action2::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::Nt____VarTys(__nt), __end));
                 56
             }
             _ => panic!("invalid action code {}", __action)
@@ -4698,36 +2195,6 @@ mod __parse__Members {
             _ => panic!("symbol type mismatch")
         }
     }
-    fn __pop_Nt_28_3cField_3e_20_22_2c_22_29<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Field, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt_28_3cField_3e_20_22_2c_22_29_2a<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::vec::Vec<Field>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29_2a(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt_28_3cField_3e_20_22_2c_22_29_2b<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::vec::Vec<Field>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29_2b(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
     fn __pop_Nt_28_3cType_3e_20_22_2c_22_29<
       'input,
     >(
@@ -4755,6 +2222,36 @@ mod __parse__Members {
     ) -> (usize, ::std::vec::Vec<Type>, usize) {
         match __symbols.pop().unwrap() {
             (__l, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29_2b(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_3cVarTy_3e_20_22_2c_22_29<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, VarTy, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_3cVarTy_3e_20_22_2c_22_29_2a<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::vec::Vec<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29_2a(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_3cVarTy_3e_20_22_2c_22_29_2b<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::vec::Vec<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(__v), __r) => (__l, __v, __r),
             _ => panic!("symbol type mismatch")
         }
     }
@@ -4848,16 +2345,6 @@ mod __parse__Members {
             _ => panic!("symbol type mismatch")
         }
     }
-    fn __pop_NtComma_3cField_3e<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Vec<Field>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtComma_3cField_3e(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
     fn __pop_NtComma_3cType_3e<
       'input,
     >(
@@ -4865,6 +2352,16 @@ mod __parse__Members {
     ) -> (usize, Vec<Type>, usize) {
         match __symbols.pop().unwrap() {
             (__l, __Symbol::NtComma_3cType_3e(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtComma_3cVarTy_3e<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Vec<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtComma_3cVarTy_3e(__v), __r) => (__l, __v, __r),
             _ => panic!("symbol type mismatch")
         }
     }
@@ -4885,56 +2382,6 @@ mod __parse__Members {
     ) -> (usize, Option<Path>, usize) {
         match __symbols.pop().unwrap() {
             (__l, __Symbol::NtExtends(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtField<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Field, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtField(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtField_2a<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::vec::Vec<Field>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtField_2a(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtField_2b<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::vec::Vec<Field>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtField_2b(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtField_3f<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::option::Option<Field>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtField_3f(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtFields<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Vec<Field>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtFields(__v), __r) => (__l, __v, __r),
             _ => panic!("symbol type mismatch")
         }
     }
@@ -5128,13 +2575,53 @@ mod __parse__Members {
             _ => panic!("symbol type mismatch")
         }
     }
-    fn __pop_Nt____Fields<
+    fn __pop_NtVarTy<
       'input,
     >(
         __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Vec<Field>, usize) {
+    ) -> (usize, VarTy, usize) {
         match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt____Fields(__v), __r) => (__l, __v, __r),
+            (__l, __Symbol::NtVarTy(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtVarTy_2a<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::vec::Vec<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtVarTy_2a(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtVarTy_2b<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::vec::Vec<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtVarTy_2b(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtVarTy_3f<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::option::Option<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtVarTy_3f(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtVarTys<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Vec<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtVarTys(__v), __r) => (__l, __v, __r),
             _ => panic!("symbol type mismatch")
         }
     }
@@ -5155,6 +2642,16 @@ mod __parse__Members {
     ) -> (usize, Program, usize) {
         match __symbols.pop().unwrap() {
             (__l, __Symbol::Nt____Program(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt____VarTys<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Vec<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt____VarTys(__v), __r) => (__l, __v, __r),
             _ => panic!("symbol type mismatch")
         }
     }
@@ -5206,12 +2703,12 @@ mod __parse__Program {
         Nt_28_28_29_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29(Vec<Type>),
         Nt_28_28_29_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29_3f(::std::option::Option<Vec<Type>>),
         Nt_28_29(()),
-        Nt_28_3cField_3e_20_22_2c_22_29(Field),
-        Nt_28_3cField_3e_20_22_2c_22_29_2a(::std::vec::Vec<Field>),
-        Nt_28_3cField_3e_20_22_2c_22_29_2b(::std::vec::Vec<Field>),
         Nt_28_3cType_3e_20_22_2c_22_29(Type),
         Nt_28_3cType_3e_20_22_2c_22_29_2a(::std::vec::Vec<Type>),
         Nt_28_3cType_3e_20_22_2c_22_29_2b(::std::vec::Vec<Type>),
+        Nt_28_3cVarTy_3e_20_22_2c_22_29(VarTy),
+        Nt_28_3cVarTy_3e_20_22_2c_22_29_2a(::std::vec::Vec<VarTy>),
+        Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(::std::vec::Vec<VarTy>),
         Nt_40L(usize),
         NtAnyPath_3c_22_3a_3a_22_3e(Path),
         NtAnyPath_3c_28_29_3e(Path),
@@ -5221,15 +2718,10 @@ mod __parse__Program {
         NtClass_2a(::std::vec::Vec<Class>),
         NtClass_2b(::std::vec::Vec<Class>),
         NtCodeBlock(OpaqueTokens),
-        NtComma_3cField_3e(Vec<Field>),
         NtComma_3cType_3e(Vec<Type>),
+        NtComma_3cVarTy_3e(Vec<VarTy>),
         NtExprPath(Path),
         NtExtends(Option<Path>),
-        NtField(Field),
-        NtField_2a(::std::vec::Vec<Field>),
-        NtField_2b(::std::vec::Vec<Field>),
-        NtField_3f(::std::option::Option<Field>),
-        NtFields(Vec<Field>),
         NtFnDef(FnDef),
         NtFnSig(FnSig),
         NtId(Identifier),
@@ -5249,9 +2741,14 @@ mod __parse__Program {
         NtType1(Type),
         NtType_3f(::std::option::Option<Type>),
         NtTypePath(Path),
-        Nt____Fields(Vec<Field>),
+        NtVarTy(VarTy),
+        NtVarTy_2a(::std::vec::Vec<VarTy>),
+        NtVarTy_2b(::std::vec::Vec<VarTy>),
+        NtVarTy_3f(::std::option::Option<VarTy>),
+        NtVarTys(Vec<VarTy>),
         Nt____Members(Vec<Member>),
         Nt____Program(Program),
+        Nt____VarTys(Vec<VarTy>),
     }
     const __ACTION: &'static [i32] = &[
         // State 0
@@ -5269,15 +2766,15 @@ mod __parse__Program {
         // State 6
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, -56, 0, 0,
         // State 7
-        0, 0, 0, -69, -69, 0, 0, -69, -69, -69, 0, -69, 0, -69, 0, 0, 0, 0, 0, -69, 0, 0,
+        0, 0, 0, -60, -60, 0, 0, -60, -60, -60, 0, -60, 0, -60, 0, 0, 0, 0, 0, -60, 0, 0,
         // State 8
-        0, 0, 0, -71, -71, 0, 0, -71, -71, -71, 0, -71, 0, -71, 0, 0, 0, 0, 0, -71, 0, 0,
+        0, 0, 0, -62, -62, 0, 0, -62, -62, -62, 0, -62, 0, -62, 0, 0, 0, 0, 0, -62, 0, 0,
         // State 9
-        0, 0, 0, -72, -72, 0, 0, -72, -72, -72, 0, -72, 0, -72, 0, 0, 0, 0, 0, -72, 0, 0,
+        0, 0, 0, -63, -63, 0, 0, -63, -63, -63, 0, -63, 0, -63, 0, 0, 0, 0, 0, -63, 0, 0,
         // State 10
-        0, 0, 0, -70, -70, 0, 0, -70, -70, -70, 0, -70, 0, -70, 0, 0, 0, 0, 0, -70, 0, 0,
+        0, 0, 0, -61, -61, 0, 0, -61, -61, -61, 0, -61, 0, -61, 0, 0, 0, 0, 0, -61, 0, 0,
         // State 11
-        0, 0, 0, -73, -73, 0, 0, -73, -73, -73, 0, -73, 0, -73, 0, 0, 0, 0, 0, -73, 0, 0,
+        0, 0, 0, -64, -64, 0, 0, -64, -64, -64, 0, -64, 0, -64, 0, 0, 0, 0, 0, -64, 0, 0,
         // State 12
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0,
         // State 13
@@ -5285,11 +2782,11 @@ mod __parse__Program {
         // State 14
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -40, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 15
-        0, 0, 0, -100, -100, 0, 0, 24, 0, -100, 0, -100, 0, 0, 0, 0, 0, 0, 0, -100, 0, 0,
+        0, 0, 0, -91, -91, 0, 0, 24, 0, -91, 0, -91, 0, 0, 0, 0, 0, 0, 0, -91, 0, 0,
         // State 16
         0, 0, 0, -30, -30, 0, 0, -30, 0, -30, 0, -30, 0, 0, 0, 0, 0, 0, 0, -30, 0, 0,
         // State 17
-        0, 0, 0, -88, -88, 0, 0, -88, 25, -88, 0, -88, 0, 0, 0, 0, 0, 0, 0, -88, 0, 0,
+        0, 0, 0, -79, -79, 0, 0, -79, 25, -79, 0, -79, 0, 0, 0, 0, 0, 0, 0, -79, 0, 0,
         // State 18
         0, 0, 0, -39, -39, 0, 0, -39, 0, -39, 0, -39, 0, 0, 0, 0, 0, 0, 0, -39, 0, 0,
         // State 19
@@ -5303,49 +2800,49 @@ mod __parse__Program {
         // State 23
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 10, 0, 11, 0, 0, 0, 0, 12, 0,
         // State 24
-        0, 0, 0, 0, 0, 0, 0, 21, 0, -51, 32, 0, 9, 10, 0, 11, 22, 0, 23, 0, 12, 0,
+        0, 0, 0, 0, 0, 0, 0, 21, 0, -47, 32, 0, 9, 10, 0, 11, 22, 0, 23, 0, 12, 0,
         // State 25
         0, 0, 0, -31, -31, 0, 0, -31, 0, -31, 0, -31, 0, 0, 0, 0, 0, 0, 0, -31, 0, 0,
         // State 26
-        0, 0, 0, 0, 0, 0, 0, 21, 0, -53, 32, 0, 9, 10, 0, 11, 22, 0, 23, 0, 12, 0,
+        0, 0, 0, 0, 0, 0, 0, 21, 0, -49, 32, 0, 9, 10, 0, 11, 22, 0, 23, 0, 12, 0,
         // State 27
         0, 0, 0, 0, 0, 0, 0, 0, 0, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 28
-        0, 0, 0, 0, 35, 0, 0, 0, 0, -50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 35, 0, 0, 0, 0, -46, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 29
-        0, 0, 0, 37, -94, 0, 0, 0, 0, -94, 0, -94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 37, -85, 0, 0, 0, 0, -85, 0, -85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 30
-        0, 0, 0, -96, -96, 0, 0, 0, 0, -96, 0, -96, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, -87, -87, 0, 0, 0, 0, -87, 0, -87, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 31
         0, 0, 0, 0, 0, 0, 0, 21, 0, 0, 32, 0, 9, 10, 0, 11, 22, 0, 23, 0, 12, 0,
         // State 32
-        0, 0, 0, 0, 39, 0, 0, 0, 0, -52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 39, 0, 0, 0, 0, -48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 33
-        0, 0, 0, -87, -87, 0, 0, -87, 0, -87, 0, -87, 0, 0, 0, 0, 0, 0, 0, -87, 0, 0,
+        0, 0, 0, -78, -78, 0, 0, -78, 0, -78, 0, -78, 0, 0, 0, 0, 0, 0, 0, -78, 0, 0,
         // State 34
-        0, 0, 0, 0, 0, 0, 0, -25, 0, -25, -25, 0, -25, -25, 0, -25, -25, 0, -25, 0, -25, 0,
+        0, 0, 0, 0, 0, 0, 0, -20, 0, -20, -20, 0, -20, -20, 0, -20, -20, 0, -20, 0, -20, 0,
         // State 35
-        0, 0, 0, 40, -95, 0, 0, 0, 0, -95, 0, -95, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 40, -86, 0, 0, 0, 0, -86, 0, -86, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 36
         0, 0, 0, 0, 0, 0, 0, 21, 0, 0, 32, 0, 9, 10, 0, 11, 22, 0, 23, 0, 12, 0,
         // State 37
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 38
-        0, 0, 0, 0, 0, 0, 0, -26, 0, -26, -26, 0, -26, -26, 0, -26, -26, 0, -26, 0, -26, 0,
+        0, 0, 0, 0, 0, 0, 0, -21, 0, -21, -21, 0, -21, -21, 0, -21, -21, 0, -21, 0, -21, 0,
         // State 39
         0, 0, 0, 0, 0, 0, 0, 21, 0, 0, 32, 0, 9, 10, 0, 11, 22, 0, 23, 0, 12, 0,
         // State 40
         0, 0, 0, -2, -2, 0, 0, 0, 0, -2, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 41
-        0, 0, 0, -97, -97, 0, 0, 0, 0, -97, 0, -97, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, -88, -88, 0, 0, 0, 0, -88, 0, -88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 42
         0, 0, 0, -3, -3, 0, 0, 0, 0, -3, 0, -3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     ];
     const __EOF_ACTION: &'static [i32] = &[
-        -90,
+        -81,
         -43,
-        -91,
-        -103,
+        -82,
+        -102,
         0,
         -44,
         0,
@@ -5388,7 +2885,7 @@ mod __parse__Program {
     ];
     const __GOTO: &'static [i32] = &[
         // State 0
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 1
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 2
@@ -5396,7 +2893,7 @@ mod __parse__Program {
         // State 3
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 4
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 5
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 6
@@ -5414,7 +2911,7 @@ mod __parse__Program {
         // State 12
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 13
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 8, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 8, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 14
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 15
@@ -5434,13 +2931,13 @@ mod __parse__Program {
         // State 22
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 23
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 8, 0, 0, 0, 0, 0, 0, 0, 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 8, 0, 0, 0, 0, 0, 0, 0, 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 24
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 0, 0, 16, 0, 17, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 8, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 29, 30, 0, 31, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 16, 0, 17, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 18, 8, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 29, 30, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 25
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 26
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 8, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 33, 30, 0, 31, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 8, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 33, 30, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 27
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 28
@@ -5450,7 +2947,7 @@ mod __parse__Program {
         // State 30
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 31
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 8, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 38, 30, 0, 31, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 8, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 38, 30, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 32
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 33
@@ -5460,13 +2957,13 @@ mod __parse__Program {
         // State 35
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 36
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 8, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 41, 0, 31, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 8, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 41, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 37
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 38
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 39
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 8, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 43, 0, 31, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 8, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 43, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 40
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         // State 41
@@ -5885,64 +3382,6 @@ mod __parse__Program {
                 10
             }
             17 => {
-                // (<Field> ",") = Field, "," => ActionFn(61);
-                let __sym1 = __pop_Term_22_2c_22(__symbols);
-                let __sym0 = __pop_NtField(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action61::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29(__nt), __end));
-                11
-            }
-            18 => {
-                // (<Field> ",")* =  => ActionFn(59);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action59::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29_2a(__nt), __end));
-                12
-            }
-            19 => {
-                // (<Field> ",")* = (<Field> ",")+ => ActionFn(60);
-                let __sym0 = __pop_Nt_28_3cField_3e_20_22_2c_22_29_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action60::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29_2a(__nt), __end));
-                12
-            }
-            20 => {
-                // (<Field> ",")+ = Field, "," => ActionFn(105);
-                let __sym1 = __pop_Term_22_2c_22(__symbols);
-                let __sym0 = __pop_NtField(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action105::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29_2b(__nt), __end));
-                13
-            }
-            21 => {
-                // (<Field> ",")+ = (<Field> ",")+, Field, "," => ActionFn(106);
-                let __sym2 = __pop_Term_22_2c_22(__symbols);
-                let __sym1 = __pop_NtField(__symbols);
-                let __sym0 = __pop_Nt_28_3cField_3e_20_22_2c_22_29_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym2.2.clone();
-                let __nt = super::__action106::<>(__sym0, __sym1, __sym2);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 3);
-                __symbols.push((__start, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29_2b(__nt), __end));
-                13
-            }
-            22 => {
                 // (<Type> ",") = Type, "," => ActionFn(87);
                 let __sym1 = __pop_Term_22_2c_22(__symbols);
                 let __sym0 = __pop_NtType(__symbols);
@@ -5952,9 +3391,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 2);
                 __symbols.push((__start, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29(__nt), __end));
-                14
+                11
             }
-            23 => {
+            18 => {
                 // (<Type> ",")* =  => ActionFn(85);
                 let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
                 let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
@@ -5962,9 +3401,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 0);
                 __symbols.push((__start, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29_2a(__nt), __end));
-                15
+                12
             }
-            24 => {
+            19 => {
                 // (<Type> ",")* = (<Type> ",")+ => ActionFn(86);
                 let __sym0 = __pop_Nt_28_3cType_3e_20_22_2c_22_29_2b(__symbols);
                 let __start = __sym0.0.clone();
@@ -5973,31 +3412,89 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29_2a(__nt), __end));
-                15
+                12
             }
-            25 => {
-                // (<Type> ",")+ = Type, "," => ActionFn(109);
+            20 => {
+                // (<Type> ",")+ = Type, "," => ActionFn(105);
                 let __sym1 = __pop_Term_22_2c_22(__symbols);
                 let __sym0 = __pop_NtType(__symbols);
                 let __start = __sym0.0.clone();
                 let __end = __sym1.2.clone();
-                let __nt = super::__action109::<>(__sym0, __sym1);
+                let __nt = super::__action105::<>(__sym0, __sym1);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 2);
                 __symbols.push((__start, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29_2b(__nt), __end));
-                16
+                13
             }
-            26 => {
-                // (<Type> ",")+ = (<Type> ",")+, Type, "," => ActionFn(110);
+            21 => {
+                // (<Type> ",")+ = (<Type> ",")+, Type, "," => ActionFn(106);
                 let __sym2 = __pop_Term_22_2c_22(__symbols);
                 let __sym1 = __pop_NtType(__symbols);
                 let __sym0 = __pop_Nt_28_3cType_3e_20_22_2c_22_29_2b(__symbols);
                 let __start = __sym0.0.clone();
                 let __end = __sym2.2.clone();
-                let __nt = super::__action110::<>(__sym0, __sym1, __sym2);
+                let __nt = super::__action106::<>(__sym0, __sym1, __sym2);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 3);
                 __symbols.push((__start, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29_2b(__nt), __end));
+                13
+            }
+            22 => {
+                // (<VarTy> ",") = VarTy, "," => ActionFn(61);
+                let __sym1 = __pop_Term_22_2c_22(__symbols);
+                let __sym0 = __pop_NtVarTy(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action61::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29(__nt), __end));
+                14
+            }
+            23 => {
+                // (<VarTy> ",")* =  => ActionFn(59);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action59::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29_2a(__nt), __end));
+                15
+            }
+            24 => {
+                // (<VarTy> ",")* = (<VarTy> ",")+ => ActionFn(60);
+                let __sym0 = __pop_Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action60::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29_2a(__nt), __end));
+                15
+            }
+            25 => {
+                // (<VarTy> ",")+ = VarTy, "," => ActionFn(109);
+                let __sym1 = __pop_Term_22_2c_22(__symbols);
+                let __sym0 = __pop_NtVarTy(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action109::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(__nt), __end));
+                16
+            }
+            26 => {
+                // (<VarTy> ",")+ = (<VarTy> ",")+, VarTy, "," => ActionFn(110);
+                let __sym2 = __pop_Term_22_2c_22(__symbols);
+                let __sym1 = __pop_NtVarTy(__symbols);
+                let __sym0 = __pop_Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym2.2.clone();
+                let __nt = super::__action110::<>(__sym0, __sym1, __sym2);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 3);
+                __symbols.push((__start, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(__nt), __end));
                 16
             }
             27 => {
@@ -6219,91 +3716,91 @@ mod __parse__Program {
                 25
             }
             46 => {
-                // Comma<Field> = Field => ActionFn(119);
-                let __sym0 = __pop_NtField(__symbols);
+                // Comma<Type> = Type => ActionFn(119);
+                let __sym0 = __pop_NtType(__symbols);
                 let __start = __sym0.0.clone();
                 let __end = __sym0.2.clone();
                 let __nt = super::__action119::<>(__sym0);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtComma_3cField_3e(__nt), __end));
+                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
                 26
             }
             47 => {
-                // Comma<Field> =  => ActionFn(120);
+                // Comma<Type> =  => ActionFn(120);
                 let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
                 let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
                 let __nt = super::__action120::<>(&__start, &__end);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::NtComma_3cField_3e(__nt), __end));
+                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
                 26
             }
             48 => {
-                // Comma<Field> = (<Field> ",")+, Field => ActionFn(121);
-                let __sym1 = __pop_NtField(__symbols);
-                let __sym0 = __pop_Nt_28_3cField_3e_20_22_2c_22_29_2b(__symbols);
+                // Comma<Type> = (<Type> ",")+, Type => ActionFn(121);
+                let __sym1 = __pop_NtType(__symbols);
+                let __sym0 = __pop_Nt_28_3cType_3e_20_22_2c_22_29_2b(__symbols);
                 let __start = __sym0.0.clone();
                 let __end = __sym1.2.clone();
                 let __nt = super::__action121::<>(__sym0, __sym1);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::NtComma_3cField_3e(__nt), __end));
+                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
                 26
             }
             49 => {
-                // Comma<Field> = (<Field> ",")+ => ActionFn(122);
-                let __sym0 = __pop_Nt_28_3cField_3e_20_22_2c_22_29_2b(__symbols);
+                // Comma<Type> = (<Type> ",")+ => ActionFn(122);
+                let __sym0 = __pop_Nt_28_3cType_3e_20_22_2c_22_29_2b(__symbols);
                 let __start = __sym0.0.clone();
                 let __end = __sym0.2.clone();
                 let __nt = super::__action122::<>(__sym0);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtComma_3cField_3e(__nt), __end));
+                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
                 26
             }
             50 => {
-                // Comma<Type> = Type => ActionFn(125);
-                let __sym0 = __pop_NtType(__symbols);
+                // Comma<VarTy> = VarTy => ActionFn(125);
+                let __sym0 = __pop_NtVarTy(__symbols);
                 let __start = __sym0.0.clone();
                 let __end = __sym0.2.clone();
                 let __nt = super::__action125::<>(__sym0);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
+                __symbols.push((__start, __Symbol::NtComma_3cVarTy_3e(__nt), __end));
                 27
             }
             51 => {
-                // Comma<Type> =  => ActionFn(126);
+                // Comma<VarTy> =  => ActionFn(126);
                 let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
                 let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
                 let __nt = super::__action126::<>(&__start, &__end);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
+                __symbols.push((__start, __Symbol::NtComma_3cVarTy_3e(__nt), __end));
                 27
             }
             52 => {
-                // Comma<Type> = (<Type> ",")+, Type => ActionFn(127);
-                let __sym1 = __pop_NtType(__symbols);
-                let __sym0 = __pop_Nt_28_3cType_3e_20_22_2c_22_29_2b(__symbols);
+                // Comma<VarTy> = (<VarTy> ",")+, VarTy => ActionFn(127);
+                let __sym1 = __pop_NtVarTy(__symbols);
+                let __sym0 = __pop_Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(__symbols);
                 let __start = __sym0.0.clone();
                 let __end = __sym1.2.clone();
                 let __nt = super::__action127::<>(__sym0, __sym1);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
+                __symbols.push((__start, __Symbol::NtComma_3cVarTy_3e(__nt), __end));
                 27
             }
             53 => {
-                // Comma<Type> = (<Type> ",")+ => ActionFn(128);
-                let __sym0 = __pop_Nt_28_3cType_3e_20_22_2c_22_29_2b(__symbols);
+                // Comma<VarTy> = (<VarTy> ",")+ => ActionFn(128);
+                let __sym0 = __pop_Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(__symbols);
                 let __start = __sym0.0.clone();
                 let __end = __sym0.2.clone();
                 let __nt = super::__action128::<>(__sym0);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
+                __symbols.push((__start, __Symbol::NtComma_3cVarTy_3e(__nt), __end));
                 27
             }
             54 => {
@@ -6340,105 +3837,6 @@ mod __parse__Program {
                 29
             }
             57 => {
-                // Field = Id, ":", Type => ActionFn(23);
-                let __sym2 = __pop_NtType(__symbols);
-                let __sym1 = __pop_Term_22_3a_22(__symbols);
-                let __sym0 = __pop_NtId(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym2.2.clone();
-                let __nt = super::__action23::<>(__sym0, __sym1, __sym2);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 3);
-                __symbols.push((__start, __Symbol::NtField(__nt), __end));
-                30
-            }
-            58 => {
-                // Field* =  => ActionFn(39);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action39::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::NtField_2a(__nt), __end));
-                31
-            }
-            59 => {
-                // Field* = Field+ => ActionFn(40);
-                let __sym0 = __pop_NtField_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action40::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtField_2a(__nt), __end));
-                31
-            }
-            60 => {
-                // Field+ = Field => ActionFn(62);
-                let __sym0 = __pop_NtField(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action62::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtField_2b(__nt), __end));
-                32
-            }
-            61 => {
-                // Field+ = Field+, Field => ActionFn(63);
-                let __sym1 = __pop_NtField(__symbols);
-                let __sym0 = __pop_NtField_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym1.2.clone();
-                let __nt = super::__action63::<>(__sym0, __sym1);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 2);
-                __symbols.push((__start, __Symbol::NtField_2b(__nt), __end));
-                32
-            }
-            62 => {
-                // Field? = Field => ActionFn(57);
-                let __sym0 = __pop_NtField(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action57::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtField_3f(__nt), __end));
-                33
-            }
-            63 => {
-                // Field? =  => ActionFn(58);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action58::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::NtField_3f(__nt), __end));
-                33
-            }
-            64 => {
-                // Fields =  => ActionFn(117);
-                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
-                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action117::<>(&__start, &__end);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 0);
-                __symbols.push((__start, __Symbol::NtFields(__nt), __end));
-                34
-            }
-            65 => {
-                // Fields = Field+ => ActionFn(118);
-                let __sym0 = __pop_NtField_2b(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action118::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::NtFields(__nt), __end));
-                34
-            }
-            66 => {
                 // FnDef = FnSig, CodeBlock => ActionFn(18);
                 let __sym1 = __pop_NtCodeBlock(__symbols);
                 let __sym0 = __pop_NtFnSig(__symbols);
@@ -6448,9 +3846,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 2);
                 __symbols.push((__start, __Symbol::NtFnDef(__nt), __end));
-                35
+                30
             }
-            67 => {
+            58 => {
                 // FnSig = "(", "&", "self", ")", ReturnTy => ActionFn(19);
                 let __sym4 = __pop_NtReturnTy(__symbols);
                 let __sym3 = __pop_Term_22_29_22(__symbols);
@@ -6463,13 +3861,13 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 5);
                 __symbols.push((__start, __Symbol::NtFnSig(__nt), __end));
-                36
+                31
             }
-            68 => {
-                // FnSig = "(", "&", "self", ",", Comma<Field>, ")", ReturnTy => ActionFn(20);
+            59 => {
+                // FnSig = "(", "&", "self", ",", Comma<VarTy>, ")", ReturnTy => ActionFn(20);
                 let __sym6 = __pop_NtReturnTy(__symbols);
                 let __sym5 = __pop_Term_22_29_22(__symbols);
-                let __sym4 = __pop_NtComma_3cField_3e(__symbols);
+                let __sym4 = __pop_NtComma_3cVarTy_3e(__symbols);
                 let __sym3 = __pop_Term_22_2c_22(__symbols);
                 let __sym2 = __pop_Term_22self_22(__symbols);
                 let __sym1 = __pop_Term_22_26_22(__symbols);
@@ -6480,9 +3878,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 7);
                 __symbols.push((__start, __Symbol::NtFnSig(__nt), __end));
-                36
+                31
             }
-            69 => {
+            60 => {
                 // Id = IdStr => ActionFn(7);
                 let __sym0 = __pop_NtIdStr(__symbols);
                 let __start = __sym0.0.clone();
@@ -6491,9 +3889,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtId(__nt), __end));
-                37
+                32
             }
-            70 => {
+            61 => {
                 // IdStr = "init" => ActionFn(8);
                 let __sym0 = __pop_Term_22init_22(__symbols);
                 let __start = __sym0.0.clone();
@@ -6502,9 +3900,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtIdStr(__nt), __end));
-                38
+                33
             }
-            71 => {
+            62 => {
                 // IdStr = "class" => ActionFn(9);
                 let __sym0 = __pop_Term_22class_22(__symbols);
                 let __start = __sym0.0.clone();
@@ -6513,9 +3911,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtIdStr(__nt), __end));
-                38
+                33
             }
-            72 => {
+            63 => {
                 // IdStr = "extends" => ActionFn(10);
                 let __sym0 = __pop_Term_22extends_22(__symbols);
                 let __start = __sym0.0.clone();
@@ -6524,9 +3922,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtIdStr(__nt), __end));
-                38
+                33
             }
-            73 => {
+            64 => {
                 // IdStr = OtherId => ActionFn(11);
                 let __sym0 = __pop_TermOtherId(__symbols);
                 let __start = __sym0.0.clone();
@@ -6535,9 +3933,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtIdStr(__nt), __end));
-                38
+                33
             }
-            74 => {
+            65 => {
                 // Init = "init", CodeBlock => ActionFn(16);
                 let __sym1 = __pop_NtCodeBlock(__symbols);
                 let __sym0 = __pop_Term_22init_22(__symbols);
@@ -6547,9 +3945,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 2);
                 __symbols.push((__start, __Symbol::NtInit(__nt), __end));
-                39
+                34
             }
-            75 => {
+            66 => {
                 // Member = PrivateStruct => ActionFn(12);
                 let __sym0 = __pop_NtPrivateStruct(__symbols);
                 let __start = __sym0.0.clone();
@@ -6558,9 +3956,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtMember(__nt), __end));
-                40
+                35
             }
-            76 => {
+            67 => {
                 // Member = Init => ActionFn(13);
                 let __sym0 = __pop_NtInit(__symbols);
                 let __start = __sym0.0.clone();
@@ -6569,9 +3967,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtMember(__nt), __end));
-                40
+                35
             }
-            77 => {
+            68 => {
                 // Member = Method => ActionFn(14);
                 let __sym0 = __pop_NtMethod(__symbols);
                 let __start = __sym0.0.clone();
@@ -6580,9 +3978,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtMember(__nt), __end));
-                40
+                35
             }
-            78 => {
+            69 => {
                 // Member* =  => ActionFn(45);
                 let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
                 let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
@@ -6590,9 +3988,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 0);
                 __symbols.push((__start, __Symbol::NtMember_2a(__nt), __end));
-                41
+                36
             }
-            79 => {
+            70 => {
                 // Member* = Member+ => ActionFn(46);
                 let __sym0 = __pop_NtMember_2b(__symbols);
                 let __start = __sym0.0.clone();
@@ -6601,9 +3999,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtMember_2a(__nt), __end));
-                41
+                36
             }
-            80 => {
+            71 => {
                 // Member+ = Member => ActionFn(55);
                 let __sym0 = __pop_NtMember(__symbols);
                 let __start = __sym0.0.clone();
@@ -6612,9 +4010,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtMember_2b(__nt), __end));
-                42
+                37
             }
-            81 => {
+            72 => {
                 // Member+ = Member+, Member => ActionFn(56);
                 let __sym1 = __pop_NtMember(__symbols);
                 let __sym0 = __pop_NtMember_2b(__symbols);
@@ -6624,30 +4022,30 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 2);
                 __symbols.push((__start, __Symbol::NtMember_2b(__nt), __end));
-                42
+                37
             }
-            82 => {
-                // Members =  => ActionFn(123);
+            73 => {
+                // Members =  => ActionFn(117);
                 let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
                 let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
-                let __nt = super::__action123::<>(&__start, &__end);
+                let __nt = super::__action117::<>(&__start, &__end);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 0);
                 __symbols.push((__start, __Symbol::NtMembers(__nt), __end));
-                43
+                38
             }
-            83 => {
-                // Members = Member+ => ActionFn(124);
+            74 => {
+                // Members = Member+ => ActionFn(118);
                 let __sym0 = __pop_NtMember_2b(__symbols);
                 let __start = __sym0.0.clone();
                 let __end = __sym0.2.clone();
-                let __nt = super::__action124::<>(__sym0);
+                let __nt = super::__action118::<>(__sym0);
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtMembers(__nt), __end));
-                43
+                38
             }
-            84 => {
+            75 => {
                 // Method = "fn", Id, FnDef => ActionFn(17);
                 let __sym2 = __pop_NtFnDef(__symbols);
                 let __sym1 = __pop_NtId(__symbols);
@@ -6658,9 +4056,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 3);
                 __symbols.push((__start, __Symbol::NtMethod(__nt), __end));
-                44
+                39
             }
-            85 => {
+            76 => {
                 // PathId<"::"> = Id, "::", "<", Comma<Type>, ">" => ActionFn(96);
                 let __sym4 = __pop_Term_22_3e_22(__symbols);
                 let __sym3 = __pop_NtComma_3cType_3e(__symbols);
@@ -6673,9 +4071,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 5);
                 __symbols.push((__start, __Symbol::NtPathId_3c_22_3a_3a_22_3e(__nt), __end));
-                45
+                40
             }
-            86 => {
+            77 => {
                 // PathId<"::"> = Id => ActionFn(97);
                 let __sym0 = __pop_NtId(__symbols);
                 let __start = __sym0.0.clone();
@@ -6684,9 +4082,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtPathId_3c_22_3a_3a_22_3e(__nt), __end));
-                45
+                40
             }
-            87 => {
+            78 => {
                 // PathId<()> = Id, "<", Comma<Type>, ">" => ActionFn(103);
                 let __sym3 = __pop_Term_22_3e_22(__symbols);
                 let __sym2 = __pop_NtComma_3cType_3e(__symbols);
@@ -6698,9 +4096,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 4);
                 __symbols.push((__start, __Symbol::NtPathId_3c_28_29_3e(__nt), __end));
-                46
+                41
             }
-            88 => {
+            79 => {
                 // PathId<()> = Id => ActionFn(104);
                 let __sym0 = __pop_NtId(__symbols);
                 let __start = __sym0.0.clone();
@@ -6709,9 +4107,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtPathId_3c_28_29_3e(__nt), __end));
-                46
+                41
             }
-            89 => {
+            80 => {
                 // PrivateStruct = "struct", Id, "{..}" => ActionFn(114);
                 let __sym2 = __pop_Term_22_7b_2e_2e_7d_22(__symbols);
                 let __sym1 = __pop_NtId(__symbols);
@@ -6725,9 +4123,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 3);
                 __symbols.push((__start, __Symbol::NtPrivateStruct(__nt), __end));
-                47
+                42
             }
-            90 => {
+            81 => {
                 // Program =  => ActionFn(115);
                 let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
                 let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
@@ -6735,9 +4133,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 0);
                 __symbols.push((__start, __Symbol::NtProgram(__nt), __end));
-                48
+                43
             }
-            91 => {
+            82 => {
                 // Program = Class+ => ActionFn(116);
                 let __sym0 = __pop_NtClass_2b(__symbols);
                 let __start = __sym0.0.clone();
@@ -6746,9 +4144,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtProgram(__nt), __end));
-                48
+                43
             }
-            92 => {
+            83 => {
                 // ReturnTy = "->", Type => ActionFn(93);
                 let __sym1 = __pop_NtType(__symbols);
                 let __sym0 = __pop_Term_22_2d_3e_22(__symbols);
@@ -6758,9 +4156,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 2);
                 __symbols.push((__start, __Symbol::NtReturnTy(__nt), __end));
-                49
+                44
             }
-            93 => {
+            84 => {
                 // ReturnTy =  => ActionFn(94);
                 let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
                 let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
@@ -6768,9 +4166,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 0);
                 __symbols.push((__start, __Symbol::NtReturnTy(__nt), __end));
-                49
+                44
             }
-            94 => {
+            85 => {
                 // Type = Type1 => ActionFn(24);
                 let __sym0 = __pop_NtType1(__symbols);
                 let __start = __sym0.0.clone();
@@ -6779,9 +4177,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtType(__nt), __end));
-                50
+                45
             }
-            95 => {
+            86 => {
                 // Type = Type1, ("+" <Type1>)+ => ActionFn(25);
                 let __sym1 = __pop_Nt_28_22_2b_22_20_3cType1_3e_29_2b(__symbols);
                 let __sym0 = __pop_NtType1(__symbols);
@@ -6791,9 +4189,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 2);
                 __symbols.push((__start, __Symbol::NtType(__nt), __end));
-                50
+                45
             }
-            96 => {
+            87 => {
                 // Type1 = TypePath => ActionFn(26);
                 let __sym0 = __pop_NtTypePath(__symbols);
                 let __start = __sym0.0.clone();
@@ -6802,9 +4200,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtType1(__nt), __end));
-                51
+                46
             }
-            97 => {
+            88 => {
                 // Type1 = "[", Type, "]" => ActionFn(27);
                 let __sym2 = __pop_Term_22_5d_22(__symbols);
                 let __sym1 = __pop_NtType(__symbols);
@@ -6815,9 +4213,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 3);
                 __symbols.push((__start, __Symbol::NtType1(__nt), __end));
-                51
+                46
             }
-            98 => {
+            89 => {
                 // Type? = Type => ActionFn(83);
                 let __sym0 = __pop_NtType(__symbols);
                 let __start = __sym0.0.clone();
@@ -6826,9 +4224,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtType_3f(__nt), __end));
-                52
+                47
             }
-            99 => {
+            90 => {
                 // Type? =  => ActionFn(84);
                 let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
                 let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
@@ -6836,9 +4234,9 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 0);
                 __symbols.push((__start, __Symbol::NtType_3f(__nt), __end));
-                52
+                47
             }
-            100 => {
+            91 => {
                 // TypePath = AnyPath<()> => ActionFn(30);
                 let __sym0 = __pop_NtAnyPath_3c_28_29_3e(__symbols);
                 let __start = __sym0.0.clone();
@@ -6847,20 +4245,108 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::NtTypePath(__nt), __end));
+                48
+            }
+            92 => {
+                // VarTy = Id, ":", Type => ActionFn(23);
+                let __sym2 = __pop_NtType(__symbols);
+                let __sym1 = __pop_Term_22_3a_22(__symbols);
+                let __sym0 = __pop_NtId(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym2.2.clone();
+                let __nt = super::__action23::<>(__sym0, __sym1, __sym2);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 3);
+                __symbols.push((__start, __Symbol::NtVarTy(__nt), __end));
+                49
+            }
+            93 => {
+                // VarTy* =  => ActionFn(39);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action39::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::NtVarTy_2a(__nt), __end));
+                50
+            }
+            94 => {
+                // VarTy* = VarTy+ => ActionFn(40);
+                let __sym0 = __pop_NtVarTy_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action40::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtVarTy_2a(__nt), __end));
+                50
+            }
+            95 => {
+                // VarTy+ = VarTy => ActionFn(62);
+                let __sym0 = __pop_NtVarTy(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action62::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtVarTy_2b(__nt), __end));
+                51
+            }
+            96 => {
+                // VarTy+ = VarTy+, VarTy => ActionFn(63);
+                let __sym1 = __pop_NtVarTy(__symbols);
+                let __sym0 = __pop_NtVarTy_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action63::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::NtVarTy_2b(__nt), __end));
+                51
+            }
+            97 => {
+                // VarTy? = VarTy => ActionFn(57);
+                let __sym0 = __pop_NtVarTy(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action57::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtVarTy_3f(__nt), __end));
+                52
+            }
+            98 => {
+                // VarTy? =  => ActionFn(58);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action58::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::NtVarTy_3f(__nt), __end));
+                52
+            }
+            99 => {
+                // VarTys =  => ActionFn(123);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action123::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::NtVarTys(__nt), __end));
+                53
+            }
+            100 => {
+                // VarTys = VarTy+ => ActionFn(124);
+                let __sym0 = __pop_NtVarTy_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action124::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtVarTys(__nt), __end));
                 53
             }
             101 => {
-                // __Fields = Fields => ActionFn(2);
-                let __sym0 = __pop_NtFields(__symbols);
-                let __start = __sym0.0.clone();
-                let __end = __sym0.2.clone();
-                let __nt = super::__action2::<>(__sym0);
-                let __states_len = __states.len();
-                __states.truncate(__states_len - 1);
-                __symbols.push((__start, __Symbol::Nt____Fields(__nt), __end));
-                54
-            }
-            102 => {
                 // __Members = Members => ActionFn(1);
                 let __sym0 = __pop_NtMembers(__symbols);
                 let __start = __sym0.0.clone();
@@ -6869,14 +4355,2528 @@ mod __parse__Program {
                 let __states_len = __states.len();
                 __states.truncate(__states_len - 1);
                 __symbols.push((__start, __Symbol::Nt____Members(__nt), __end));
-                55
+                54
             }
-            103 => {
+            102 => {
                 // __Program = Program => ActionFn(0);
                 let __sym0 = __pop_NtProgram(__symbols);
                 let __start = __sym0.0.clone();
                 let __end = __sym0.2.clone();
                 let __nt = super::__action0::<>(__sym0);
+                return Some(Ok(__nt));
+            }
+            103 => {
+                // __VarTys = VarTys => ActionFn(2);
+                let __sym0 = __pop_NtVarTys(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action2::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::Nt____VarTys(__nt), __end));
+                56
+            }
+            _ => panic!("invalid action code {}", __action)
+        };
+        let __state = *__states.last().unwrap() as usize;
+        let __next_state = __GOTO[__state * 57 + __nonterminal] - 1;
+        __states.push(__next_state);
+        None
+    }
+    fn __pop_Term_22_26_22<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Tok<'input>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Term_22_26_22(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Term_22_28_22<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Tok<'input>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Term_22_28_22(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Term_22_29_22<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Tok<'input>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Term_22_29_22(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Term_22_2b_22<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Tok<'input>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Term_22_2b_22(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Term_22_2c_22<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Tok<'input>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Term_22_2c_22(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Term_22_2d_3e_22<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Tok<'input>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Term_22_2d_3e_22(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Term_22_3a_22<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Tok<'input>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Term_22_3a_22(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Term_22_3a_3a_22<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Tok<'input>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Term_22_3a_3a_22(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Term_22_3c_22<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Tok<'input>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Term_22_3c_22(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Term_22_3e_22<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Tok<'input>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Term_22_3e_22(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Term_22_5b_22<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Tok<'input>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Term_22_5b_22(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Term_22_5d_22<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Tok<'input>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Term_22_5d_22(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Term_22class_22<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Tok<'input>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Term_22class_22(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Term_22extends_22<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Tok<'input>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Term_22extends_22(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Term_22fn_22<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Tok<'input>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Term_22fn_22(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Term_22init_22<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Tok<'input>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Term_22init_22(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Term_22self_22<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Tok<'input>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Term_22self_22(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Term_22struct_22<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Tok<'input>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Term_22struct_22(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Term_22super_22<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Tok<'input>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Term_22super_22(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Term_22_7b_2e_2e_7d_22<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, &'input str, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Term_22_7b_2e_2e_7d_22(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_TermOtherId<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, &'input str, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::TermOtherId(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Termerror<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, __lalrpop_util::ErrorRecovery<usize, Tok<'input>, ::errors::Error>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Termerror(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_22_2b_22_20_3cType1_3e_29<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Type, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_22_2b_22_20_3cType1_3e_29(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_22_2b_22_20_3cType1_3e_29_2b<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::vec::Vec<Type>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_22_2b_22_20_3cType1_3e_29_2b(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_22_2d_3e_22_20_3cType_3e_29<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Type, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_22_2d_3e_22_20_3cType_3e_29(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_22_2d_3e_22_20_3cType_3e_29_3f<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::option::Option<Type>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_22_2d_3e_22_20_3cType_3e_29_3f(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_22_3a_3a_22_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Vec<Type>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_22_3a_3a_22_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_22_3a_3a_22_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29_3f<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::option::Option<Vec<Type>>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_22_3a_3a_22_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29_3f(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_22extends_22_20_3cTypePath_3e_29<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Path, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_22extends_22_20_3cTypePath_3e_29(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_22extends_22_20_3cTypePath_3e_29_3f<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::option::Option<Path>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_22extends_22_20_3cTypePath_3e_29_3f(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_28_29_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Vec<Type>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_28_29_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_28_29_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29_3f<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::option::Option<Vec<Type>>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_28_29_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29_3f(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_29<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, (), usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_29(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_3cType_3e_20_22_2c_22_29<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Type, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_3cType_3e_20_22_2c_22_29_2a<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::vec::Vec<Type>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29_2a(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_3cType_3e_20_22_2c_22_29_2b<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::vec::Vec<Type>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29_2b(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_3cVarTy_3e_20_22_2c_22_29<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, VarTy, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_3cVarTy_3e_20_22_2c_22_29_2a<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::vec::Vec<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29_2a(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_3cVarTy_3e_20_22_2c_22_29_2b<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::vec::Vec<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_40L<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, usize, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_40L(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtAnyPath_3c_22_3a_3a_22_3e<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Path, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtAnyPath_3c_22_3a_3a_22_3e(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtAnyPath_3c_28_29_3e<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Path, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtAnyPath_3c_28_29_3e(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtBasePath_3c_22_3a_3a_22_3e<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Path, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtBasePath_3c_22_3a_3a_22_3e(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtBasePath_3c_28_29_3e<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Path, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtBasePath_3c_28_29_3e(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtClass<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Class, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtClass(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtClass_2a<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::vec::Vec<Class>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtClass_2a(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtClass_2b<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::vec::Vec<Class>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtClass_2b(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtCodeBlock<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, OpaqueTokens, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtCodeBlock(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtComma_3cType_3e<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Vec<Type>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtComma_3cType_3e(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtComma_3cVarTy_3e<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Vec<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtComma_3cVarTy_3e(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtExprPath<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Path, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtExprPath(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtExtends<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Option<Path>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtExtends(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtFnDef<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, FnDef, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtFnDef(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtFnSig<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, FnSig, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtFnSig(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtId<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Identifier, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtId(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtIdStr<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, &'input str, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtIdStr(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtInit<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, OpaqueTokens, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtInit(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtMember<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Member, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtMember(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtMember_2a<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::vec::Vec<Member>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtMember_2a(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtMember_2b<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::vec::Vec<Member>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtMember_2b(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtMembers<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Vec<Member>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtMembers(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtMethod<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Method, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtMethod(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtPathId_3c_22_3a_3a_22_3e<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, PathId, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtPathId_3c_22_3a_3a_22_3e(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtPathId_3c_28_29_3e<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, PathId, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtPathId_3c_28_29_3e(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtPrivateStruct<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, PrivateStruct, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtPrivateStruct(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtProgram<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Program, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtProgram(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtReturnTy<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Option<Type>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtReturnTy(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtType<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Type, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtType(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtType1<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Type, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtType1(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtType_3f<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::option::Option<Type>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtType_3f(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtTypePath<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Path, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtTypePath(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtVarTy<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, VarTy, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtVarTy(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtVarTy_2a<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::vec::Vec<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtVarTy_2a(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtVarTy_2b<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::vec::Vec<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtVarTy_2b(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtVarTy_3f<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::option::Option<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtVarTy_3f(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtVarTys<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Vec<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtVarTys(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt____Members<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Vec<Member>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt____Members(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt____Program<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Program, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt____Program(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt____VarTys<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Vec<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt____VarTys(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+}
+pub use self::__parse__Program::parse_Program;
+
+mod __parse__VarTys {
+    #![allow(non_snake_case, non_camel_case_types, unused_mut, unused_variables, unused_imports)]
+
+    use ast::*;
+    use lalrpop_intern::intern;
+    use parser;
+    use quote::Tokens;
+    use tok::Tok;
+    extern crate lalrpop_util as __lalrpop_util;
+    use super::__ToTriple;
+    #[allow(dead_code)]
+    pub enum __Symbol<'input> {
+        Term_22_26_22(Tok<'input>),
+        Term_22_28_22(Tok<'input>),
+        Term_22_29_22(Tok<'input>),
+        Term_22_2b_22(Tok<'input>),
+        Term_22_2c_22(Tok<'input>),
+        Term_22_2d_3e_22(Tok<'input>),
+        Term_22_3a_22(Tok<'input>),
+        Term_22_3a_3a_22(Tok<'input>),
+        Term_22_3c_22(Tok<'input>),
+        Term_22_3e_22(Tok<'input>),
+        Term_22_5b_22(Tok<'input>),
+        Term_22_5d_22(Tok<'input>),
+        Term_22class_22(Tok<'input>),
+        Term_22extends_22(Tok<'input>),
+        Term_22fn_22(Tok<'input>),
+        Term_22init_22(Tok<'input>),
+        Term_22self_22(Tok<'input>),
+        Term_22struct_22(Tok<'input>),
+        Term_22super_22(Tok<'input>),
+        Term_22_7b_2e_2e_7d_22(&'input str),
+        TermOtherId(&'input str),
+        Termerror(__lalrpop_util::ErrorRecovery<usize, Tok<'input>, ::errors::Error>),
+        Nt_28_22_2b_22_20_3cType1_3e_29(Type),
+        Nt_28_22_2b_22_20_3cType1_3e_29_2b(::std::vec::Vec<Type>),
+        Nt_28_22_2d_3e_22_20_3cType_3e_29(Type),
+        Nt_28_22_2d_3e_22_20_3cType_3e_29_3f(::std::option::Option<Type>),
+        Nt_28_22_3a_3a_22_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29(Vec<Type>),
+        Nt_28_22_3a_3a_22_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29_3f(::std::option::Option<Vec<Type>>),
+        Nt_28_22extends_22_20_3cTypePath_3e_29(Path),
+        Nt_28_22extends_22_20_3cTypePath_3e_29_3f(::std::option::Option<Path>),
+        Nt_28_28_29_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29(Vec<Type>),
+        Nt_28_28_29_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29_3f(::std::option::Option<Vec<Type>>),
+        Nt_28_29(()),
+        Nt_28_3cType_3e_20_22_2c_22_29(Type),
+        Nt_28_3cType_3e_20_22_2c_22_29_2a(::std::vec::Vec<Type>),
+        Nt_28_3cType_3e_20_22_2c_22_29_2b(::std::vec::Vec<Type>),
+        Nt_28_3cVarTy_3e_20_22_2c_22_29(VarTy),
+        Nt_28_3cVarTy_3e_20_22_2c_22_29_2a(::std::vec::Vec<VarTy>),
+        Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(::std::vec::Vec<VarTy>),
+        Nt_40L(usize),
+        NtAnyPath_3c_22_3a_3a_22_3e(Path),
+        NtAnyPath_3c_28_29_3e(Path),
+        NtBasePath_3c_22_3a_3a_22_3e(Path),
+        NtBasePath_3c_28_29_3e(Path),
+        NtClass(Class),
+        NtClass_2a(::std::vec::Vec<Class>),
+        NtClass_2b(::std::vec::Vec<Class>),
+        NtCodeBlock(OpaqueTokens),
+        NtComma_3cType_3e(Vec<Type>),
+        NtComma_3cVarTy_3e(Vec<VarTy>),
+        NtExprPath(Path),
+        NtExtends(Option<Path>),
+        NtFnDef(FnDef),
+        NtFnSig(FnSig),
+        NtId(Identifier),
+        NtIdStr(&'input str),
+        NtInit(OpaqueTokens),
+        NtMember(Member),
+        NtMember_2a(::std::vec::Vec<Member>),
+        NtMember_2b(::std::vec::Vec<Member>),
+        NtMembers(Vec<Member>),
+        NtMethod(Method),
+        NtPathId_3c_22_3a_3a_22_3e(PathId),
+        NtPathId_3c_28_29_3e(PathId),
+        NtPrivateStruct(PrivateStruct),
+        NtProgram(Program),
+        NtReturnTy(Option<Type>),
+        NtType(Type),
+        NtType1(Type),
+        NtType_3f(::std::option::Option<Type>),
+        NtTypePath(Path),
+        NtVarTy(VarTy),
+        NtVarTy_2a(::std::vec::Vec<VarTy>),
+        NtVarTy_2b(::std::vec::Vec<VarTy>),
+        NtVarTy_3f(::std::option::Option<VarTy>),
+        NtVarTys(Vec<VarTy>),
+        Nt____Members(Vec<Member>),
+        Nt____Program(Program),
+        Nt____VarTys(Vec<VarTy>),
+    }
+    const __ACTION: &'static [i32] = &[
+        // State 0
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 8, 0, 9, 0, 0, 0, 0, 10, 0,
+        // State 1
+        0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 2
+        0, 0, 0, -60, -60, 0, -60, -60, -60, -60, 0, -60, -60, -60, 0, -60, 0, 0, 0, 0, -60, 0,
+        // State 3
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -95, -95, 0, -95, 0, 0, 0, 0, -95, 0,
+        // State 4
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 8, 0, 9, 0, 0, 0, 0, 10, 0,
+        // State 5
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 6
+        0, 0, 0, -62, -62, 0, -62, -62, -62, -62, 0, -62, -62, -62, 0, -62, 0, 0, 0, 0, -62, 0,
+        // State 7
+        0, 0, 0, -63, -63, 0, -63, -63, -63, -63, 0, -63, -63, -63, 0, -63, 0, 0, 0, 0, -63, 0,
+        // State 8
+        0, 0, 0, -61, -61, 0, -61, -61, -61, -61, 0, -61, -61, -61, 0, -61, 0, 0, 0, 0, -61, 0,
+        // State 9
+        0, 0, 0, -64, -64, 0, -64, -64, -64, -64, 0, -64, -64, -64, 0, -64, 0, 0, 0, 0, -64, 0,
+        // State 10
+        0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 21, 0, 7, 8, 0, 9, 22, 0, 23, 0, 10, 0,
+        // State 11
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -96, -96, 0, -96, 0, 0, 0, 0, -96, 0,
+        // State 12
+        0, 0, 0, -91, -91, 0, 0, 24, 0, -91, 0, -91, -91, -91, 0, -91, 0, 0, 0, 0, -91, 0,
+        // State 13
+        0, 0, 0, -30, -30, 0, 0, -30, 0, -30, 0, -30, -30, -30, 0, -30, 0, 0, 0, 0, -30, 0,
+        // State 14
+        0, 0, 0, -79, -79, 0, 0, -79, 25, -79, 0, -79, -79, -79, 0, -79, 0, 0, 0, 0, -79, 0,
+        // State 15
+        0, 0, 0, -39, -39, 0, 0, -39, 0, -39, 0, -39, -39, -39, 0, -39, 0, 0, 0, 0, -39, 0,
+        // State 16
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -92, -92, 0, -92, 0, 0, 0, 0, -92, 0,
+        // State 17
+        0, 0, 0, 27, -85, 0, 0, 0, 0, -85, 0, -85, -85, -85, 0, -85, 0, 0, 0, 0, -85, 0,
+        // State 18
+        0, 0, 0, -87, -87, 0, 0, 0, 0, -87, 0, -87, -87, -87, 0, -87, 0, 0, 0, 0, -87, 0,
+        // State 19
+        0, 0, 0, -36, -36, 0, 0, -36, 0, -36, 0, -36, -36, -36, 0, -36, 0, 0, 0, 0, -36, 0,
+        // State 20
+        0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 21, 0, 7, 8, 0, 9, 22, 0, 23, 0, 10, 0,
+        // State 21
+        0, 0, 0, -37, -37, 0, 0, -37, 0, -37, 0, -37, -37, -37, 0, -37, 0, 0, 0, 0, -37, 0,
+        // State 22
+        0, 0, 0, -38, -38, 0, 0, -38, 0, -38, 0, -38, -38, -38, 0, -38, 0, 0, 0, 0, -38, 0,
+        // State 23
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 8, 0, 9, 0, 0, 0, 0, 10, 0,
+        // State 24
+        0, 0, 0, 0, 0, 0, 0, 20, 0, -47, 21, 0, 7, 8, 0, 9, 22, 0, 23, 0, 10, 0,
+        // State 25
+        0, 0, 0, 33, -86, 0, 0, 0, 0, -86, 0, -86, -86, -86, 0, -86, 0, 0, 0, 0, -86, 0,
+        // State 26
+        0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 21, 0, 7, 8, 0, 9, 22, 0, 23, 0, 10, 0,
+        // State 27
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 28
+        0, 0, 0, -31, -31, 0, 0, -31, 0, -31, 0, -31, -31, -31, 0, -31, 0, 0, 0, 0, -31, 0,
+        // State 29
+        0, 0, 0, 0, 0, 0, 0, 20, 0, -49, 21, 0, 7, 8, 0, 9, 22, 0, 23, 0, 10, 0,
+        // State 30
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 31
+        0, 0, 0, 0, 38, 0, 0, 0, 0, -46, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 32
+        0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 21, 0, 7, 8, 0, 9, 22, 0, 23, 0, 10, 0,
+        // State 33
+        0, 0, 0, -2, -2, 0, 0, 0, 0, -2, 0, -2, -2, -2, 0, -2, 0, 0, 0, 0, -2, 0,
+        // State 34
+        0, 0, 0, -88, -88, 0, 0, 0, 0, -88, 0, -88, -88, -88, 0, -88, 0, 0, 0, 0, -88, 0,
+        // State 35
+        0, 0, 0, 0, 40, 0, 0, 0, 0, -48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 36
+        0, 0, 0, -78, -78, 0, 0, -78, 0, -78, 0, -78, -78, -78, 0, -78, 0, 0, 0, 0, -78, 0,
+        // State 37
+        0, 0, 0, 0, 0, 0, 0, -20, 0, -20, -20, 0, -20, -20, 0, -20, -20, 0, -20, 0, -20, 0,
+        // State 38
+        0, 0, 0, -3, -3, 0, 0, 0, 0, -3, 0, -3, -3, -3, 0, -3, 0, 0, 0, 0, -3, 0,
+        // State 39
+        0, 0, 0, 0, 0, 0, 0, -21, 0, -21, -21, 0, -21, -21, 0, -21, -21, 0, -21, 0, -21, 0,
+    ];
+    const __EOF_ACTION: &'static [i32] = &[
+        -99,
+        0,
+        -60,
+        -95,
+        -100,
+        -103,
+        -62,
+        -63,
+        -61,
+        -64,
+        0,
+        -96,
+        -91,
+        -30,
+        -79,
+        -39,
+        -92,
+        -85,
+        -87,
+        -36,
+        0,
+        -37,
+        -38,
+        0,
+        0,
+        -86,
+        0,
+        0,
+        -31,
+        0,
+        0,
+        0,
+        0,
+        -2,
+        -88,
+        0,
+        -78,
+        0,
+        -3,
+        0,
+    ];
+    const __GOTO: &'static [i32] = &[
+        // State 0
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 5, 0, 6, 0, 0, 0,
+        // State 1
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 2
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 3
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 4
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0,
+        // State 5
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 6
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 7
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 8
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 9
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 10
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 3, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 17, 18, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 11
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 12
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 13
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 14
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 15
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 16
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 17
+        0, 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 18
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 19
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 20
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 3, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 28, 18, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 21
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 22
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 23
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 3, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 24
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 0, 0, 13, 0, 14, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 15, 3, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 32, 18, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 25
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 26
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 3, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 34, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 27
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 28
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 29
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 3, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 36, 18, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 30
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 31
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 32
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 3, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 39, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 33
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 34
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 35
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 36
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 37
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 38
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        // State 39
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    ];
+    fn __expected_tokens(__state: usize) -> Vec<::std::string::String> {
+        const __TERMINAL: &'static [&'static str] = &[
+            r###""&""###,
+            r###""(""###,
+            r###"")""###,
+            r###""+""###,
+            r###"",""###,
+            r###""->""###,
+            r###"":""###,
+            r###""::""###,
+            r###""<""###,
+            r###"">""###,
+            r###""[""###,
+            r###""]""###,
+            r###""class""###,
+            r###""extends""###,
+            r###""fn""###,
+            r###""init""###,
+            r###""self""###,
+            r###""struct""###,
+            r###""super""###,
+            r###""{..}""###,
+            r###"OtherId"###,
+        ];
+        __ACTION[(__state * 22)..].iter().zip(__TERMINAL).filter_map(|(&state, terminal)| {
+            if state == 0 {
+                None
+            } else {
+                Some(terminal.to_string())
+            }
+        }).collect()
+    }
+    pub fn parse_VarTys<
+        'input,
+        __TOKEN: __ToTriple<'input, Error=::errors::Error>,
+        __TOKENS: IntoIterator<Item=__TOKEN>,
+    >(
+        __tokens0: __TOKENS,
+    ) -> Result<Vec<VarTy>, __lalrpop_util::ParseError<usize, Tok<'input>, ::errors::Error>>
+    {
+        let __tokens = __tokens0.into_iter();
+        let mut __tokens = __tokens.map(|t| __ToTriple::to_triple(t));
+        let mut __states = vec![0_i32];
+        let mut __symbols = vec![];
+        let mut __integer;
+        let mut __lookahead;
+        let mut __last_location = Default::default();
+        '__shift: loop {
+            __lookahead = match __tokens.next() {
+                Some(Ok(v)) => v,
+                None => break '__shift,
+                Some(Err(e)) => return Err(__lalrpop_util::ParseError::User { error: e }),
+            };
+            __last_location = __lookahead.2.clone();
+            __integer = match __lookahead.1 {
+                Tok::Ampersand if true => 0,
+                Tok::LeftParen if true => 1,
+                Tok::RightParen if true => 2,
+                Tok::Plus if true => 3,
+                Tok::Comma if true => 4,
+                Tok::ThinArrow if true => 5,
+                Tok::Colon if true => 6,
+                Tok::ColonColon if true => 7,
+                Tok::LessThan if true => 8,
+                Tok::GreaterThan if true => 9,
+                Tok::LeftBracket if true => 10,
+                Tok::RightBracket if true => 11,
+                Tok::ClassKeyword if true => 12,
+                Tok::ExtendsKeyword if true => 13,
+                Tok::FnKeyword if true => 14,
+                Tok::InitKeyword if true => 15,
+                Tok::SelfKeyword if true => 16,
+                Tok::StructKeyword if true => 17,
+                Tok::SuperKeyword if true => 18,
+                Tok::Block(_) if true => 19,
+                Tok::Id(_) if true => 20,
+                _ => {
+                    let __state = *__states.last().unwrap() as usize;
+                    let __error = __lalrpop_util::ParseError::UnrecognizedToken {
+                        token: Some(__lookahead),
+                        expected: __expected_tokens(__state),
+                    };
+                    return Err(__error);
+                }
+            };
+            '__inner: loop {
+                let __state = *__states.last().unwrap() as usize;
+                let __action = __ACTION[__state * 22 + __integer];
+                if __action > 0 {
+                    let __symbol = match __integer {
+                        0 => match __lookahead.1 {
+                            __tok @ Tok::Ampersand => __Symbol::Term_22_26_22(__tok),
+                            _ => unreachable!(),
+                        },
+                        1 => match __lookahead.1 {
+                            __tok @ Tok::LeftParen => __Symbol::Term_22_28_22(__tok),
+                            _ => unreachable!(),
+                        },
+                        2 => match __lookahead.1 {
+                            __tok @ Tok::RightParen => __Symbol::Term_22_29_22(__tok),
+                            _ => unreachable!(),
+                        },
+                        3 => match __lookahead.1 {
+                            __tok @ Tok::Plus => __Symbol::Term_22_2b_22(__tok),
+                            _ => unreachable!(),
+                        },
+                        4 => match __lookahead.1 {
+                            __tok @ Tok::Comma => __Symbol::Term_22_2c_22(__tok),
+                            _ => unreachable!(),
+                        },
+                        5 => match __lookahead.1 {
+                            __tok @ Tok::ThinArrow => __Symbol::Term_22_2d_3e_22(__tok),
+                            _ => unreachable!(),
+                        },
+                        6 => match __lookahead.1 {
+                            __tok @ Tok::Colon => __Symbol::Term_22_3a_22(__tok),
+                            _ => unreachable!(),
+                        },
+                        7 => match __lookahead.1 {
+                            __tok @ Tok::ColonColon => __Symbol::Term_22_3a_3a_22(__tok),
+                            _ => unreachable!(),
+                        },
+                        8 => match __lookahead.1 {
+                            __tok @ Tok::LessThan => __Symbol::Term_22_3c_22(__tok),
+                            _ => unreachable!(),
+                        },
+                        9 => match __lookahead.1 {
+                            __tok @ Tok::GreaterThan => __Symbol::Term_22_3e_22(__tok),
+                            _ => unreachable!(),
+                        },
+                        10 => match __lookahead.1 {
+                            __tok @ Tok::LeftBracket => __Symbol::Term_22_5b_22(__tok),
+                            _ => unreachable!(),
+                        },
+                        11 => match __lookahead.1 {
+                            __tok @ Tok::RightBracket => __Symbol::Term_22_5d_22(__tok),
+                            _ => unreachable!(),
+                        },
+                        12 => match __lookahead.1 {
+                            __tok @ Tok::ClassKeyword => __Symbol::Term_22class_22(__tok),
+                            _ => unreachable!(),
+                        },
+                        13 => match __lookahead.1 {
+                            __tok @ Tok::ExtendsKeyword => __Symbol::Term_22extends_22(__tok),
+                            _ => unreachable!(),
+                        },
+                        14 => match __lookahead.1 {
+                            __tok @ Tok::FnKeyword => __Symbol::Term_22fn_22(__tok),
+                            _ => unreachable!(),
+                        },
+                        15 => match __lookahead.1 {
+                            __tok @ Tok::InitKeyword => __Symbol::Term_22init_22(__tok),
+                            _ => unreachable!(),
+                        },
+                        16 => match __lookahead.1 {
+                            __tok @ Tok::SelfKeyword => __Symbol::Term_22self_22(__tok),
+                            _ => unreachable!(),
+                        },
+                        17 => match __lookahead.1 {
+                            __tok @ Tok::StructKeyword => __Symbol::Term_22struct_22(__tok),
+                            _ => unreachable!(),
+                        },
+                        18 => match __lookahead.1 {
+                            __tok @ Tok::SuperKeyword => __Symbol::Term_22super_22(__tok),
+                            _ => unreachable!(),
+                        },
+                        19 => match __lookahead.1 {
+                            Tok::Block(__tok0) => __Symbol::Term_22_7b_2e_2e_7d_22(__tok0),
+                            _ => unreachable!(),
+                        },
+                        20 => match __lookahead.1 {
+                            Tok::Id(__tok0) => __Symbol::TermOtherId(__tok0),
+                            _ => unreachable!(),
+                        },
+                        _ => unreachable!(),
+                    };
+                    __states.push(__action - 1);
+                    __symbols.push((__lookahead.0, __symbol, __lookahead.2));
+                    continue '__shift;
+                } else if __action < 0 {
+                    if let Some(r) = __reduce(__action, Some(&__lookahead.0), &mut __states, &mut __symbols, ::std::marker::PhantomData::<()>) {
+                        return r;
+                    }
+                } else {
+                    let __state = *__states.last().unwrap() as usize;
+                    let __error = __lalrpop_util::ParseError::UnrecognizedToken {
+                        token: Some(__lookahead),
+                        expected: __expected_tokens(__state),
+                    };
+                    return Err(__error)
+                }
+            }
+        }
+        loop {
+            let __state = *__states.last().unwrap() as usize;
+            let __action = __EOF_ACTION[__state];
+            if __action < 0 {
+                if let Some(r) = __reduce(__action, None, &mut __states, &mut __symbols, ::std::marker::PhantomData::<()>) {
+                    return r;
+                }
+            } else {
+                let __state = *__states.last().unwrap() as usize;
+                let __error = __lalrpop_util::ParseError::UnrecognizedToken {
+                    token: None,
+                    expected: __expected_tokens(__state),
+                };
+                return Err(__error);
+            }
+        }
+    }
+    pub fn __reduce<
+        'input,
+    >(
+        __action: i32,
+        __lookahead_start: Option<&usize>,
+        __states: &mut ::std::vec::Vec<i32>,
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>,
+        _: ::std::marker::PhantomData<()>,
+    ) -> Option<Result<Vec<VarTy>,__lalrpop_util::ParseError<usize, Tok<'input>, ::errors::Error>>>
+    {
+        let __nonterminal = match -__action {
+            1 => {
+                // ("+" <Type1>) = "+", Type1 => ActionFn(38);
+                let __sym1 = __pop_NtType1(__symbols);
+                let __sym0 = __pop_Term_22_2b_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action38::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::Nt_28_22_2b_22_20_3cType1_3e_29(__nt), __end));
+                0
+            }
+            2 => {
+                // ("+" <Type1>)+ = "+", Type1 => ActionFn(90);
+                let __sym1 = __pop_NtType1(__symbols);
+                let __sym0 = __pop_Term_22_2b_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action90::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::Nt_28_22_2b_22_20_3cType1_3e_29_2b(__nt), __end));
+                1
+            }
+            3 => {
+                // ("+" <Type1>)+ = ("+" <Type1>)+, "+", Type1 => ActionFn(91);
+                let __sym2 = __pop_NtType1(__symbols);
+                let __sym1 = __pop_Term_22_2b_22(__symbols);
+                let __sym0 = __pop_Nt_28_22_2b_22_20_3cType1_3e_29_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym2.2.clone();
+                let __nt = super::__action91::<>(__sym0, __sym1, __sym2);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 3);
+                __symbols.push((__start, __Symbol::Nt_28_22_2b_22_20_3cType1_3e_29_2b(__nt), __end));
+                1
+            }
+            4 => {
+                // ("->" <Type>) = "->", Type => ActionFn(43);
+                let __sym1 = __pop_NtType(__symbols);
+                let __sym0 = __pop_Term_22_2d_3e_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action43::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::Nt_28_22_2d_3e_22_20_3cType_3e_29(__nt), __end));
+                2
+            }
+            5 => {
+                // ("->" <Type>)? = "->", Type => ActionFn(92);
+                let __sym1 = __pop_NtType(__symbols);
+                let __sym0 = __pop_Term_22_2d_3e_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action92::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::Nt_28_22_2d_3e_22_20_3cType_3e_29_3f(__nt), __end));
+                3
+            }
+            6 => {
+                // ("->" <Type>)? =  => ActionFn(42);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action42::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::Nt_28_22_2d_3e_22_20_3cType_3e_29_3f(__nt), __end));
+                3
+            }
+            7 => {
+                // ("::" "<" <Comma<Type>> ">") = "::", "<", Comma<Type>, ">" => ActionFn(79);
+                let __sym3 = __pop_Term_22_3e_22(__symbols);
+                let __sym2 = __pop_NtComma_3cType_3e(__symbols);
+                let __sym1 = __pop_Term_22_3c_22(__symbols);
+                let __sym0 = __pop_Term_22_3a_3a_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym3.2.clone();
+                let __nt = super::__action79::<>(__sym0, __sym1, __sym2, __sym3);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 4);
+                __symbols.push((__start, __Symbol::Nt_28_22_3a_3a_22_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29(__nt), __end));
+                4
+            }
+            8 => {
+                // ("::" "<" <Comma<Type>> ">")? = "::", "<", Comma<Type>, ">" => ActionFn(95);
+                let __sym3 = __pop_Term_22_3e_22(__symbols);
+                let __sym2 = __pop_NtComma_3cType_3e(__symbols);
+                let __sym1 = __pop_Term_22_3c_22(__symbols);
+                let __sym0 = __pop_Term_22_3a_3a_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym3.2.clone();
+                let __nt = super::__action95::<>(__sym0, __sym1, __sym2, __sym3);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 4);
+                __symbols.push((__start, __Symbol::Nt_28_22_3a_3a_22_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29_3f(__nt), __end));
+                5
+            }
+            9 => {
+                // ("::" "<" <Comma<Type>> ">")? =  => ActionFn(78);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action78::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::Nt_28_22_3a_3a_22_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29_3f(__nt), __end));
+                5
+            }
+            10 => {
+                // ("extends" <TypePath>) = "extends", TypePath => ActionFn(49);
+                let __sym1 = __pop_NtTypePath(__symbols);
+                let __sym0 = __pop_Term_22extends_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action49::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::Nt_28_22extends_22_20_3cTypePath_3e_29(__nt), __end));
+                6
+            }
+            11 => {
+                // ("extends" <TypePath>)? = "extends", TypePath => ActionFn(98);
+                let __sym1 = __pop_NtTypePath(__symbols);
+                let __sym0 = __pop_Term_22extends_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action98::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::Nt_28_22extends_22_20_3cTypePath_3e_29_3f(__nt), __end));
+                7
+            }
+            12 => {
+                // ("extends" <TypePath>)? =  => ActionFn(48);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action48::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::Nt_28_22extends_22_20_3cTypePath_3e_29_3f(__nt), __end));
+                7
+            }
+            13 => {
+                // (() "<" <Comma<Type>> ">") = "<", Comma<Type>, ">" => ActionFn(101);
+                let __sym2 = __pop_Term_22_3e_22(__symbols);
+                let __sym1 = __pop_NtComma_3cType_3e(__symbols);
+                let __sym0 = __pop_Term_22_3c_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym2.2.clone();
+                let __nt = super::__action101::<>(__sym0, __sym1, __sym2);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 3);
+                __symbols.push((__start, __Symbol::Nt_28_28_29_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29(__nt), __end));
+                8
+            }
+            14 => {
+                // (() "<" <Comma<Type>> ">")? = "<", Comma<Type>, ">" => ActionFn(102);
+                let __sym2 = __pop_Term_22_3e_22(__symbols);
+                let __sym1 = __pop_NtComma_3cType_3e(__symbols);
+                let __sym0 = __pop_Term_22_3c_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym2.2.clone();
+                let __nt = super::__action102::<>(__sym0, __sym1, __sym2);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 3);
+                __symbols.push((__start, __Symbol::Nt_28_28_29_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29_3f(__nt), __end));
+                9
+            }
+            15 => {
+                // (() "<" <Comma<Type>> ">")? =  => ActionFn(75);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action75::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::Nt_28_28_29_20_22_3c_22_20_3cComma_3cType_3e_3e_20_22_3e_22_29_3f(__nt), __end));
+                9
+            }
+            16 => {
+                // () =  => ActionFn(33);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action33::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::Nt_28_29(__nt), __end));
+                10
+            }
+            17 => {
+                // (<Type> ",") = Type, "," => ActionFn(87);
+                let __sym1 = __pop_Term_22_2c_22(__symbols);
+                let __sym0 = __pop_NtType(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action87::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29(__nt), __end));
+                11
+            }
+            18 => {
+                // (<Type> ",")* =  => ActionFn(85);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action85::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29_2a(__nt), __end));
+                12
+            }
+            19 => {
+                // (<Type> ",")* = (<Type> ",")+ => ActionFn(86);
+                let __sym0 = __pop_Nt_28_3cType_3e_20_22_2c_22_29_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action86::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29_2a(__nt), __end));
+                12
+            }
+            20 => {
+                // (<Type> ",")+ = Type, "," => ActionFn(105);
+                let __sym1 = __pop_Term_22_2c_22(__symbols);
+                let __sym0 = __pop_NtType(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action105::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29_2b(__nt), __end));
+                13
+            }
+            21 => {
+                // (<Type> ",")+ = (<Type> ",")+, Type, "," => ActionFn(106);
+                let __sym2 = __pop_Term_22_2c_22(__symbols);
+                let __sym1 = __pop_NtType(__symbols);
+                let __sym0 = __pop_Nt_28_3cType_3e_20_22_2c_22_29_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym2.2.clone();
+                let __nt = super::__action106::<>(__sym0, __sym1, __sym2);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 3);
+                __symbols.push((__start, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29_2b(__nt), __end));
+                13
+            }
+            22 => {
+                // (<VarTy> ",") = VarTy, "," => ActionFn(61);
+                let __sym1 = __pop_Term_22_2c_22(__symbols);
+                let __sym0 = __pop_NtVarTy(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action61::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29(__nt), __end));
+                14
+            }
+            23 => {
+                // (<VarTy> ",")* =  => ActionFn(59);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action59::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29_2a(__nt), __end));
+                15
+            }
+            24 => {
+                // (<VarTy> ",")* = (<VarTy> ",")+ => ActionFn(60);
+                let __sym0 = __pop_Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action60::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29_2a(__nt), __end));
+                15
+            }
+            25 => {
+                // (<VarTy> ",")+ = VarTy, "," => ActionFn(109);
+                let __sym1 = __pop_Term_22_2c_22(__symbols);
+                let __sym0 = __pop_NtVarTy(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action109::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(__nt), __end));
+                16
+            }
+            26 => {
+                // (<VarTy> ",")+ = (<VarTy> ",")+, VarTy, "," => ActionFn(110);
+                let __sym2 = __pop_Term_22_2c_22(__symbols);
+                let __sym1 = __pop_NtVarTy(__symbols);
+                let __sym0 = __pop_Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym2.2.clone();
+                let __nt = super::__action110::<>(__sym0, __sym1, __sym2);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 3);
+                __symbols.push((__start, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(__nt), __end));
+                16
+            }
+            27 => {
+                // @L =  => ActionFn(50);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action50::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::Nt_40L(__nt), __end));
+                17
+            }
+            28 => {
+                // AnyPath<"::"> = BasePath<"::"> => ActionFn(34);
+                let __sym0 = __pop_NtBasePath_3c_22_3a_3a_22_3e(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action34::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtAnyPath_3c_22_3a_3a_22_3e(__nt), __end));
+                18
+            }
+            29 => {
+                // AnyPath<"::"> = AnyPath<"::">, "::", PathId<"::"> => ActionFn(35);
+                let __sym2 = __pop_NtPathId_3c_22_3a_3a_22_3e(__symbols);
+                let __sym1 = __pop_Term_22_3a_3a_22(__symbols);
+                let __sym0 = __pop_NtAnyPath_3c_22_3a_3a_22_3e(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym2.2.clone();
+                let __nt = super::__action35::<>(__sym0, __sym1, __sym2);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 3);
+                __symbols.push((__start, __Symbol::NtAnyPath_3c_22_3a_3a_22_3e(__nt), __end));
+                18
+            }
+            30 => {
+                // AnyPath<()> = BasePath<()> => ActionFn(31);
+                let __sym0 = __pop_NtBasePath_3c_28_29_3e(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action31::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtAnyPath_3c_28_29_3e(__nt), __end));
+                19
+            }
+            31 => {
+                // AnyPath<()> = AnyPath<()>, "::", PathId<()> => ActionFn(32);
+                let __sym2 = __pop_NtPathId_3c_28_29_3e(__symbols);
+                let __sym1 = __pop_Term_22_3a_3a_22(__symbols);
+                let __sym0 = __pop_NtAnyPath_3c_28_29_3e(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym2.2.clone();
+                let __nt = super::__action32::<>(__sym0, __sym1, __sym2);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 3);
+                __symbols.push((__start, __Symbol::NtAnyPath_3c_28_29_3e(__nt), __end));
+                19
+            }
+            32 => {
+                // BasePath<"::"> = "::" => ActionFn(65);
+                let __sym0 = __pop_Term_22_3a_3a_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action65::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtBasePath_3c_22_3a_3a_22_3e(__nt), __end));
+                20
+            }
+            33 => {
+                // BasePath<"::"> = "self" => ActionFn(66);
+                let __sym0 = __pop_Term_22self_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action66::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtBasePath_3c_22_3a_3a_22_3e(__nt), __end));
+                20
+            }
+            34 => {
+                // BasePath<"::"> = "super" => ActionFn(67);
+                let __sym0 = __pop_Term_22super_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action67::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtBasePath_3c_22_3a_3a_22_3e(__nt), __end));
+                20
+            }
+            35 => {
+                // BasePath<"::"> = PathId<"::"> => ActionFn(68);
+                let __sym0 = __pop_NtPathId_3c_22_3a_3a_22_3e(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action68::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtBasePath_3c_22_3a_3a_22_3e(__nt), __end));
+                20
+            }
+            36 => {
+                // BasePath<()> = "::" => ActionFn(70);
+                let __sym0 = __pop_Term_22_3a_3a_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action70::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtBasePath_3c_28_29_3e(__nt), __end));
+                21
+            }
+            37 => {
+                // BasePath<()> = "self" => ActionFn(71);
+                let __sym0 = __pop_Term_22self_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action71::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtBasePath_3c_28_29_3e(__nt), __end));
+                21
+            }
+            38 => {
+                // BasePath<()> = "super" => ActionFn(72);
+                let __sym0 = __pop_Term_22super_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action72::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtBasePath_3c_28_29_3e(__nt), __end));
+                21
+            }
+            39 => {
+                // BasePath<()> = PathId<()> => ActionFn(73);
+                let __sym0 = __pop_NtPathId_3c_28_29_3e(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action73::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtBasePath_3c_28_29_3e(__nt), __end));
+                21
+            }
+            40 => {
+                // Class = "class", Id, Extends, "{..}" => ActionFn(113);
+                let __sym3 = __pop_Term_22_7b_2e_2e_7d_22(__symbols);
+                let __sym2 = __pop_NtExtends(__symbols);
+                let __sym1 = __pop_NtId(__symbols);
+                let __sym0 = __pop_Term_22class_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym3.2.clone();
+                let __nt = match super::__action113::<>(__sym0, __sym1, __sym2, __sym3) {
+                    Ok(v) => v,
+                    Err(e) => return Some(Err(e)),
+                };
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 4);
+                __symbols.push((__start, __Symbol::NtClass(__nt), __end));
+                22
+            }
+            41 => {
+                // Class* =  => ActionFn(51);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action51::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::NtClass_2a(__nt), __end));
+                23
+            }
+            42 => {
+                // Class* = Class+ => ActionFn(52);
+                let __sym0 = __pop_NtClass_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action52::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtClass_2a(__nt), __end));
+                23
+            }
+            43 => {
+                // Class+ = Class => ActionFn(53);
+                let __sym0 = __pop_NtClass(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action53::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtClass_2b(__nt), __end));
+                24
+            }
+            44 => {
+                // Class+ = Class+, Class => ActionFn(54);
+                let __sym1 = __pop_NtClass(__symbols);
+                let __sym0 = __pop_NtClass_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action54::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::NtClass_2b(__nt), __end));
+                24
+            }
+            45 => {
+                // CodeBlock = "{..}" => ActionFn(28);
+                let __sym0 = __pop_Term_22_7b_2e_2e_7d_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action28::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtCodeBlock(__nt), __end));
+                25
+            }
+            46 => {
+                // Comma<Type> = Type => ActionFn(119);
+                let __sym0 = __pop_NtType(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action119::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
+                26
+            }
+            47 => {
+                // Comma<Type> =  => ActionFn(120);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action120::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
+                26
+            }
+            48 => {
+                // Comma<Type> = (<Type> ",")+, Type => ActionFn(121);
+                let __sym1 = __pop_NtType(__symbols);
+                let __sym0 = __pop_Nt_28_3cType_3e_20_22_2c_22_29_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action121::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
+                26
+            }
+            49 => {
+                // Comma<Type> = (<Type> ",")+ => ActionFn(122);
+                let __sym0 = __pop_Nt_28_3cType_3e_20_22_2c_22_29_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action122::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtComma_3cType_3e(__nt), __end));
+                26
+            }
+            50 => {
+                // Comma<VarTy> = VarTy => ActionFn(125);
+                let __sym0 = __pop_NtVarTy(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action125::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtComma_3cVarTy_3e(__nt), __end));
+                27
+            }
+            51 => {
+                // Comma<VarTy> =  => ActionFn(126);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action126::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::NtComma_3cVarTy_3e(__nt), __end));
+                27
+            }
+            52 => {
+                // Comma<VarTy> = (<VarTy> ",")+, VarTy => ActionFn(127);
+                let __sym1 = __pop_NtVarTy(__symbols);
+                let __sym0 = __pop_Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action127::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::NtComma_3cVarTy_3e(__nt), __end));
+                27
+            }
+            53 => {
+                // Comma<VarTy> = (<VarTy> ",")+ => ActionFn(128);
+                let __sym0 = __pop_Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action128::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtComma_3cVarTy_3e(__nt), __end));
+                27
+            }
+            54 => {
+                // ExprPath = AnyPath<"::"> => ActionFn(29);
+                let __sym0 = __pop_NtAnyPath_3c_22_3a_3a_22_3e(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action29::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtExprPath(__nt), __end));
+                28
+            }
+            55 => {
+                // Extends = "extends", TypePath => ActionFn(99);
+                let __sym1 = __pop_NtTypePath(__symbols);
+                let __sym0 = __pop_Term_22extends_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action99::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::NtExtends(__nt), __end));
+                29
+            }
+            56 => {
+                // Extends =  => ActionFn(100);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action100::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::NtExtends(__nt), __end));
+                29
+            }
+            57 => {
+                // FnDef = FnSig, CodeBlock => ActionFn(18);
+                let __sym1 = __pop_NtCodeBlock(__symbols);
+                let __sym0 = __pop_NtFnSig(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action18::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::NtFnDef(__nt), __end));
+                30
+            }
+            58 => {
+                // FnSig = "(", "&", "self", ")", ReturnTy => ActionFn(19);
+                let __sym4 = __pop_NtReturnTy(__symbols);
+                let __sym3 = __pop_Term_22_29_22(__symbols);
+                let __sym2 = __pop_Term_22self_22(__symbols);
+                let __sym1 = __pop_Term_22_26_22(__symbols);
+                let __sym0 = __pop_Term_22_28_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym4.2.clone();
+                let __nt = super::__action19::<>(__sym0, __sym1, __sym2, __sym3, __sym4);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 5);
+                __symbols.push((__start, __Symbol::NtFnSig(__nt), __end));
+                31
+            }
+            59 => {
+                // FnSig = "(", "&", "self", ",", Comma<VarTy>, ")", ReturnTy => ActionFn(20);
+                let __sym6 = __pop_NtReturnTy(__symbols);
+                let __sym5 = __pop_Term_22_29_22(__symbols);
+                let __sym4 = __pop_NtComma_3cVarTy_3e(__symbols);
+                let __sym3 = __pop_Term_22_2c_22(__symbols);
+                let __sym2 = __pop_Term_22self_22(__symbols);
+                let __sym1 = __pop_Term_22_26_22(__symbols);
+                let __sym0 = __pop_Term_22_28_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym6.2.clone();
+                let __nt = super::__action20::<>(__sym0, __sym1, __sym2, __sym3, __sym4, __sym5, __sym6);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 7);
+                __symbols.push((__start, __Symbol::NtFnSig(__nt), __end));
+                31
+            }
+            60 => {
+                // Id = IdStr => ActionFn(7);
+                let __sym0 = __pop_NtIdStr(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action7::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtId(__nt), __end));
+                32
+            }
+            61 => {
+                // IdStr = "init" => ActionFn(8);
+                let __sym0 = __pop_Term_22init_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action8::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtIdStr(__nt), __end));
+                33
+            }
+            62 => {
+                // IdStr = "class" => ActionFn(9);
+                let __sym0 = __pop_Term_22class_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action9::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtIdStr(__nt), __end));
+                33
+            }
+            63 => {
+                // IdStr = "extends" => ActionFn(10);
+                let __sym0 = __pop_Term_22extends_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action10::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtIdStr(__nt), __end));
+                33
+            }
+            64 => {
+                // IdStr = OtherId => ActionFn(11);
+                let __sym0 = __pop_TermOtherId(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action11::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtIdStr(__nt), __end));
+                33
+            }
+            65 => {
+                // Init = "init", CodeBlock => ActionFn(16);
+                let __sym1 = __pop_NtCodeBlock(__symbols);
+                let __sym0 = __pop_Term_22init_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action16::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::NtInit(__nt), __end));
+                34
+            }
+            66 => {
+                // Member = PrivateStruct => ActionFn(12);
+                let __sym0 = __pop_NtPrivateStruct(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action12::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtMember(__nt), __end));
+                35
+            }
+            67 => {
+                // Member = Init => ActionFn(13);
+                let __sym0 = __pop_NtInit(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action13::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtMember(__nt), __end));
+                35
+            }
+            68 => {
+                // Member = Method => ActionFn(14);
+                let __sym0 = __pop_NtMethod(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action14::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtMember(__nt), __end));
+                35
+            }
+            69 => {
+                // Member* =  => ActionFn(45);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action45::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::NtMember_2a(__nt), __end));
+                36
+            }
+            70 => {
+                // Member* = Member+ => ActionFn(46);
+                let __sym0 = __pop_NtMember_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action46::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtMember_2a(__nt), __end));
+                36
+            }
+            71 => {
+                // Member+ = Member => ActionFn(55);
+                let __sym0 = __pop_NtMember(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action55::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtMember_2b(__nt), __end));
+                37
+            }
+            72 => {
+                // Member+ = Member+, Member => ActionFn(56);
+                let __sym1 = __pop_NtMember(__symbols);
+                let __sym0 = __pop_NtMember_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action56::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::NtMember_2b(__nt), __end));
+                37
+            }
+            73 => {
+                // Members =  => ActionFn(117);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action117::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::NtMembers(__nt), __end));
+                38
+            }
+            74 => {
+                // Members = Member+ => ActionFn(118);
+                let __sym0 = __pop_NtMember_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action118::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtMembers(__nt), __end));
+                38
+            }
+            75 => {
+                // Method = "fn", Id, FnDef => ActionFn(17);
+                let __sym2 = __pop_NtFnDef(__symbols);
+                let __sym1 = __pop_NtId(__symbols);
+                let __sym0 = __pop_Term_22fn_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym2.2.clone();
+                let __nt = super::__action17::<>(__sym0, __sym1, __sym2);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 3);
+                __symbols.push((__start, __Symbol::NtMethod(__nt), __end));
+                39
+            }
+            76 => {
+                // PathId<"::"> = Id, "::", "<", Comma<Type>, ">" => ActionFn(96);
+                let __sym4 = __pop_Term_22_3e_22(__symbols);
+                let __sym3 = __pop_NtComma_3cType_3e(__symbols);
+                let __sym2 = __pop_Term_22_3c_22(__symbols);
+                let __sym1 = __pop_Term_22_3a_3a_22(__symbols);
+                let __sym0 = __pop_NtId(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym4.2.clone();
+                let __nt = super::__action96::<>(__sym0, __sym1, __sym2, __sym3, __sym4);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 5);
+                __symbols.push((__start, __Symbol::NtPathId_3c_22_3a_3a_22_3e(__nt), __end));
+                40
+            }
+            77 => {
+                // PathId<"::"> = Id => ActionFn(97);
+                let __sym0 = __pop_NtId(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action97::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtPathId_3c_22_3a_3a_22_3e(__nt), __end));
+                40
+            }
+            78 => {
+                // PathId<()> = Id, "<", Comma<Type>, ">" => ActionFn(103);
+                let __sym3 = __pop_Term_22_3e_22(__symbols);
+                let __sym2 = __pop_NtComma_3cType_3e(__symbols);
+                let __sym1 = __pop_Term_22_3c_22(__symbols);
+                let __sym0 = __pop_NtId(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym3.2.clone();
+                let __nt = super::__action103::<>(__sym0, __sym1, __sym2, __sym3);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 4);
+                __symbols.push((__start, __Symbol::NtPathId_3c_28_29_3e(__nt), __end));
+                41
+            }
+            79 => {
+                // PathId<()> = Id => ActionFn(104);
+                let __sym0 = __pop_NtId(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action104::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtPathId_3c_28_29_3e(__nt), __end));
+                41
+            }
+            80 => {
+                // PrivateStruct = "struct", Id, "{..}" => ActionFn(114);
+                let __sym2 = __pop_Term_22_7b_2e_2e_7d_22(__symbols);
+                let __sym1 = __pop_NtId(__symbols);
+                let __sym0 = __pop_Term_22struct_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym2.2.clone();
+                let __nt = match super::__action114::<>(__sym0, __sym1, __sym2) {
+                    Ok(v) => v,
+                    Err(e) => return Some(Err(e)),
+                };
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 3);
+                __symbols.push((__start, __Symbol::NtPrivateStruct(__nt), __end));
+                42
+            }
+            81 => {
+                // Program =  => ActionFn(115);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action115::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::NtProgram(__nt), __end));
+                43
+            }
+            82 => {
+                // Program = Class+ => ActionFn(116);
+                let __sym0 = __pop_NtClass_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action116::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtProgram(__nt), __end));
+                43
+            }
+            83 => {
+                // ReturnTy = "->", Type => ActionFn(93);
+                let __sym1 = __pop_NtType(__symbols);
+                let __sym0 = __pop_Term_22_2d_3e_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action93::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::NtReturnTy(__nt), __end));
+                44
+            }
+            84 => {
+                // ReturnTy =  => ActionFn(94);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action94::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::NtReturnTy(__nt), __end));
+                44
+            }
+            85 => {
+                // Type = Type1 => ActionFn(24);
+                let __sym0 = __pop_NtType1(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action24::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtType(__nt), __end));
+                45
+            }
+            86 => {
+                // Type = Type1, ("+" <Type1>)+ => ActionFn(25);
+                let __sym1 = __pop_Nt_28_22_2b_22_20_3cType1_3e_29_2b(__symbols);
+                let __sym0 = __pop_NtType1(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action25::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::NtType(__nt), __end));
+                45
+            }
+            87 => {
+                // Type1 = TypePath => ActionFn(26);
+                let __sym0 = __pop_NtTypePath(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action26::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtType1(__nt), __end));
+                46
+            }
+            88 => {
+                // Type1 = "[", Type, "]" => ActionFn(27);
+                let __sym2 = __pop_Term_22_5d_22(__symbols);
+                let __sym1 = __pop_NtType(__symbols);
+                let __sym0 = __pop_Term_22_5b_22(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym2.2.clone();
+                let __nt = super::__action27::<>(__sym0, __sym1, __sym2);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 3);
+                __symbols.push((__start, __Symbol::NtType1(__nt), __end));
+                46
+            }
+            89 => {
+                // Type? = Type => ActionFn(83);
+                let __sym0 = __pop_NtType(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action83::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtType_3f(__nt), __end));
+                47
+            }
+            90 => {
+                // Type? =  => ActionFn(84);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action84::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::NtType_3f(__nt), __end));
+                47
+            }
+            91 => {
+                // TypePath = AnyPath<()> => ActionFn(30);
+                let __sym0 = __pop_NtAnyPath_3c_28_29_3e(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action30::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtTypePath(__nt), __end));
+                48
+            }
+            92 => {
+                // VarTy = Id, ":", Type => ActionFn(23);
+                let __sym2 = __pop_NtType(__symbols);
+                let __sym1 = __pop_Term_22_3a_22(__symbols);
+                let __sym0 = __pop_NtId(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym2.2.clone();
+                let __nt = super::__action23::<>(__sym0, __sym1, __sym2);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 3);
+                __symbols.push((__start, __Symbol::NtVarTy(__nt), __end));
+                49
+            }
+            93 => {
+                // VarTy* =  => ActionFn(39);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action39::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::NtVarTy_2a(__nt), __end));
+                50
+            }
+            94 => {
+                // VarTy* = VarTy+ => ActionFn(40);
+                let __sym0 = __pop_NtVarTy_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action40::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtVarTy_2a(__nt), __end));
+                50
+            }
+            95 => {
+                // VarTy+ = VarTy => ActionFn(62);
+                let __sym0 = __pop_NtVarTy(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action62::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtVarTy_2b(__nt), __end));
+                51
+            }
+            96 => {
+                // VarTy+ = VarTy+, VarTy => ActionFn(63);
+                let __sym1 = __pop_NtVarTy(__symbols);
+                let __sym0 = __pop_NtVarTy_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym1.2.clone();
+                let __nt = super::__action63::<>(__sym0, __sym1);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 2);
+                __symbols.push((__start, __Symbol::NtVarTy_2b(__nt), __end));
+                51
+            }
+            97 => {
+                // VarTy? = VarTy => ActionFn(57);
+                let __sym0 = __pop_NtVarTy(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action57::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtVarTy_3f(__nt), __end));
+                52
+            }
+            98 => {
+                // VarTy? =  => ActionFn(58);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action58::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::NtVarTy_3f(__nt), __end));
+                52
+            }
+            99 => {
+                // VarTys =  => ActionFn(123);
+                let __start = __symbols.last().map(|s| s.2.clone()).unwrap_or_default();
+                let __end = __lookahead_start.cloned().unwrap_or_else(|| __start.clone());
+                let __nt = super::__action123::<>(&__start, &__end);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 0);
+                __symbols.push((__start, __Symbol::NtVarTys(__nt), __end));
+                53
+            }
+            100 => {
+                // VarTys = VarTy+ => ActionFn(124);
+                let __sym0 = __pop_NtVarTy_2b(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action124::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::NtVarTys(__nt), __end));
+                53
+            }
+            101 => {
+                // __Members = Members => ActionFn(1);
+                let __sym0 = __pop_NtMembers(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action1::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::Nt____Members(__nt), __end));
+                54
+            }
+            102 => {
+                // __Program = Program => ActionFn(0);
+                let __sym0 = __pop_NtProgram(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action0::<>(__sym0);
+                let __states_len = __states.len();
+                __states.truncate(__states_len - 1);
+                __symbols.push((__start, __Symbol::Nt____Program(__nt), __end));
+                55
+            }
+            103 => {
+                // __VarTys = VarTys => ActionFn(2);
+                let __sym0 = __pop_NtVarTys(__symbols);
+                let __start = __sym0.0.clone();
+                let __end = __sym0.2.clone();
+                let __nt = super::__action2::<>(__sym0);
                 return Some(Ok(__nt));
             }
             _ => panic!("invalid action code {}", __action)
@@ -7216,36 +7216,6 @@ mod __parse__Program {
             _ => panic!("symbol type mismatch")
         }
     }
-    fn __pop_Nt_28_3cField_3e_20_22_2c_22_29<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Field, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt_28_3cField_3e_20_22_2c_22_29_2a<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::vec::Vec<Field>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29_2a(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_Nt_28_3cField_3e_20_22_2c_22_29_2b<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::vec::Vec<Field>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt_28_3cField_3e_20_22_2c_22_29_2b(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
     fn __pop_Nt_28_3cType_3e_20_22_2c_22_29<
       'input,
     >(
@@ -7273,6 +7243,36 @@ mod __parse__Program {
     ) -> (usize, ::std::vec::Vec<Type>, usize) {
         match __symbols.pop().unwrap() {
             (__l, __Symbol::Nt_28_3cType_3e_20_22_2c_22_29_2b(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_3cVarTy_3e_20_22_2c_22_29<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, VarTy, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_3cVarTy_3e_20_22_2c_22_29_2a<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::vec::Vec<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29_2a(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_Nt_28_3cVarTy_3e_20_22_2c_22_29_2b<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::vec::Vec<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt_28_3cVarTy_3e_20_22_2c_22_29_2b(__v), __r) => (__l, __v, __r),
             _ => panic!("symbol type mismatch")
         }
     }
@@ -7366,16 +7366,6 @@ mod __parse__Program {
             _ => panic!("symbol type mismatch")
         }
     }
-    fn __pop_NtComma_3cField_3e<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Vec<Field>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtComma_3cField_3e(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
     fn __pop_NtComma_3cType_3e<
       'input,
     >(
@@ -7383,6 +7373,16 @@ mod __parse__Program {
     ) -> (usize, Vec<Type>, usize) {
         match __symbols.pop().unwrap() {
             (__l, __Symbol::NtComma_3cType_3e(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtComma_3cVarTy_3e<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Vec<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtComma_3cVarTy_3e(__v), __r) => (__l, __v, __r),
             _ => panic!("symbol type mismatch")
         }
     }
@@ -7403,56 +7403,6 @@ mod __parse__Program {
     ) -> (usize, Option<Path>, usize) {
         match __symbols.pop().unwrap() {
             (__l, __Symbol::NtExtends(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtField<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Field, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtField(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtField_2a<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::vec::Vec<Field>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtField_2a(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtField_2b<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::vec::Vec<Field>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtField_2b(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtField_3f<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, ::std::option::Option<Field>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtField_3f(__v), __r) => (__l, __v, __r),
-            _ => panic!("symbol type mismatch")
-        }
-    }
-    fn __pop_NtFields<
-      'input,
-    >(
-        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Vec<Field>, usize) {
-        match __symbols.pop().unwrap() {
-            (__l, __Symbol::NtFields(__v), __r) => (__l, __v, __r),
             _ => panic!("symbol type mismatch")
         }
     }
@@ -7646,13 +7596,53 @@ mod __parse__Program {
             _ => panic!("symbol type mismatch")
         }
     }
-    fn __pop_Nt____Fields<
+    fn __pop_NtVarTy<
       'input,
     >(
         __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
-    ) -> (usize, Vec<Field>, usize) {
+    ) -> (usize, VarTy, usize) {
         match __symbols.pop().unwrap() {
-            (__l, __Symbol::Nt____Fields(__v), __r) => (__l, __v, __r),
+            (__l, __Symbol::NtVarTy(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtVarTy_2a<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::vec::Vec<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtVarTy_2a(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtVarTy_2b<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::vec::Vec<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtVarTy_2b(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtVarTy_3f<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, ::std::option::Option<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtVarTy_3f(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
+    fn __pop_NtVarTys<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Vec<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::NtVarTys(__v), __r) => (__l, __v, __r),
             _ => panic!("symbol type mismatch")
         }
     }
@@ -7676,8 +7666,18 @@ mod __parse__Program {
             _ => panic!("symbol type mismatch")
         }
     }
+    fn __pop_Nt____VarTys<
+      'input,
+    >(
+        __symbols: &mut ::std::vec::Vec<(usize,__Symbol<'input>,usize)>
+    ) -> (usize, Vec<VarTy>, usize) {
+        match __symbols.pop().unwrap() {
+            (__l, __Symbol::Nt____VarTys(__v), __r) => (__l, __v, __r),
+            _ => panic!("symbol type mismatch")
+        }
+    }
 }
-pub use self::__parse__Program::parse_Program;
+pub use self::__parse__VarTys::parse_VarTys;
 
 pub fn __action0<
     'input,
@@ -7700,8 +7700,8 @@ pub fn __action1<
 pub fn __action2<
     'input,
 >(
-    (_, __0, _): (usize, Vec<Field>, usize),
-) -> Vec<Field>
+    (_, __0, _): (usize, Vec<VarTy>, usize),
+) -> Vec<VarTy>
 {
     (__0)
 }
@@ -7831,7 +7831,7 @@ pub fn __action15<
 ) -> Result<PrivateStruct,__lalrpop_util::ParseError<usize,Tok<'input>,::errors::Error>>
 {
     {
-        let fields = parser::parse_fields(fields, s)?;
+        let fields = parser::parse_var_tys(fields, s)?;
         Ok(PrivateStruct { name, fields })
     }
 }
@@ -7891,7 +7891,7 @@ pub fn __action20<
     (_, _, _): (usize, Tok<'input>, usize),
     (_, _, _): (usize, Tok<'input>, usize),
     (_, _, _): (usize, Tok<'input>, usize),
-    (_, args, _): (usize, Vec<Field>, usize),
+    (_, args, _): (usize, Vec<VarTy>, usize),
     (_, _, _): (usize, Tok<'input>, usize),
     (_, return_ty, _): (usize, Option<Type>, usize),
 ) -> FnSig
@@ -7913,8 +7913,8 @@ pub fn __action21<
 pub fn __action22<
     'input,
 >(
-    (_, __0, _): (usize, ::std::vec::Vec<Field>, usize),
-) -> Vec<Field>
+    (_, __0, _): (usize, ::std::vec::Vec<VarTy>, usize),
+) -> Vec<VarTy>
 {
     (__0)
 }
@@ -7925,9 +7925,9 @@ pub fn __action23<
     (_, name, _): (usize, Identifier, usize),
     (_, _, _): (usize, Tok<'input>, usize),
     (_, ty, _): (usize, Type, usize),
-) -> Field
+) -> VarTy
 {
-    Field { name, ty }
+    VarTy { name, ty }
 }
 
 pub fn __action24<
@@ -8084,7 +8084,7 @@ pub fn __action39<
 >(
     __lookbehind: &usize,
     __lookahead: &usize,
-) -> ::std::vec::Vec<Field>
+) -> ::std::vec::Vec<VarTy>
 {
     vec![]
 }
@@ -8092,8 +8092,8 @@ pub fn __action39<
 pub fn __action40<
     'input,
 >(
-    (_, v, _): (usize, ::std::vec::Vec<Field>, usize),
-) -> ::std::vec::Vec<Field>
+    (_, v, _): (usize, ::std::vec::Vec<VarTy>, usize),
+) -> ::std::vec::Vec<VarTy>
 {
     v
 }
@@ -8130,9 +8130,9 @@ pub fn __action43<
 pub fn __action44<
     'input,
 >(
-    (_, h, _): (usize, ::std::vec::Vec<Field>, usize),
-    (_, t, _): (usize, ::std::option::Option<Field>, usize),
-) -> Vec<Field>
+    (_, h, _): (usize, ::std::vec::Vec<VarTy>, usize),
+    (_, t, _): (usize, ::std::option::Option<VarTy>, usize),
+) -> Vec<VarTy>
 {
     {
         let mut h = h;
@@ -8259,8 +8259,8 @@ pub fn __action56<
 pub fn __action57<
     'input,
 >(
-    (_, __0, _): (usize, Field, usize),
-) -> ::std::option::Option<Field>
+    (_, __0, _): (usize, VarTy, usize),
+) -> ::std::option::Option<VarTy>
 {
     Some(__0)
 }
@@ -8270,7 +8270,7 @@ pub fn __action58<
 >(
     __lookbehind: &usize,
     __lookahead: &usize,
-) -> ::std::option::Option<Field>
+) -> ::std::option::Option<VarTy>
 {
     None
 }
@@ -8280,7 +8280,7 @@ pub fn __action59<
 >(
     __lookbehind: &usize,
     __lookahead: &usize,
-) -> ::std::vec::Vec<Field>
+) -> ::std::vec::Vec<VarTy>
 {
     vec![]
 }
@@ -8288,8 +8288,8 @@ pub fn __action59<
 pub fn __action60<
     'input,
 >(
-    (_, v, _): (usize, ::std::vec::Vec<Field>, usize),
-) -> ::std::vec::Vec<Field>
+    (_, v, _): (usize, ::std::vec::Vec<VarTy>, usize),
+) -> ::std::vec::Vec<VarTy>
 {
     v
 }
@@ -8297,9 +8297,9 @@ pub fn __action60<
 pub fn __action61<
     'input,
 >(
-    (_, __0, _): (usize, Field, usize),
+    (_, __0, _): (usize, VarTy, usize),
     (_, _, _): (usize, Tok<'input>, usize),
-) -> Field
+) -> VarTy
 {
     (__0)
 }
@@ -8307,8 +8307,8 @@ pub fn __action61<
 pub fn __action62<
     'input,
 >(
-    (_, __0, _): (usize, Field, usize),
-) -> ::std::vec::Vec<Field>
+    (_, __0, _): (usize, VarTy, usize),
+) -> ::std::vec::Vec<VarTy>
 {
     vec![__0]
 }
@@ -8316,9 +8316,9 @@ pub fn __action62<
 pub fn __action63<
     'input,
 >(
-    (_, v, _): (usize, ::std::vec::Vec<Field>, usize),
-    (_, e, _): (usize, Field, usize),
-) -> ::std::vec::Vec<Field>
+    (_, v, _): (usize, ::std::vec::Vec<VarTy>, usize),
+    (_, e, _): (usize, VarTy, usize),
+) -> ::std::vec::Vec<VarTy>
 {
     { let mut v = v; v.push(e); v }
 }
@@ -8500,8 +8500,8 @@ pub fn __action80<
 pub fn __action81<
     'input,
 >(
-    (_, __0, _): (usize, Field, usize),
-) -> ::std::vec::Vec<Field>
+    (_, __0, _): (usize, VarTy, usize),
+) -> ::std::vec::Vec<VarTy>
 {
     vec![__0]
 }
@@ -8509,9 +8509,9 @@ pub fn __action81<
 pub fn __action82<
     'input,
 >(
-    (_, v, _): (usize, ::std::vec::Vec<Field>, usize),
-    (_, e, _): (usize, Field, usize),
-) -> ::std::vec::Vec<Field>
+    (_, v, _): (usize, ::std::vec::Vec<VarTy>, usize),
+    (_, e, _): (usize, VarTy, usize),
+) -> ::std::vec::Vec<VarTy>
 {
     { let mut v = v; v.push(e); v }
 }
@@ -8893,84 +8893,6 @@ pub fn __action104<
 pub fn __action105<
     'input,
 >(
-    __0: (usize, Field, usize),
-    __1: (usize, Tok<'input>, usize),
-) -> ::std::vec::Vec<Field>
-{
-    let __start0 = __0.0.clone();
-    let __end0 = __1.2.clone();
-    let __temp0 = __action61(
-        __0,
-        __1,
-    );
-    let __temp0 = (__start0, __temp0, __end0);
-    __action81(
-        __temp0,
-    )
-}
-
-pub fn __action106<
-    'input,
->(
-    __0: (usize, ::std::vec::Vec<Field>, usize),
-    __1: (usize, Field, usize),
-    __2: (usize, Tok<'input>, usize),
-) -> ::std::vec::Vec<Field>
-{
-    let __start0 = __1.0.clone();
-    let __end0 = __2.2.clone();
-    let __temp0 = __action61(
-        __1,
-        __2,
-    );
-    let __temp0 = (__start0, __temp0, __end0);
-    __action82(
-        __0,
-        __temp0,
-    )
-}
-
-pub fn __action107<
-    'input,
->(
-    __0: (usize, ::std::option::Option<Field>, usize),
-) -> Vec<Field>
-{
-    let __start0 = __0.0.clone();
-    let __end0 = __0.0.clone();
-    let __temp0 = __action59(
-        &__start0,
-        &__end0,
-    );
-    let __temp0 = (__start0, __temp0, __end0);
-    __action44(
-        __temp0,
-        __0,
-    )
-}
-
-pub fn __action108<
-    'input,
->(
-    __0: (usize, ::std::vec::Vec<Field>, usize),
-    __1: (usize, ::std::option::Option<Field>, usize),
-) -> Vec<Field>
-{
-    let __start0 = __0.0.clone();
-    let __end0 = __0.2.clone();
-    let __temp0 = __action60(
-        __0,
-    );
-    let __temp0 = (__start0, __temp0, __end0);
-    __action44(
-        __temp0,
-        __1,
-    )
-}
-
-pub fn __action109<
-    'input,
->(
     __0: (usize, Type, usize),
     __1: (usize, Tok<'input>, usize),
 ) -> ::std::vec::Vec<Type>
@@ -8987,7 +8909,7 @@ pub fn __action109<
     )
 }
 
-pub fn __action110<
+pub fn __action106<
     'input,
 >(
     __0: (usize, ::std::vec::Vec<Type>, usize),
@@ -9008,7 +8930,7 @@ pub fn __action110<
     )
 }
 
-pub fn __action111<
+pub fn __action107<
     'input,
 >(
     __0: (usize, ::std::option::Option<Type>, usize),
@@ -9027,7 +8949,7 @@ pub fn __action111<
     )
 }
 
-pub fn __action112<
+pub fn __action108<
     'input,
 >(
     __0: (usize, ::std::vec::Vec<Type>, usize),
@@ -9041,6 +8963,84 @@ pub fn __action112<
     );
     let __temp0 = (__start0, __temp0, __end0);
     __action80(
+        __temp0,
+        __1,
+    )
+}
+
+pub fn __action109<
+    'input,
+>(
+    __0: (usize, VarTy, usize),
+    __1: (usize, Tok<'input>, usize),
+) -> ::std::vec::Vec<VarTy>
+{
+    let __start0 = __0.0.clone();
+    let __end0 = __1.2.clone();
+    let __temp0 = __action61(
+        __0,
+        __1,
+    );
+    let __temp0 = (__start0, __temp0, __end0);
+    __action81(
+        __temp0,
+    )
+}
+
+pub fn __action110<
+    'input,
+>(
+    __0: (usize, ::std::vec::Vec<VarTy>, usize),
+    __1: (usize, VarTy, usize),
+    __2: (usize, Tok<'input>, usize),
+) -> ::std::vec::Vec<VarTy>
+{
+    let __start0 = __1.0.clone();
+    let __end0 = __2.2.clone();
+    let __temp0 = __action61(
+        __1,
+        __2,
+    );
+    let __temp0 = (__start0, __temp0, __end0);
+    __action82(
+        __0,
+        __temp0,
+    )
+}
+
+pub fn __action111<
+    'input,
+>(
+    __0: (usize, ::std::option::Option<VarTy>, usize),
+) -> Vec<VarTy>
+{
+    let __start0 = __0.0.clone();
+    let __end0 = __0.0.clone();
+    let __temp0 = __action59(
+        &__start0,
+        &__end0,
+    );
+    let __temp0 = (__start0, __temp0, __end0);
+    __action44(
+        __temp0,
+        __0,
+    )
+}
+
+pub fn __action112<
+    'input,
+>(
+    __0: (usize, ::std::vec::Vec<VarTy>, usize),
+    __1: (usize, ::std::option::Option<VarTy>, usize),
+) -> Vec<VarTy>
+{
+    let __start0 = __0.0.clone();
+    let __end0 = __0.2.clone();
+    let __temp0 = __action60(
+        __0,
+    );
+    let __temp0 = (__start0, __temp0, __end0);
+    __action44(
         __temp0,
         __1,
     )
@@ -9135,116 +9135,6 @@ pub fn __action117<
 >(
     __lookbehind: &usize,
     __lookahead: &usize,
-) -> Vec<Field>
-{
-    let __start0 = __lookbehind.clone();
-    let __end0 = __lookahead.clone();
-    let __temp0 = __action39(
-        &__start0,
-        &__end0,
-    );
-    let __temp0 = (__start0, __temp0, __end0);
-    __action22(
-        __temp0,
-    )
-}
-
-pub fn __action118<
-    'input,
->(
-    __0: (usize, ::std::vec::Vec<Field>, usize),
-) -> Vec<Field>
-{
-    let __start0 = __0.0.clone();
-    let __end0 = __0.2.clone();
-    let __temp0 = __action40(
-        __0,
-    );
-    let __temp0 = (__start0, __temp0, __end0);
-    __action22(
-        __temp0,
-    )
-}
-
-pub fn __action119<
-    'input,
->(
-    __0: (usize, Field, usize),
-) -> Vec<Field>
-{
-    let __start0 = __0.0.clone();
-    let __end0 = __0.2.clone();
-    let __temp0 = __action57(
-        __0,
-    );
-    let __temp0 = (__start0, __temp0, __end0);
-    __action107(
-        __temp0,
-    )
-}
-
-pub fn __action120<
-    'input,
->(
-    __lookbehind: &usize,
-    __lookahead: &usize,
-) -> Vec<Field>
-{
-    let __start0 = __lookbehind.clone();
-    let __end0 = __lookahead.clone();
-    let __temp0 = __action58(
-        &__start0,
-        &__end0,
-    );
-    let __temp0 = (__start0, __temp0, __end0);
-    __action107(
-        __temp0,
-    )
-}
-
-pub fn __action121<
-    'input,
->(
-    __0: (usize, ::std::vec::Vec<Field>, usize),
-    __1: (usize, Field, usize),
-) -> Vec<Field>
-{
-    let __start0 = __1.0.clone();
-    let __end0 = __1.2.clone();
-    let __temp0 = __action57(
-        __1,
-    );
-    let __temp0 = (__start0, __temp0, __end0);
-    __action108(
-        __0,
-        __temp0,
-    )
-}
-
-pub fn __action122<
-    'input,
->(
-    __0: (usize, ::std::vec::Vec<Field>, usize),
-) -> Vec<Field>
-{
-    let __start0 = __0.2.clone();
-    let __end0 = __0.2.clone();
-    let __temp0 = __action58(
-        &__start0,
-        &__end0,
-    );
-    let __temp0 = (__start0, __temp0, __end0);
-    __action108(
-        __0,
-        __temp0,
-    )
-}
-
-pub fn __action123<
-    'input,
->(
-    __lookbehind: &usize,
-    __lookahead: &usize,
 ) -> Vec<Member>
 {
     let __start0 = __lookbehind.clone();
@@ -9259,7 +9149,7 @@ pub fn __action123<
     )
 }
 
-pub fn __action124<
+pub fn __action118<
     'input,
 >(
     __0: (usize, ::std::vec::Vec<Member>, usize),
@@ -9276,7 +9166,7 @@ pub fn __action124<
     )
 }
 
-pub fn __action125<
+pub fn __action119<
     'input,
 >(
     __0: (usize, Type, usize),
@@ -9288,12 +9178,12 @@ pub fn __action125<
         __0,
     );
     let __temp0 = (__start0, __temp0, __end0);
-    __action111(
+    __action107(
         __temp0,
     )
 }
 
-pub fn __action126<
+pub fn __action120<
     'input,
 >(
     __lookbehind: &usize,
@@ -9307,12 +9197,12 @@ pub fn __action126<
         &__end0,
     );
     let __temp0 = (__start0, __temp0, __end0);
-    __action111(
+    __action107(
         __temp0,
     )
 }
 
-pub fn __action127<
+pub fn __action121<
     'input,
 >(
     __0: (usize, ::std::vec::Vec<Type>, usize),
@@ -9325,6 +9215,116 @@ pub fn __action127<
         __1,
     );
     let __temp0 = (__start0, __temp0, __end0);
+    __action108(
+        __0,
+        __temp0,
+    )
+}
+
+pub fn __action122<
+    'input,
+>(
+    __0: (usize, ::std::vec::Vec<Type>, usize),
+) -> Vec<Type>
+{
+    let __start0 = __0.2.clone();
+    let __end0 = __0.2.clone();
+    let __temp0 = __action84(
+        &__start0,
+        &__end0,
+    );
+    let __temp0 = (__start0, __temp0, __end0);
+    __action108(
+        __0,
+        __temp0,
+    )
+}
+
+pub fn __action123<
+    'input,
+>(
+    __lookbehind: &usize,
+    __lookahead: &usize,
+) -> Vec<VarTy>
+{
+    let __start0 = __lookbehind.clone();
+    let __end0 = __lookahead.clone();
+    let __temp0 = __action39(
+        &__start0,
+        &__end0,
+    );
+    let __temp0 = (__start0, __temp0, __end0);
+    __action22(
+        __temp0,
+    )
+}
+
+pub fn __action124<
+    'input,
+>(
+    __0: (usize, ::std::vec::Vec<VarTy>, usize),
+) -> Vec<VarTy>
+{
+    let __start0 = __0.0.clone();
+    let __end0 = __0.2.clone();
+    let __temp0 = __action40(
+        __0,
+    );
+    let __temp0 = (__start0, __temp0, __end0);
+    __action22(
+        __temp0,
+    )
+}
+
+pub fn __action125<
+    'input,
+>(
+    __0: (usize, VarTy, usize),
+) -> Vec<VarTy>
+{
+    let __start0 = __0.0.clone();
+    let __end0 = __0.2.clone();
+    let __temp0 = __action57(
+        __0,
+    );
+    let __temp0 = (__start0, __temp0, __end0);
+    __action111(
+        __temp0,
+    )
+}
+
+pub fn __action126<
+    'input,
+>(
+    __lookbehind: &usize,
+    __lookahead: &usize,
+) -> Vec<VarTy>
+{
+    let __start0 = __lookbehind.clone();
+    let __end0 = __lookahead.clone();
+    let __temp0 = __action58(
+        &__start0,
+        &__end0,
+    );
+    let __temp0 = (__start0, __temp0, __end0);
+    __action111(
+        __temp0,
+    )
+}
+
+pub fn __action127<
+    'input,
+>(
+    __0: (usize, ::std::vec::Vec<VarTy>, usize),
+    __1: (usize, VarTy, usize),
+) -> Vec<VarTy>
+{
+    let __start0 = __1.0.clone();
+    let __end0 = __1.2.clone();
+    let __temp0 = __action57(
+        __1,
+    );
+    let __temp0 = (__start0, __temp0, __end0);
     __action112(
         __0,
         __temp0,
@@ -9334,12 +9334,12 @@ pub fn __action127<
 pub fn __action128<
     'input,
 >(
-    __0: (usize, ::std::vec::Vec<Type>, usize),
-) -> Vec<Type>
+    __0: (usize, ::std::vec::Vec<VarTy>, usize),
+) -> Vec<VarTy>
 {
     let __start0 = __0.2.clone();
     let __end0 = __0.2.clone();
-    let __temp0 = __action84(
+    let __temp0 = __action58(
         &__start0,
         &__end0,
     );
