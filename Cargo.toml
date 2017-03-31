@@ -7,3 +7,6 @@ authors = ["Niko Matsakis <niko@alum.mit.edu>"]
 glib-sys = "0.3.1"
 lazy_static = "0.2.2"
 gobject-sys = "0.3.3"
+
+[lib]
+crate-type = ["staticlib"]
