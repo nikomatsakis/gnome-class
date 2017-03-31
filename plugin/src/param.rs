@@ -9,7 +9,7 @@ fn param_name_is_valid (name: &str) -> bool {
         return false;
     }
 
-    for c in name.as_bytes () {
+    for &c in name.as_bytes () {
         if c != b'-' &&
 	    (c < b'0' || c > b'9') &&
 	    (c < b'A' || c > b'Z') &&

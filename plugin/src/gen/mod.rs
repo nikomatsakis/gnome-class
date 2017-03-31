@@ -23,7 +23,10 @@ struct ClassContext<'ast> {
     program: &'ast Program,
     class: &'ast Class,
     private_struct: &'ast PrivateStruct,
-    gclass_name: Identifier,
+    GClassName: Identifier,
+    MethodsDeclared: Identifier,
+    ParentInstance: Tokens,
+    ParentGClass: Tokens,
 }
 
 impl<'ast> ClassContext<'ast> {
@@ -42,32 +45,53 @@ impl<'ast> ClassContext<'ast> {
             None => bail!("no private struct found")
         };
 
-        let gclass_name = Identifier {
+        let GClassName = Identifier {
             str: intern(&format!("{}Class", class.name.str))
         };
 
-        Ok(ClassContext { program, class, private_struct, gclass_name })
-    }
-
-    pub fn gen_class(&self) -> Result<Tokens> {
-        let InstanceName = self.class.name;
-        let PrivateName = self.private_struct.name;
-        let GClassName = self.gclass_name;
-
-        let private_struct_fields = &self.private_struct.fields;
-        let init_fn = self.init_fn();
-        let method_names = &self.method_names();
-        let method_names1 = method_names;
-        let method_fn_tys = &self.method_fn_tys();
-        let method_redirects = &self.method_redirects();
-        let method_free_fns = &self.method_free_fns();
-
         // GObject is hardcoded in various places below
-        assert!(self.class.extends.is_none());
+        assert!(class.extends.is_none());
         let ParentInstance = quote! { ::gobject_sys::GObject };
         let ParentGClass = quote! { ::gobject_sys::GObjectClass };
 
-        Ok(quote! {
+        let InstanceName = class.name;
+        let MethodsDeclared = Identifier {
+            str: intern(&format!("MethodsDeclaredIn{}", InstanceName.str))
+        };
+
+        Ok(ClassContext { program, class, private_struct, GClassName,
+                          ParentInstance, ParentGClass, MethodsDeclared })
+    }
+
+    pub fn gen_class(&self) -> Result<Tokens> {
+        let all = vec![
+            self.type_decls(),
+            self.impls(),
+            self.methods_declared_in_instance(),
+            self.always_impl(),
+            self.method_redirects(),
+            self.gclass_impl(),
+        ];
+
+        let mut result = Tokens::new();
+        result.append_all(all);
+        Ok(result)
+    }
+
+    fn type_decls(&self) -> Tokens {
+        let InstanceName = self.class.name;
+        let ParentInstance = &self.ParentInstance;
+        let PrivateName = self.private_struct.name;
+        let GClassName = self.GClassName;
+        let ParentGClass = &&self.ParentGClass;
+
+        let private_struct_fields = &self.private_struct.fields;
+
+        let init_fn = self.init_fn();
+        let method_names = &self.method_names();
+        let method_fn_tys = &self.method_fn_tys();
+
+        quote! {
             #[repr(C)]
             pub struct #InstanceName {
                 parent: #ParentInstance,
@@ -84,11 +108,20 @@ impl<'ast> ClassContext<'ast> {
                 }
             }
 
+            #[repr(C)]
             pub struct #GClassName {
                 parent_class: #ParentGClass,
                 #(#method_names: Option<#method_fn_tys>,)*
             }
+        }
+    }
 
+    fn impls(&self) -> Tokens {
+        let InstanceName = self.class.name;
+        let GClassName = self.GClassName;
+        let ParentGClass = &self.ParentGClass;
+
+        quote! {
             unsafe impl GInstance for #InstanceName {
                 type Class = #GClassName;
             }
@@ -100,101 +133,7 @@ impl<'ast> ClassContext<'ast> {
             unsafe impl GSubclass for #GClassName {
                 type ParentClass = #ParentGClass;
             }
-
-            impl #InstanceName {
-                pub fn new() -> G<#InstanceName> {
-                    use gobject_sys::GObject;
-                    use std::ptr;
-
-                    unsafe {
-                        let data: *mut GObject =
-                            gobject_sys::g_object_new(#GClassName::class(),
-                                                      ptr::null_mut());
-                        G::new(data as *mut #InstanceName)
-                    }
-                }
-
-                fn private(&self) -> &#PrivateName {
-                    use gobject_sys::{self, GTypeInstance};
-
-                    unsafe {
-                        let this = self as *const #InstanceName as *mut GTypeInstance;
-                        let private = gobject_sys::g_type_instance_get_private(this, #GClassName::class());
-                        let private = private as *const #PrivateName;
-                        &*private
-                    }
-                }
-
-                pub fn to_ref(&self) -> G<#InstanceName> {
-                    ::g::to_object_ref(self).clone()
-                }
-
-                pub fn upcast(&self) -> &#ParentInstance {
-                    &self.parent
-                }
-
-                #(#method_redirects)*
-            }
-
-            #(#method_free_fns)*
-
-            impl #GClassName {
-                pub fn gtype() -> GType {
-                    use gobject_sys;
-
-                    extern fn instance_init(this: *mut GTypeInstance,
-                                            _klass: gpointer)
-                    {
-                        unsafe {
-                            extern crate gobject_sys;
-                            use std::ptr;
-
-                            let private = gobject_sys::g_type_instance_get_private(this, #GClassName::gtype());
-                            let private = private as *mut #PrivateName;
-                            ptr::write(private, #PrivateName::new());
-                        }
-                    }
-
-                    extern fn class_init(klass: gpointer,
-                                         _klass_data: gpointer)
-                    {
-                        extern "C" fn finalize(this: *mut gobject_sys::GObject) {
-                            // TODO finalize fields
-                        }
-
-                        unsafe {
-                            let g_object_class = klass as *mut GObjectClass;
-                            (*g_object_class).finalize = Some(finalize);
-
-                            gobject_sys::g_type_class_add_private(
-                                klass,
-                                mem::size_of::<#PrivateName>());
-
-                            let klass = klass as *mut #GClassName;
-                            let klass: &mut #GClassName = &mut *klass;
-                            #(klass.#method_names = self::#method_names1;)*
-                        }
-                    }
-
-                    lazy_static! {
-                        static ref GTYPE: GType = {
-                            unsafe {
-                                gobject_sys::g_type_register_static_simple(
-                                    #ParentGClass::gtype(),
-                                    XXX, //b"Counter\0" as *const u8 as *const i8,
-                                    mem::size_of::<#GClassName>() as u32,
-                                    Some(class_init),
-                                    mem::size_of::<#InstanceName>() as u32,
-                                    Some(instance_init),
-                                    GTypeFlags::empty())
-                            }
-                        };
-                    }
-
-                    *GTYPE
-                }
-            }
-        })
+        }
     }
 
     pub fn init_fn(&self) -> Tokens {
@@ -229,6 +168,17 @@ impl<'ast> ClassContext<'ast> {
             .collect()
     }
 
+    fn method_assignments(&self) -> Vec<Tokens> {
+        let InstanceName = self.class.name;
+        let MethodsDeclared = &self.MethodsDeclared;
+        self.method_names()
+            .iter()
+            .map(|method_name| {
+                quote! { klass.#method_name = <#InstanceName as #MethodsDeclared>::#method_name; }
+            })
+            .collect()
+    }
+
     pub fn method_fn_tys(&self) -> Vec<Tokens> {
         self.methods()
             .map(|method| {
@@ -241,8 +191,103 @@ impl<'ast> ClassContext<'ast> {
             .collect()
     }
 
-    pub fn method_redirects(&self) -> Vec<Tokens> {
+    fn methods_declared_in_instance(&self) -> Tokens {
+        let InstanceName = self.class.name;
+        let method_trait_fns = &self.method_trait_fns();
+        let method_impl_fns = &self.method_impl_fns();
+        let MethodsDeclared = &self.MethodsDeclared;
+
+        quote! {
+            pub(super) trait Trait {
+                #(#method_trait_fns)*
+            }
+
+            impl #MethodsDeclared for #InstanceName {
+                #(#method_impl_fns)*
+            }
+        }
+    }
+
+    pub fn method_trait_fns(&self) -> Vec<Tokens> {
         self.methods()
+            .map(|method| {
+                let name = method.name;
+                let args = &method.fn_def.sig.args;
+                let return_ty = ReturnTy {
+                    ty: method.fn_def.sig.return_ty.as_ref()
+                };
+                quote! {
+                    fn #name(&self, #(#args),*) #return_ty;
+                }
+            })
+            .collect()
+    }
+
+    pub fn method_impl_fns(&self) -> Vec<Tokens> {
+        self.methods()
+            .map(|method| {
+                let name = method.name;
+                let args = &method.fn_def.sig.args;
+                let return_ty = ReturnTy {
+                    ty: method.fn_def.sig.return_ty.as_ref()
+                };
+                let code = &method.fn_def.code;
+                quote! {
+                    fn #name(&self, #(#args),*) #return_ty {
+                        #code
+                    }
+                }
+            })
+            .collect()
+    }
+
+    fn always_impl(&self) -> Tokens {
+        let InstanceName = self.class.name;
+        let GClassName = self.GClassName;
+        let PrivateName = self.private_struct.name;
+        let ParentInstance = &self.ParentInstance;
+
+        quote! {
+            impl #InstanceName {
+                pub fn new() -> G<#InstanceName> {
+                    use gobject_sys::GObject;
+                    use std::ptr;
+
+                    unsafe {
+                        let data: *mut GObject =
+                            gobject_sys::g_object_new(#GClassName::class(),
+                                                      ptr::null_mut());
+                        G::new(data as *mut #InstanceName)
+                    }
+                }
+
+                fn private(&self) -> &#PrivateName {
+                    use gobject_sys::{self, GTypeInstance};
+
+                    unsafe {
+                        let this = self as *const #InstanceName as *mut GTypeInstance;
+                        let private = gobject_sys::g_type_instance_get_private(this, #GClassName::class());
+                        let private = private as *const #PrivateName;
+                        &*private
+                    }
+                }
+
+                pub fn to_ref(&self) -> G<#InstanceName> {
+                    ::g::to_object_ref(self).clone()
+                }
+
+                pub fn upcast(&self) -> &#ParentInstance {
+                    &self.parent
+                }
+            }
+        }
+    }
+
+    fn method_redirects(&self) -> Tokens {
+        let InstanceName = self.class.name;
+
+        let method_tokens: Vec<_> =
+            self.methods()
             .map(|method| {
                 let name = method.name;
                 let args = &method.fn_def.sig.args;
@@ -257,26 +302,84 @@ impl<'ast> ClassContext<'ast> {
                     }
                 }
             })
-            .collect()
+            .collect();
+
+        quote! {
+            impl #InstanceName {
+                #(#method_tokens)*
+            }
+        }
     }
 
-    pub fn method_free_fns(&self) -> Vec<Tokens> {
+    fn gclass_impl(&self) -> Tokens {
         let InstanceName = self.class.name;
-        self.methods()
-            .map(|method| {
-                let name = method.name;
-                let args = &method.fn_def.sig.args;
-                let return_ty = ReturnTy {
-                    ty: method.fn_def.sig.return_ty.as_ref()
-                };
-                let code = &method.fn_def.code;
-                quote! {
-                    pub fn #name(this: &#InstanceName, #(#args),*) #return_ty {
-                        #code
+        let GClassName = self.GClassName;
+        let ParentGClass = &self.ParentGClass;
+        let PrivateName = self.private_struct.name;
+
+        let method_assignments = self.method_assignments();
+
+        quote! {
+            impl #GClassName {
+                pub fn gtype() -> GType {
+                    use gobject_sys;
+                    use std::mem;
+
+                    extern fn instance_init(this: *mut GTypeInstance,
+                                            _klass: gpointer)
+                    {
+                        unsafe {
+                            extern crate gobject_sys;
+                            use std::ptr;
+
+                            let private = gobject_sys::g_type_instance_get_private(this, #GClassName::gtype());
+                            let private = private as *mut #PrivateName;
+                            ptr::write(private, #PrivateName::new());
+                        }
                     }
+
+                    extern fn class_init(klass: gpointer,
+                                         _klass_data: gpointer)
+                    {
+                        extern "C" fn finalize(this: *mut gobject_sys::GObject) {
+                            // TODO finalize fields
+                        }
+
+                        unsafe {
+                            let g_object_class = klass as *mut GObjectClass;
+                            (*g_object_class).finalize = Some(finalize);
+
+                            gobject_sys::g_type_class_add_private(
+                                klass,
+                                mem::size_of::<#PrivateName>());
+
+                            let klass = klass as *mut #GClassName;
+                            let klass: &mut #GClassName = &mut *klass;
+                            #(#method_assignments)*
+                        }
+                    }
+
+                    fn register() -> GType {
+                        unsafe {
+                            gobject_sys::g_type_register_static_simple(
+                                #ParentGClass::gtype(),
+                                XXX, //b"Counter\0" as *const u8 as *const i8,
+                                mem::size_of::<#GClassName>() as u32,
+                                Some(class_init),
+                                mem::size_of::<#InstanceName>() as u32,
+                                Some(instance_init),
+                                GTypeFlags::empty())
+                        }
+                    }
+
+                    lazy_static! {
+                        static ref GTYPE: GType = register();
+                    }
+
+                    *GTYPE
                 }
-            })
-            .collect()
+            }
+        }
     }
 }
 
