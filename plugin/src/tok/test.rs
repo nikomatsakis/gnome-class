@@ -70,7 +70,7 @@ fn test_err(input: &str, span: &str, ec: &str) {
 #[test]
 fn basic() {
     test("class Foo", vec![
-        ("~~~~~    ", Class),
+        ("~~~~~    ", ClassKeyword),
         ("      ~~~", Id("Foo")),
     ]);
 }
@@ -78,7 +78,7 @@ fn basic() {
 #[test]
 fn eol_comment() {
     test("class // This is a comment$ foo", vec![
-        ("~~~~~                          ", Class),
+        ("~~~~~                          ", ClassKeyword),
         ("                            ~~~", Id("foo")),
     ]);
 }
@@ -86,7 +86,7 @@ fn eol_comment() {
 #[test]
 fn block() {
     test("class { foo(); [] // comment$ bar(); } foo", vec![
-        ("~~~~~                          ", Class),
+        ("~~~~~                          ", ClassKeyword),
         ("      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", Block("{ foo(); [] // comment\n bar(); }")),
         ("                                       ~~~", Id("foo")),
     ]);

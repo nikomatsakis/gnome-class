@@ -88,8 +88,7 @@ Type: Type = {
 };
 
 Type1: Type = {
-    Id => Type::Name(<>),
-    <Id> "<" <Type*> ">" => Type::Args(<>),
+    TypePath => Type::Path(<>),
     "[" <Type> "]" => Type::Array(Box::new(<>)),
 };
 
@@ -98,6 +97,33 @@ CodeBlock: OpaqueTokens = {
         let mut tokens = Tokens::new();
         tokens.append(<>);
         OpaqueTokens { tokens }
+    }
+};
+
+ExprPath: Path = {
+    AnyPath<"::">
+};
+
+TypePath: Path = {
+    AnyPath<()>
+};
+
+AnyPath<S>: Path = {
+    BasePath<S>,
+    <b:AnyPath<S>> "::" <e:PathId<S>> => Path::Extend(Box::new(b), e),
+};
+
+BasePath<S>: Path = {
+    "::" => Path::FromRoot,
+    "self" => Path::FromSelf,
+    "super" => Path::FromSuper,
+    PathId<S> => Path::From(<>),
+};
+
+PathId<S>: PathId = {
+    <name:Id> <tys:(S "<" <Comma<Type>> ">")?> => {
+        let tys = tys.unwrap_or_default();
+        PathId { name, tys }
     }
 };
 
@@ -113,15 +139,17 @@ extern {
     type Location = usize;
     type Error = ::errors::Error;
     enum Tok<'input> {
-        "class" => Tok::Class,
-        "struct" => Tok::Struct,
-        "fn" => Tok::Fn,
-        "init" => Tok::Init,
-        "self" => Tok::SelfKw,
-        "extends" => Tok::Extends,
+        "class" => Tok::ClassKeyword,
+        "struct" => Tok::StructKeyword,
+        "fn" => Tok::FnKeyword,
+        "init" => Tok::InitKeyword,
+        "self" => Tok::SelfKeyword,
+        "super" => Tok::SuperKeyword,
+        "extends" => Tok::ExtendsKeyword,
         "{..}" => Tok::Block(<&'input str>),
         OtherId => Tok::Id(<&'input str>),
         ":" => Tok::Colon,
+        "::" => Tok::ColonColon,
         "<" => Tok::LessThan,
         ">" => Tok::GreaterThan,
         "[" => Tok::LeftBracket,

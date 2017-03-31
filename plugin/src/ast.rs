@@ -53,10 +53,7 @@ pub struct Field {
 #[derive(Debug)]
 pub enum Type {
     // N
-    Name(Identifier),
-
-    // N<>
-    Args(Identifier, Vec<Type>),
+    Path(Path),
 
     // [N]
     Array(Box<Type>),
@@ -73,4 +70,19 @@ pub struct OpaqueTokens {
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct Identifier {
     pub str: InternedString
+}
+
+#[derive(Debug)]
+pub enum Path {
+    FromRoot,
+    FromSelf,
+    FromSuper,
+    From(PathId),
+    Extend(Box<Path>, PathId)
+}
+
+#[derive(Debug)]
+pub struct PathId {
+    pub name: Identifier,
+    pub tys: Vec<Type>
 }

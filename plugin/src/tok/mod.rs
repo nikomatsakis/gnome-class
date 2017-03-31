@@ -29,12 +29,13 @@ fn unterminated_block<T>(offset: usize) -> Result<T> {
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Tok<'input> {
-    Class, // `class`
-    Struct, // `struct`
-    Fn, // `fn`
-    Init, // `init`
-    SelfKw, // `self`
-    Extends, // `extends`
+    ClassKeyword, // `class`
+    StructKeyword, // `struct`
+    FnKeyword, // `fn`
+    InitKeyword, // `init`
+    SelfKeyword, // `self`
+    SuperKeyword, // `super`
+    ExtendsKeyword, // `extends`
     Id(&'input str), // identifier
     ThinArrow, // `->`
     Underscore, // `_`
@@ -71,12 +72,13 @@ macro_rules! eof {
 pub type Spanned<T> = (usize, T, usize);
 
 const KEYWORDS: &'static [(&'static str, Tok<'static>)] = &[
-    ("class", Class),
-    ("struct", Struct),
-    ("fn", Fn),
-    ("init", Init),
-    ("extends", Extends),
-    ("self", SelfKw),
+    ("class", ClassKeyword),
+    ("struct", StructKeyword),
+    ("fn", FnKeyword),
+    ("init", InitKeyword),
+    ("extends", ExtendsKeyword),
+    ("self", SelfKeyword),
+    ("super", SuperKeyword),
     ("_", Underscore),
     ];
 

@@ -7,6 +7,12 @@ use lalrpop_intern::{self, intern};
 use quote::{Ident, Tokens, ToTokens};
 use std::convert::Into;
 
+macro_rules! quote_in {
+    ($tokens:expr, $($t:tt)*) => {
+        $tokens.append_all(Some(quote!{$($t)*}));
+    }
+}
+
 // HYGIENE NOTE:
 //
 // I am using the `__` prefix to indicate names that, while visible
@@ -494,27 +500,22 @@ impl<'ast> ClassContext<'ast> {
 
 impl ToTokens for Field {
     fn to_tokens(&self, tokens: &mut Tokens) {
-        self.name.to_tokens(tokens);
-        tokens.append(":");
-        self.ty.to_tokens(tokens);
+        let &Field { name, ref ty } = self;
+        quote_in!(tokens, #name: #ty)
     }
 }
 
 impl ToTokens for Type {
     fn to_tokens(&self, tokens: &mut Tokens) {
         match *self {
-            Type::Name(id) => id.to_tokens(tokens),
-            Type::Args(id, ref tys) => {
-                let q = quote!{ #id < #(#tys),* > };
-                tokens.append_all(Some(q));
+            Type::Path(ref path) => {
+                path.ty().to_tokens(tokens)
             }
             Type::Array(ref ty) => {
-                let q = quote!{ [ #ty ] };
-                tokens.append_all(Some(q));
+                quote_in!(tokens, [ #ty ]);
             }
             Type::Sum(ref tys) => {
-                let q = quote!{ #(#tys)+* };
-                tokens.append_all(Some(q));
+                quote_in!(tokens, #(#tys)+*);
             }
         }
     }
@@ -558,19 +559,14 @@ struct MethodTy<'ast> {
 
 impl<'ast> ToTokens for MethodTy<'ast> {
     fn to_tokens(&self, tokens: &mut Tokens) {
-        tokens.append("extern fn(");
+        let class_name = self.class_name;
+        let arg_tys = self.sig.args.iter().map(|a| &a.ty);
+        let return_ty = self.sig.return_ty();
 
-        tokens.append("&");
-        self.class_name.to_tokens(tokens);
-        tokens.append(", ");
-
-        for arg in &self.sig.args {
-            arg.ty.to_tokens(tokens);
-            tokens.append(", ");
+        quote_in! {
+            tokens,
+            extern fn(&#class_name, #(#arg_tys),*) #return_ty
         }
-        tokens.append(")");
-
-        self.sig.return_ty().to_tokens(tokens);
     }
 }
 
@@ -579,17 +575,17 @@ impl<'ast> ToTokens for MethodTy<'ast> {
 /// assume an example method `fn get(&self, x: u32, y: u32) -> u32`.
 impl FnSig {
     /// Generates `x: u32, y: u32`
-    fn arg_decls<'a>(&'a self) -> ArgDecls<'a> {
+    fn arg_decls<'ast>(&'ast self) -> ArgDecls<'ast> {
         ArgDecls { sig: self }
     }
 
     /// Generates `x, y`
-    fn arg_names<'a>(&'a self) -> ArgNames<'a> {
+    fn arg_names<'ast>(&'ast self) -> ArgNames<'ast> {
         ArgNames { sig: self }
     }
 
     /// Generates `-> u32` (or `` if unit)
-    fn return_ty<'a>(&'a self) -> ReturnTy<'a> {
+    fn return_ty<'ast>(&'ast self) -> ReturnTy<'ast> {
         ReturnTy { sig: self }
     }
 }
@@ -601,8 +597,7 @@ struct ArgDecls<'ast> {
 impl<'ast> ToTokens for ArgDecls<'ast> {
     fn to_tokens(&self, tokens: &mut Tokens) {
         let args = &self.sig.args;
-        let q = quote! { #(#args),* };
-        tokens.append_all(Some(q));
+        quote_in!(tokens, #(#args),*);
     }
 }
 
@@ -613,8 +608,7 @@ struct ArgNames<'ast> {
 impl<'ast> ToTokens for ArgNames<'ast> {
     fn to_tokens(&self, tokens: &mut Tokens) {
         let args = self.sig.args.iter().map(|arg| arg.name);
-        let q = quote! { #(#args),* };
-        tokens.append_all(Some(q));
+        quote_in!(tokens, #(#args),*);
     }
 }
 
@@ -625,8 +619,59 @@ struct ReturnTy<'ast> {
 impl<'ast> ToTokens for ReturnTy<'ast> {
     fn to_tokens(&self, tokens: &mut Tokens) {
         if let Some(ref return_ty) = self.sig.return_ty {
-            tokens.append(" -> ");
-            return_ty.to_tokens(tokens);
+            quote_in!(tokens, -> #return_ty)
+        }
+    }
+}
+
+impl Path {
+    fn ty<'a>(&'a self) -> SepPath<'a> {
+        SepPath { cc: false, path: self }
+    }
+
+    fn exprty<'a>(&'a self) -> SepPath<'a> {
+        SepPath { cc: true, path: self }
+    }
+}
+
+struct SepPath<'a> {
+    cc: bool,
+    path: &'a Path,
+}
+
+impl<'a> ToTokens for SepPath<'a> {
+    fn to_tokens(&self, tokens: &mut Tokens) {
+        match *self.path {
+            Path::FromRoot => tokens.append("::"),
+            Path::FromSelf => tokens.append("self"),
+            Path::FromSuper => tokens.append("super"),
+            Path::From(ref i) => {
+                let i = SepPathId { cc: self.cc, path_id: i};
+                i.to_tokens(tokens)
+            }
+            Path::Extend(ref b, ref i) => {
+                let b = SepPath { cc: self.cc, path: b };
+                let i = SepPathId { cc: self.cc, path_id: i };
+                quote_in!(tokens, #b :: #i)
+            }
+        }
+    }
+}
+
+struct SepPathId<'a> {
+    cc: bool,
+    path_id: &'a PathId,
+}
+
+impl<'a> ToTokens for SepPathId<'a> {
+    fn to_tokens(&self, tokens: &mut Tokens) {
+        self.path_id.name.to_tokens(tokens);
+        let tys = &self.path_id.tys;
+        if !tys.is_empty() {
+            if self.cc {
+                tokens.append("::");
+            }
+            quote_in!(tokens, <#(#tys),*>);
         }
     }
 }
