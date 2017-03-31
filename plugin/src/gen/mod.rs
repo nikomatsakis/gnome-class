@@ -40,6 +40,7 @@ struct ClassContext<'ast> {
     ParentGClass: Tokens,
     GObject: Tokens,
     GObjectClass: Tokens,
+    InstanceTrait: Identifier,
 }
 
 impl<'ast> ClassContext<'ast> {
@@ -78,7 +79,11 @@ impl<'ast> ClassContext<'ast> {
 
         let InstanceName = class.name;
         let MethodsFrom = Identifier {
-            str: intern(&format!("__MethodsFrom{}", InstanceName.str))
+            str: intern(&format!("__methods_from_{}", InstanceName.str))
+        };
+
+        let InstanceTrait = Identifier {
+            str: intern(&format!("{}Trait", class.name.str))
         };
 
         Ok(ClassContext {
@@ -91,6 +96,7 @@ impl<'ast> ClassContext<'ast> {
             MethodsFrom,
             GObject,
             GObjectClass,
+            InstanceTrait,
         })
     }
 
@@ -100,7 +106,8 @@ impl<'ast> ClassContext<'ast> {
             self.impls(),
             self.methods_declared_in_instance(),
             self.always_impl(),
-            self.method_redirects(),
+            self.instance_trait(),
+            self.instance_trait_impl(),
             self.c_symbols(),
         ];
 
@@ -148,6 +155,28 @@ impl<'ast> ClassContext<'ast> {
             pub struct #GClassName {
                 parent_class: #ParentGClass,
                 #(#method_names: Option<#method_fn_tys>,)*
+            }
+        }
+    }
+
+    fn instance_trait(&self) -> Tokens {
+        let InstanceTrait = self.InstanceTrait;
+        let method_trait_fns = &self.method_trait_fns();
+
+        quote! {
+            pub trait #InstanceTrait {
+                #(#method_trait_fns)*
+            }
+        }
+    }
+
+    fn instance_trait_impl(&self) -> Tokens {
+        let InstanceName = self.class.name;
+        let InstanceTrait = self.InstanceTrait;
+        let method_redirects = self.method_redirects();
+        quote! {
+            impl #InstanceTrait for #InstanceName {
+                #(#method_redirects)*
             }
         }
     }
@@ -224,7 +253,7 @@ impl<'ast> ClassContext<'ast> {
         self.method_names()
             .iter()
             .map(|method_name| {
-                quote! { klass.#method_name = Some(<#InstanceName as #MethodsFrom>::#method_name); }
+                quote! { klass.#method_name = Some(<#InstanceName as #MethodsFrom::Trait>::#method_name); }
             })
             .collect()
     }
@@ -248,16 +277,25 @@ impl<'ast> ClassContext<'ast> {
         let MethodsFrom = &self.MethodsFrom;
 
         quote! {
-            pub trait #MethodsFrom {
-                #(#method_trait_fns)*
+            #[allow(non_snake_case)]
+            mod #MethodsFrom {
+                use super::*;
+                pub trait Trait {
+                    #(extern #method_trait_fns)*
+                }
             }
 
-            impl #MethodsFrom for #InstanceName {
-                #(#method_impl_fns)*
+            impl #MethodsFrom::Trait for #InstanceName {
+                #(extern #method_impl_fns)*
             }
         }
     }
 
+    /// Returns, for each method, something like
+    ///
+    /// ```notest
+    /// fn foo(&self, arg: u32);
+    /// ```
     pub fn method_trait_fns(&self) -> Vec<Tokens> {
         self.methods()
             .map(|method| {
@@ -265,12 +303,17 @@ impl<'ast> ClassContext<'ast> {
                 let arg_decls = method.fn_def.sig.arg_decls();
                 let return_ty = method.fn_def.sig.return_ty();
                 quote! {
-                    extern fn #name(&self, #arg_decls) #return_ty;
+                    fn #name(&self, #arg_decls) #return_ty;
                 }
             })
             .collect()
     }
 
+    /// Returns, for each method, something like
+    ///
+    /// ```notest
+    /// fn foo(&self, arg: u32) { ... }
+    /// ```
     pub fn method_impl_fns(&self) -> Vec<Tokens> {
         self.methods()
             .map(|method| {
@@ -279,7 +322,7 @@ impl<'ast> ClassContext<'ast> {
                 let return_ty = method.fn_def.sig.return_ty();
                 let code = &method.fn_def.code;
                 quote! {
-                    extern fn #name(&self, #arg_decls) #return_ty #code
+                    fn #name(&self, #arg_decls) #return_ty #code
                 }
             })
             .collect()
@@ -333,30 +376,28 @@ impl<'ast> ClassContext<'ast> {
         }
     }
 
-    fn method_redirects(&self) -> Tokens {
-        let InstanceName = self.class.name;
-
-        let method_tokens: Vec<_> =
-            self.methods()
+    /// Returns, for each method `foo`, something like:
+    ///
+    /// ```notest
+    /// fn foo(&self, arg: u32) {
+    ///     (get_class(self).foo.unwrap())(self, arg)
+    /// }
+    /// ```
+    fn method_redirects(&self) -> Vec<Tokens> {
+        self.methods()
             .map(|method| {
                 let name = method.name;
                 let arg_decls = method.fn_def.sig.arg_decls();
                 let arg_names = method.fn_def.sig.arg_names();
                 let return_ty = method.fn_def.sig.return_ty();
                 quote! {
-                    pub fn #name(&self, #arg_decls) #return_ty {
+                    fn #name(&self, #arg_decls) #return_ty {
                         let klass = ::gnome_class_shims::get_class(self);
                         (klass.#name.unwrap())(self, #arg_names)
                     }
                 }
             })
-            .collect();
-
-        quote! {
-            impl #InstanceName {
-                #(#method_tokens)*
-            }
-        }
+            .collect()
     }
 
     fn lower_case_class_name(&self) -> String {
