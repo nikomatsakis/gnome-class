@@ -1,7 +1,7 @@
 #![feature(proc_macro)]
 
-extern crate gobject_sys;
 extern crate gobject_gen;
+extern crate gnome_class_shims;
 use gobject_gen::gobject_gen;
 
 use std::cell::Cell;

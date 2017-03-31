@@ -7,6 +7,11 @@ use lalrpop_intern::{self, intern};
 use quote::{Ident, Tokens, ToTokens};
 use std::convert::Into;
 
+// HYGIENE NOTE:
+//
+// I am using the `__` prefix to indicate names that, while visible
+// to the user, are eventually intended to be hidden by hygiene.
+
 pub fn classes(program: &Program) -> Result<Tokens> {
     let class_tokens =
         program.classes
@@ -24,9 +29,11 @@ struct ClassContext<'ast> {
     class: &'ast Class,
     private_struct: &'ast PrivateStruct,
     GClassName: Identifier,
-    MethodsDeclared: Identifier,
+    MethodsFrom: Identifier,
     ParentInstance: Tokens,
     ParentGClass: Tokens,
+    GObject: Tokens,
+    GObjectClass: Tokens,
 }
 
 impl<'ast> ClassContext<'ast> {
@@ -49,18 +56,34 @@ impl<'ast> ClassContext<'ast> {
             str: intern(&format!("{}Class", class.name.str))
         };
 
-        // GObject is hardcoded in various places below
-        assert!(class.extends.is_none());
-        let ParentInstance = quote! { ::gobject_sys::GObject };
-        let ParentGClass = quote! { ::gobject_sys::GObjectClass };
+        let GObject = quote! { ::gnome_class_shims::gobject_sys::GObject };
+        let GObjectClass = quote! { ::gnome_class_shims::gobject_sys::GObjectClass };
 
-        let InstanceName = class.name;
-        let MethodsDeclared = Identifier {
-            str: intern(&format!("MethodsDeclaredIn{}", InstanceName.str))
+        // GObject is hardcoded in various places below
+        let ParentInstance =
+            class.extends
+                 .map(|c| quote! { #c })
+                 .unwrap_or_else(|| GObject.clone());
+        let ParentGClass = quote! {
+            XX//<#ParentInstance as ::gnome_class_shims::GInstance>::Class
         };
 
-        Ok(ClassContext { program, class, private_struct, GClassName,
-                          ParentInstance, ParentGClass, MethodsDeclared })
+        let InstanceName = class.name;
+        let MethodsFrom = Identifier {
+            str: intern(&format!("__MethodsFrom{}", InstanceName.str))
+        };
+
+        Ok(ClassContext {
+            program,
+            class,
+            private_struct,
+            GClassName,
+            ParentInstance,
+            ParentGClass,
+            MethodsFrom,
+            GObject,
+            GObjectClass,
+        })
     }
 
     pub fn gen_class(&self) -> Result<Tokens> {
@@ -71,11 +94,10 @@ impl<'ast> ClassContext<'ast> {
             self.always_impl(),
             self.method_redirects(),
             self.gclass_impl(),
+            self.c_symbols(),
         ];
 
-        let mut result = Tokens::new();
-        result.append_all(all);
-        Ok(result)
+        Ok(quote! { #(#all)* })
     }
 
     fn type_decls(&self) -> Tokens {
@@ -103,9 +125,7 @@ impl<'ast> ClassContext<'ast> {
             }
 
             impl #PrivateName {
-                pub fn new() -> Self {
-                    #init_fn
-                }
+                pub fn new() -> Self #init_fn
             }
 
             #[repr(C)]
@@ -170,11 +190,11 @@ impl<'ast> ClassContext<'ast> {
 
     fn method_assignments(&self) -> Vec<Tokens> {
         let InstanceName = self.class.name;
-        let MethodsDeclared = &self.MethodsDeclared;
+        let MethodsFrom = &self.MethodsFrom;
         self.method_names()
             .iter()
             .map(|method_name| {
-                quote! { klass.#method_name = <#InstanceName as #MethodsDeclared>::#method_name; }
+                quote! { klass.#method_name = <#InstanceName as #MethodsFrom>::#method_name; }
             })
             .collect()
     }
@@ -195,14 +215,14 @@ impl<'ast> ClassContext<'ast> {
         let InstanceName = self.class.name;
         let method_trait_fns = &self.method_trait_fns();
         let method_impl_fns = &self.method_impl_fns();
-        let MethodsDeclared = &self.MethodsDeclared;
+        let MethodsFrom = &self.MethodsFrom;
 
         quote! {
-            pub(super) trait Trait {
+            pub trait #MethodsFrom {
                 #(#method_trait_fns)*
             }
 
-            impl #MethodsDeclared for #InstanceName {
+            impl #MethodsFrom for #InstanceName {
                 #(#method_impl_fns)*
             }
         }
@@ -212,12 +232,10 @@ impl<'ast> ClassContext<'ast> {
         self.methods()
             .map(|method| {
                 let name = method.name;
-                let args = &method.fn_def.sig.args;
-                let return_ty = ReturnTy {
-                    ty: method.fn_def.sig.return_ty.as_ref()
-                };
+                let arg_decls = method.fn_def.sig.arg_decls();
+                let return_ty = method.fn_def.sig.return_ty();
                 quote! {
-                    fn #name(&self, #(#args),*) #return_ty;
+                    fn #name(&self, #arg_decls) #return_ty;
                 }
             })
             .collect()
@@ -227,15 +245,11 @@ impl<'ast> ClassContext<'ast> {
         self.methods()
             .map(|method| {
                 let name = method.name;
-                let args = &method.fn_def.sig.args;
-                let return_ty = ReturnTy {
-                    ty: method.fn_def.sig.return_ty.as_ref()
-                };
+                let arg_decls = method.fn_def.sig.arg_decls();
+                let return_ty = method.fn_def.sig.return_ty();
                 let code = &method.fn_def.code;
                 quote! {
-                    fn #name(&self, #(#args),*) #return_ty {
-                        #code
-                    }
+                    fn #name(&self, #arg_decls) #return_ty #code
                 }
             })
             .collect()
@@ -249,14 +263,15 @@ impl<'ast> ClassContext<'ast> {
 
         quote! {
             impl #InstanceName {
-                pub fn new() -> G<#InstanceName> {
-                    use gobject_sys::GObject;
+                pub fn new() -> ::gnome_class_shims::G<#InstanceName> {
+                    use gnome_class_shims::gobject_sys::{self, G, GObject};
                     use std::ptr;
 
                     unsafe {
                         let data: *mut GObject =
-                            gobject_sys::g_object_new(#GClassName::class(),
-                                                      ptr::null_mut());
+                            gobject_sys::g_object_new(
+                                #InstanceName::get_type(),
+                                ptr::null_mut());
                         G::new(data as *mut #InstanceName)
                     }
                 }
@@ -272,7 +287,7 @@ impl<'ast> ClassContext<'ast> {
                     }
                 }
 
-                pub fn to_ref(&self) -> G<#InstanceName> {
+                pub fn to_ref(&self) -> ::gnome_class_shims::G<#InstanceName> {
                     ::g::to_object_ref(self).clone()
                 }
 
@@ -290,15 +305,13 @@ impl<'ast> ClassContext<'ast> {
             self.methods()
             .map(|method| {
                 let name = method.name;
-                let args = &method.fn_def.sig.args;
-                let return_ty = ReturnTy {
-                    ty: method.fn_def.sig.return_ty.as_ref()
-                };
+                let arg_decls = method.fn_def.sig.arg_decls();
+                let arg_names = method.fn_def.sig.arg_names();
+                let return_ty = method.fn_def.sig.return_ty();
                 quote! {
-                    pub fn #name(&self, #(#args),*) #return_ty {
-                        (::g::get_class(self).#name.unwrap())(
-                            self, #(#args),*
-                        )
+                    pub fn #name(&self, #arg_decls) #return_ty {
+                        let klass = ::gnome_class_shims::get_class(self);
+                        (klass.#name.unwrap())(self, #arg_names)
                     }
                 }
             })
@@ -311,66 +324,137 @@ impl<'ast> ClassContext<'ast> {
         }
     }
 
+    fn lower_case_class_name(&self) -> String {
+        format!("{}", self.class.name.str) // XXX fix
+    }
+
+    fn c_symbols(&self) -> Tokens {
+        let InstanceName = self.class.name;
+        let instanceName = self.lower_case_class_name();
+
+        let method_tokens: Vec<_> =
+            self.methods()
+                .map(|method| {
+                    let arg_decls = method.fn_def.sig.arg_decls();
+                    let arg_names = method.fn_def.sig.arg_names();
+                    let return_ty = method.fn_def.sig.return_ty();
+                    let name = method.name;
+                    let c_name = Ident::new(format!("{}_{}",
+                                                    instanceName,
+                                                    method.name.str));
+                    quote! {
+                        #[no_mangle]
+                        pub extern fn #c_name(__this: &InstanceName, #arg_decls) #return_ty {
+                            #InstanceName::#name(__this, #arg_names)
+                        }
+                    }
+                })
+                .collect();
+
+        let get_type_name = Ident::new(format!("{}_get_type",
+                                               instanceName));
+        quote! {
+            #[no_mangle]
+            pub extern fn #get_type_name() -> ::gnome_class_shims::glib_sys::GType
+            {
+                #InstanceName::get_type()
+            }
+
+            #(#method_tokens)*
+        }
+    }
+
     fn gclass_impl(&self) -> Tokens {
         let InstanceName = self.class.name;
         let GClassName = self.GClassName;
         let ParentGClass = &self.ParentGClass;
         let PrivateName = self.private_struct.name;
 
+        // The function which initializes an instance of our class.
+        // It simply sets up the private fields.
+        let instance_init = quote! {
+            extern fn instance_init(this: *mut GTypeInstance,
+                                    _klass: gpointer)
+            {
+                unsafe {
+                    let private = gobject_sys::g_type_instance_get_private(this, #GClassName::get_type());
+                    let private = private as *mut #PrivateName;
+                    ptr::write(private, #PrivateName::new());
+                }
+            }
+        };
+
+        // The finalizer. It drops the private fields and then invokes
+        // the parent class finalizer (which it loads from the parent
+        // class struct).
+        let finalize = quote! {
+            extern fn finalize(this: *mut GObject) {
+                let this = this as *mut #InstanceName;
+                unsafe {
+                    ptr::read((*this).private());
+
+                    let object_class = shims::get_class(&*this);
+                    let parent_class = shims::get_parent_class(object_class);
+                    if let Some(f) = parent_class.finalize {
+                        f(this as *mut GObject);
+                    }
+                }
+            }
+        };
+
+        // Class initializer. Sets up the finalizer, private field
+        // size, and initializes the fields for each of our methods.
         let method_assignments = self.method_assignments();
+        let class_init = quote! {
+            extern fn class_init(klass: gpointer,
+                                 _klass_data: gpointer)
+            {
+                unsafe {
+                    let g_object_class = klass as *mut GObjectClass;
+                    (*g_object_class).finalize = Some(finalize);
+
+                    gobject_sys::g_type_class_add_private(
+                        klass,
+                        mem::size_of::<#PrivateName>());
+
+                    let klass = klass as *mut #GClassName;
+                    let klass: &mut #GClassName = &mut *klass;
+                    #(#method_assignments)*
+                }
+            }
+        };
+
+        // Registration function. Creates the GType. Intended to be run
+        // at most once, returns the `GType` we created.
+        let register = quote! {
+            fn register() -> GType {
+                unsafe {
+                    gobject_sys::g_type_register_static_simple(
+                        #ParentGClass::get_type(),
+                        XXX, //b"Counter\0" as *const u8 as *const i8,
+                        mem::size_of::<#GClassName>() as u32,
+                        Some(class_init),
+                        mem::size_of::<#InstanceName>() as u32,
+                        Some(instance_init),
+                        GTypeFlags::empty())
+                }
+            }
+        };
 
         quote! {
-            impl #GClassName {
-                pub fn gtype() -> GType {
-                    use gobject_sys;
-                    use std::mem;
+            impl #InstanceName {
+                pub fn get_type() -> GType {
+                    use gnome_class_shims as shims;
+                    use gnome_class_shims::gobject_sys::{self, GObject, GObjectClass};
+                    use std::{mem, ptr};
 
-                    extern fn instance_init(this: *mut GTypeInstance,
-                                            _klass: gpointer)
-                    {
-                        unsafe {
-                            extern crate gobject_sys;
-                            use std::ptr;
-
-                            let private = gobject_sys::g_type_instance_get_private(this, #GClassName::gtype());
-                            let private = private as *mut #PrivateName;
-                            ptr::write(private, #PrivateName::new());
-                        }
-                    }
-
-                    extern fn class_init(klass: gpointer,
-                                         _klass_data: gpointer)
-                    {
-                        extern "C" fn finalize(this: *mut gobject_sys::GObject) {
-                            // TODO finalize fields
-                        }
-
-                        unsafe {
-                            let g_object_class = klass as *mut GObjectClass;
-                            (*g_object_class).finalize = Some(finalize);
-
-                            gobject_sys::g_type_class_add_private(
-                                klass,
-                                mem::size_of::<#PrivateName>());
-
-                            let klass = klass as *mut #GClassName;
-                            let klass: &mut #GClassName = &mut *klass;
-                            #(#method_assignments)*
-                        }
-                    }
-
-                    fn register() -> GType {
-                        unsafe {
-                            gobject_sys::g_type_register_static_simple(
-                                #ParentGClass::gtype(),
-                                XXX, //b"Counter\0" as *const u8 as *const i8,
-                                mem::size_of::<#GClassName>() as u32,
-                                Some(class_init),
-                                mem::size_of::<#InstanceName>() as u32,
-                                Some(instance_init),
-                                GTypeFlags::empty())
-                        }
-                    }
+                    // All these helper functions are intentionally
+                    // hidden inside of `get_type` so as not to
+                    // pollute the user's namespace.
+                    #instance_init
+                    #finalize
+                    #class_init
+                    #register
 
                     lazy_static! {
                         static ref GTYPE: GType = register();
@@ -444,20 +528,62 @@ impl<'ast> ToTokens for MethodTy<'ast> {
         }
         tokens.append(")");
 
-        ReturnTy {
-            ty: self.sig.return_ty.as_ref()
-        }.to_tokens(tokens);
+        self.sig.return_ty().to_tokens(tokens);
+    }
+}
+
+/// Helper methods for printing out various bits of
+/// a method signature. For each of the comments below,
+/// assume an example method `fn get(&self, x: u32, y: u32) -> u32`.
+impl FnSig {
+    /// Generates `x: u32, y: u32`
+    fn arg_decls<'a>(&'a self) -> ArgDecls<'a> {
+        ArgDecls { sig: self }
+    }
+
+    /// Generates `x, y`
+    fn arg_names<'a>(&'a self) -> ArgNames<'a> {
+        ArgNames { sig: self }
+    }
+
+    /// Generates `-> u32` (or `` if unit)
+    fn return_ty<'a>(&'a self) -> ReturnTy<'a> {
+        ReturnTy { sig: self }
+    }
+}
+
+struct ArgDecls<'ast> {
+    sig: &'ast FnSig
+}
+
+impl<'ast> ToTokens for ArgDecls<'ast> {
+    fn to_tokens(&self, tokens: &mut Tokens) {
+        let args = &self.sig.args;
+        let q = quote! { #(#args),* };
+        tokens.append_all(Some(q));
+    }
+}
+
+struct ArgNames<'ast> {
+    sig: &'ast FnSig
+}
+
+impl<'ast> ToTokens for ArgNames<'ast> {
+    fn to_tokens(&self, tokens: &mut Tokens) {
+        let args = self.sig.args.iter();
+        let q = quote! { #(#args),* };
+        tokens.append_all(Some(q));
     }
 }
 
 struct ReturnTy<'ast> {
-    ty: Option<&'ast Type>,
+    sig: &'ast FnSig,
 }
 
 impl<'ast> ToTokens for ReturnTy<'ast> {
     fn to_tokens(&self, tokens: &mut Tokens) {
-        if let Some(return_ty) = self.ty {
-            tokens.append("->");
+        if let Some(ref return_ty) = self.sig.return_ty {
+            tokens.append(" -> ");
             return_ty.to_tokens(tokens);
         }
     }

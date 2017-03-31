@@ -1,0 +1,10 @@
+[package]
+name = "gnome-class-shims"
+version = "0.1.0"
+authors = ["Niko Matsakis <niko@alum.mit.edu>"]
+
+[dependencies]
+glib-sys = "0.3.1"
+lazy_static = "0.2.2"
+gobject-sys = "0.3.3"
+

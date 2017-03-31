@@ -29,4 +29,4 @@ unicode-xid = "0.0.4"
 [dev-dependencies]
 glib-sys = "0.3.1"
 lazy_static = "0.2.2"
-gobject-sys = "0.3.3"
+gnome-class-shims = { path = "../gnome-class-shims" }
