@@ -12,10 +12,14 @@ pub Program: Program = {
 };
 
 Class: Class = {
-    "class" <name:Id> <extends:("extends" <Id>)?> <b:@L> <blk:"{..}"> =>? {
+    "class" <name:Id> <extends:Extends> <b:@L> <blk:"{..}"> =>? {
         let members = parser::parse_members(blk, b)?;
         Ok(Class { name, extends, members })
     }
+};
+
+Extends: Option<Path> = {
+    ("extends" <TypePath>)?
 };
 
 pub Members: Vec<Member> = {

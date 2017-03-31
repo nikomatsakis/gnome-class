@@ -9,7 +9,7 @@ pub struct Program {
 #[derive(Debug)]
 pub struct Class {
     pub name: Identifier,
-    pub extends: Option<Identifier>,
+    pub extends: Option<Path>,
     pub members: Vec<Member>
 }
 

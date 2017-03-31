@@ -68,6 +68,8 @@ impl<'ast> ClassContext<'ast> {
         // GObject is hardcoded in various places below
         let ParentInstance =
             class.extends
+                 .as_ref()
+                 .map(|c| c.ty())
                  .map(|c| quote! { #c })
                  .unwrap_or_else(|| GObject.clone());
         let ParentGClass = quote! {
