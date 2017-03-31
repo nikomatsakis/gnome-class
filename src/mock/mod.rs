@@ -229,6 +229,33 @@ lazy_static! {
     };
 }
 
+#[no_mangle]
+pub extern fn counter_get_type () -> GType {
+    *COUNTER_GTYPE
+}
+
+#[no_mangle]
+pub extern fn counter_new () -> *const Counter {
+    let obj = Counter::new();
+    let ptr: *const Counter = &*obj;
+    mem::forget(obj);
+    ptr
+}
+
+#[no_mangle]
+pub unsafe extern fn counter_get (counter: *mut Counter) -> u32 {
+    let counter = &*counter;
+
+    counter.get ()
+}
+
+#[no_mangle]
+pub unsafe extern fn counter_add (counter: *mut Counter, v: u32) -> u32 {
+    let counter = &*counter;
+
+    counter.add (v)
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //// MultCounter
 //

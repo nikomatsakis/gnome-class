@@ -22,6 +22,7 @@ use std::io::Write;
 mod ast;
 mod errors;
 mod gen;
+mod param;
 mod parser;
 mod tok;
 

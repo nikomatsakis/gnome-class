@@ -2,6 +2,7 @@
  *   gcc -Wall -g -O0 -o test-counter test-counter.c `pkg-config --cflags --libs gobject-2.0`
  */
 
+#include <stdio.h>
 #include <glib-object.h>
 #include "counter.h"
 
@@ -20,6 +21,8 @@ main (int argc, char **argv)
 	g_assert (counter_get (counter) == 43);
 
 	g_object_unref (counter);
+
+	printf ("yay!\n");
 
 	return 0;
 }
