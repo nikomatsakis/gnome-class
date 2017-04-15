@@ -359,9 +359,7 @@ impl<'ast> ClassContext<'ast> {
     fn lower_case_class_name(&self) -> String {
         lalrpop_intern::read(|interner| {
             let name_str = interner.data(self.class.name.str);
-            let mut name_chars = name_str.chars();
-            let first_char: char = name_chars.next().unwrap();
-            first_char.to_lowercase().chain(name_chars).collect()
+            name_str.to_lowercase()
         })
     }
 
