@@ -8,7 +8,6 @@ extern crate gnome_class_shims;
 extern crate gobject_gen;
 use gobject_gen::gobject_gen;
 
-use gnome_class_shims::G;
 use std::cell::RefCell;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -58,7 +57,7 @@ fn check() {
     let dc = DropCounter::new();
 
     {
-        let c: G<Dummy> = Dummy::new();
+        let c: Dummy = Dummy::new();
         c.set_dc(dc.clone());
         println!("Drop counter has value: {}", dc.get());
         assert_eq!(dc.get(), 0);

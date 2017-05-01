@@ -34,6 +34,7 @@ struct ClassContext<'ast> {
     program: &'ast Program,
     class: &'ast Class,
     private_struct: &'ast PrivateStruct,
+    FieldsName: Identifier,
     GClassName: Identifier,
     MethodsFrom: Identifier,
     ParentInstance: Tokens,
@@ -59,12 +60,17 @@ impl<'ast> ClassContext<'ast> {
             None => bail!("no private struct found")
         };
 
+        let FieldsName = Identifier {
+            str: intern(&format!("{}Fields", class.name.str))
+        };
+
         let GClassName = Identifier {
             str: intern(&format!("{}Class", class.name.str))
         };
 
         let GObject = quote! { ::gnome_class_shims::gobject_sys::GObject };
         let GObjectClass = quote! { ::gnome_class_shims::gobject_sys::GObjectClass };
+        let GObjectRef = quote! { ::gnome_class_shims::GObjectRef };
 
         // GObject is hardcoded in various places below
         let ParentInstance =
@@ -72,7 +78,7 @@ impl<'ast> ClassContext<'ast> {
                  .as_ref()
                  .map(|c| c.ty())
                  .map(|c| quote! { #c })
-                 .unwrap_or_else(|| GObject.clone());
+                 .unwrap_or_else(|| GObjectRef.clone());
         let ParentGClass = quote! {
             <#ParentInstance as ::gnome_class_shims::GInstance>::Class
         };
@@ -90,6 +96,7 @@ impl<'ast> ClassContext<'ast> {
             program,
             class,
             private_struct,
+            FieldsName,
             GClassName,
             ParentInstance,
             ParentGClass,
@@ -115,10 +122,12 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn type_decls(&self) -> Tokens {
+        let FieldsName = self.FieldsName;
         let InstanceName = self.class.name;
         let ParentInstance = &self.ParentInstance;
         let PrivateName = self.private_struct.name;
         let GClassName = self.GClassName;
+        let GObject = &self.GObject;
         let ParentGClass = &&self.ParentGClass;
 
         let private_struct_fields = &self.private_struct.fields;
@@ -130,6 +139,11 @@ impl<'ast> ClassContext<'ast> {
         quote! {
             #[repr(C)]
             pub struct #InstanceName {
+                ptr: *mut #GObject
+            }
+
+            #[repr(C)]
+            pub struct #FieldsName {
                 parent: #ParentInstance,
 
                 // The GObject runtime will store some private data in here.
@@ -137,7 +151,7 @@ impl<'ast> ClassContext<'ast> {
 
                 // This type, while zero-sized, is not constructible.
                 // This assures that no Rust code can ever create an
-                // instance of `#InstanceName` -- the only instances
+                // instance of `#FieldsName` -- the only instances
                 // are created by the GObject runtime. This is
                 // important for the `GInstance` impl.
                 _no_construct: ::gnome_class_shims::NoConstruct,
@@ -183,7 +197,9 @@ impl<'ast> ClassContext<'ast> {
 
     fn impls(&self) -> Tokens {
         let InstanceName = self.class.name;
+        let FieldsName = self.FieldsName;
         let GClassName = self.GClassName;
+        let GObject = &self.GObject;
         let ParentGClass = &self.ParentGClass;
 
         let get_type_fn = self.get_type_fn();
@@ -191,8 +207,18 @@ impl<'ast> ClassContext<'ast> {
         quote! {
             unsafe impl ::gnome_class_shims::GInstance for #InstanceName {
                 type Class = #GClassName;
+                type Fields = #FieldsName;
 
                 #get_type_fn
+
+                unsafe fn to_gobject_ptr(this: *const Self)
+                                         -> *mut #GObject {
+                    (*this).ptr
+                }
+
+                unsafe fn from_gobject_ptr(g: *mut #GObject) -> Self {
+                    #InstanceName { ptr: g }
+                }
             }
 
             unsafe impl ::gnome_class_shims::GClass for #GClassName {
@@ -201,6 +227,28 @@ impl<'ast> ClassContext<'ast> {
 
             unsafe impl ::gnome_class_shims::GSubclass for #GClassName {
                 type ParentClass = #ParentGClass;
+            }
+
+            unsafe impl ::gnome_class_shims::GFields for #FieldsName {
+                type Instance = #InstanceName;
+            }
+
+            impl Clone for #InstanceName {
+                fn clone(&self) -> Self {
+                    use gnome_class_shims::GInstance;
+                    GInstance::clone_ref(self)
+                }
+            }
+
+            impl Drop for #InstanceName {
+                fn drop(&mut self) {
+                    // We assert that we are calling `drop_ref` from
+                    // within `drop`:
+                    use gnome_class_shims::GInstance;
+                    unsafe {
+                        GInstance::drop_ref(self)
+                    }
+                }
             }
         }
     }
@@ -335,8 +383,7 @@ impl<'ast> ClassContext<'ast> {
 
         quote! {
             impl #InstanceName {
-                pub fn new() -> ::gnome_class_shims::G<#InstanceName> {
-                    use gnome_class_shims::G;
+                pub fn new() -> #InstanceName {
                     use gnome_class_shims::GInstance;
                     use gnome_class_shims::gobject_sys::{self, GObject};
                     use std::ptr;
@@ -346,7 +393,7 @@ impl<'ast> ClassContext<'ast> {
                             gobject_sys::g_object_new(
                                 #InstanceName::get_type(),
                                 ptr::null_mut());
-                        G::new(data as *mut #InstanceName)
+                        #InstanceName::from_gobject_ptr(data)
                     }
                 }
 
@@ -356,7 +403,7 @@ impl<'ast> ClassContext<'ast> {
                     use gnome_class_shims::gobject_sys::{self, GTypeInstance};
 
                     unsafe {
-                        let this = self as *const #InstanceName as *mut GTypeInstance;
+                        let this = GInstance::to_gobject_ptr(self) as *mut GTypeInstance;
                         let private = gobject_sys::g_type_instance_get_private(this, #InstanceName::get_type());
                         let private = private as *const #PrivateName;
                         &*private
@@ -364,13 +411,11 @@ impl<'ast> ClassContext<'ast> {
                 }
 
                 #[allow(dead_code)]
-                pub fn to_ref(&self) -> ::gnome_class_shims::G<#InstanceName> {
-                    ::gnome_class_shims::to_object_ref(self).clone()
-                }
-
-                #[allow(dead_code)]
                 pub fn upcast(&self) -> &#ParentInstance {
-                    &self.parent
+                    use gnome_class_shims::GInstance;
+                    unsafe {
+                        GInstance::borrow_gobject_ptr(&self.ptr)
+                    }
                 }
             }
         }
@@ -411,6 +456,7 @@ impl<'ast> ClassContext<'ast> {
 
     fn c_symbols(&self) -> Tokens {
         let InstanceName = self.class.name;
+        let FieldsName = self.FieldsName;
         let instanceName = self.lower_case_class_name();
 
         let method_tokens: Vec<_> =
@@ -425,7 +471,9 @@ impl<'ast> ClassContext<'ast> {
                                                     method.name.str));
                     quote! {
                         #[no_mangle]
-                        pub extern fn #c_name(__this: &#InstanceName, #arg_decls) #return_ty {
+                        pub extern fn #c_name(__this: &#FieldsName, #arg_decls) #return_ty {
+                            use gnome_class_shims::GFields;
+                            let __this = <#FieldsName as GFields>::as_instance(&__this);
                             #InstanceName::#name(__this, #arg_names)
                         }
                     }
@@ -439,7 +487,7 @@ impl<'ast> ClassContext<'ast> {
             pub extern fn #get_type_name() -> ::gnome_class_shims::glib_sys::GType
             {
                 use gnome_class_shims::GInstance;
-                #InstanceName::get_type()
+                <#InstanceName as GInstance>::get_type()
             }
 
             #(#method_tokens)*
@@ -448,6 +496,7 @@ impl<'ast> ClassContext<'ast> {
 
     fn get_type_fn(&self) -> Tokens {
         let InstanceName = self.class.name;
+        let FieldsName = self.GClassName;
         let GClassName = self.GClassName;
         let ParentInstance = &self.ParentInstance;
         let PrivateName = self.private_struct.name;
@@ -471,14 +520,16 @@ impl<'ast> ClassContext<'ast> {
         // class struct).
         let finalize = quote! {
             extern fn finalize(this: *mut GObject) {
-                let this = this as *mut #InstanceName;
+                use gnome_class_shims::GInstance;
+
                 unsafe {
+                    let this = <#InstanceName as GInstance>::borrow_gobject_ptr(&this);
                     ptr::read((*this).private());
 
                     let object_class = shims::get_class(&*this);
                     let parent_class = shims::get_parent_class(object_class);
                     if let Some(f) = parent_class.finalize {
-                        f(this as *mut GObject);
+                        f(#InstanceName::to_gobject_ptr(this))
                     }
                 }
             }
@@ -517,7 +568,7 @@ impl<'ast> ClassContext<'ast> {
                         #byte_string as *const u8 as *const i8,
                         mem::size_of::<#GClassName>() as u32,
                         Some(class_init),
-                        mem::size_of::<#InstanceName>() as u32,
+                        mem::size_of::<#FieldsName>() as u32,
                         Some(instance_init),
                         GTypeFlags::empty())
                 }

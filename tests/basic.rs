@@ -8,7 +8,6 @@ extern crate gnome_class_shims;
 extern crate gobject_gen;
 use gobject_gen::gobject_gen;
 
-use gnome_class_shims::G;
 use std::cell::Cell;
 
 gobject_gen! {
@@ -32,7 +31,7 @@ gobject_gen! {
 
 #[test]
 fn test() {
-    let c: G<Counter> = Counter::new();
+    let c: Counter = Counter::new();
 
     println!("Counter has value: {}", c.get());
 

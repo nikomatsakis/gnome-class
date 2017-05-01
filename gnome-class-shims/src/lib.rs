@@ -1,9 +1,10 @@
+#![feature(untagged_unions)]
+
 pub extern crate gobject_sys;
 pub extern crate glib_sys;
 
 use glib_sys::{gpointer, GType};
 use gobject_sys::{GObject, GObjectClass, GTypeClass, GTypeInstance};
-use std::ops::Deref;
 
 /// A trait that is implemented for all things that may be gobjects.
 /// This trait is unsafe because implementing it implies validating
@@ -19,9 +20,61 @@ use std::ops::Deref;
 /// implement `Clone` and `GInstance` together, since then safe
 /// code could take an `&Self` and produce a `Self` that is not stored
 /// in a gobject.
-pub unsafe trait GInstance {
+pub unsafe trait GInstance: Sized {
     type Class: GClass;
+    type Fields: GFields;
+
     fn get_type() -> GType;
+
+    /// Extract the underlying `GObject` pointer. This will not
+    /// increment the ref-count.
+    ///
+    /// Unsafe because `this` must be borrowed.
+    unsafe fn to_gobject_ptr(this: *const Self) -> *mut GObject;
+
+    /// Create an instance of `Self` from a `gpointer`. This will
+    /// **not** increment the ref-count. Unsafe because caller
+    /// must ensure that:
+    ///
+    /// 1. This is indeed a pointer of the correct type.
+    /// 2. There is reference to surrender.
+    unsafe fn from_gobject_ptr(g: *mut GObject) -> Self;
+
+    unsafe fn borrow_gobject_ptr(g: &*mut GObject) -> &Self {
+        ::std::mem::transmute(g)
+    }
+
+    /// Basically `Clone`
+    fn clone_ref(&self) -> Self {
+        unsafe {
+            let ptr = Self::to_gobject_ptr(self);
+            gobject_sys::g_object_ref(ptr);
+            Self::from_gobject_ptr(ptr)
+        }
+    }
+
+    /// Meant to be the body of a drop impl. Drops the ref-count on
+    /// the internal ptr.
+    unsafe fn drop_ref(&mut self) {
+        let ptr = Self::to_gobject_ptr(self);
+        gobject_sys::g_object_unref(ptr);
+    }
+}
+
+/// Represents the actual fields of a GObject.
+///
+/// Unsafe contract: implementing this trait asserts that any time you
+/// have a `&Self` reference, it is pointing at the fields of a
+/// GObject. In other words, that you cannot instantiate `Self` on the
+/// stack or in any way other than GObject-new.
+pub unsafe trait GFields {
+    type Instance: GInstance;
+
+    fn as_instance<'r>(r: &'r &Self) -> &'r Self::Instance {
+        // This is safe because we know that `*r` must actually
+        // be a `*mut GObject`.
+        unsafe { ::std::mem::transmute(r) }
+    }
 }
 
 /// Represents a type that is a gnome class.
@@ -34,46 +87,11 @@ pub unsafe trait GSubclass: GClass {
     type ParentClass: GClass;
 }
 
-/// A reference to a `GObject`; the `T` is the subtype of `GObject`.
-pub struct G<T: GInstance> {
-    data: *const T
-}
-
-/// Convert `p`, which is a pointer to the contents of some `GObject`, into
-/// a `*mut GObject`, for use with the gtk-rs APIs.
-///
-/// NB: There is a subtle interaction here in the case where `T` is a
-/// trait type (e.g., the trait type representing a class). In that
-/// case, we take in a fat pointer (`*const Trait`) and return a thin
-/// pointer (`*mut GObject`) representing just the data itself,
-/// stripped of its vtable.
-pub fn to_gobject_ptr<T: GInstance>(p: *const T) -> *mut GObject {
-    p as *mut GObject
-}
-
-/// Given a valid pointer to a `GInstance`, we can convert
-/// this into an owned `G<>` reference by incrementing the
-/// reference count.
-///
-/// This is safe because:
-///
-/// - The trait requires that each instance of `self` must be
-///   inside some gobject allocation.
-/// - Having an `&Self` instance means that this gobject allocation
-///   must have a valid ref-count spanning this call.
-pub fn to_object_ref<T: GInstance>(p: &T) -> &G<T> {
-    unsafe {
-        let p = p as *const T;
-        let p = p as *const G<T>;
-        &*p
-    }
-}
-
 /// Given something that must be a `GObject`, return the class of this
 /// gobject.
 pub fn get_class<T: GInstance>(this: &T) -> &T::Class {
     unsafe {
-        let this: *mut GObject = to_gobject_ptr(this);
+        let this: *mut GObject = T::to_gobject_ptr(this);
         let type_instance: *const GTypeInstance = &(*this).g_type_instance;
 
         /// I am a horrible monster and I pray for death: the first
@@ -102,52 +120,35 @@ pub fn get_parent_class<T: GSubclass>(this: &T) -> &T::ParentClass {
     }
 }
 
-impl<T: GInstance> G<T> {
-    pub unsafe fn new(data: *const T) -> G<T> {
-        G { data: data }
-    }
+pub struct GObjectRef {
+    v: *mut GObject
 }
 
-impl<T: GInstance> Clone for G<T> {
-    fn clone(&self) -> Self {
-        unsafe {
-            gobject_sys::g_object_ref(to_gobject_ptr(self.data));
-            G::new(self.data)
-        }
-    }
-}
-
-impl<T: GInstance> Deref for G<T> {
-    type Target = T;
-
-    fn deref(&self) -> &T {
-        unsafe {
-            &(*self.data)
-        }
-    }
-}
-
-impl<T: GInstance> Drop for G<T> {
-    fn drop(&mut self) {
-        unsafe {
-            let ptr = to_gobject_ptr(self.data);
-            gobject_sys::g_object_unref(ptr);
-        }
-    }
-}
-
-unsafe impl GInstance for GObject {
+unsafe impl GInstance for GObjectRef {
     type Class = GObjectClass;
+    type Fields = GObject;
 
     fn get_type() -> GType {
         unsafe {
             gobject_sys::g_object_get_type()
         }
     }
+
+    unsafe fn to_gobject_ptr(this: *const GObjectRef) -> *mut GObject {
+        (*this).v
+    }
+
+    unsafe fn from_gobject_ptr(v: *mut GObject) -> GObjectRef {
+        GObjectRef { v: v }
+    }
+}
+
+unsafe impl GFields for GObject {
+    type Instance = GObjectRef;
 }
 
 unsafe impl GClass for GObjectClass {
-    type Instance = GObject;
+    type Instance = GObjectRef;
 }
 
 /// An intentionally unconstructable zero-sized type.  This is used by
