@@ -13,11 +13,11 @@ extern crate lalrpop_util;
 extern crate regex;
 extern crate proc_macro;
 extern crate unicode_xid;
+extern crate rustfmt;
 
 use proc_macro::TokenStream;
 use errors::*;
-use std::process::{Command, Stdio};
-use std::io::Write;
+use std::str::FromStr;
 
 mod ast;
 mod errors;
@@ -37,24 +37,27 @@ pub fn gobject_gen(input: TokenStream) -> TokenStream {
 
     match result {
         Ok(token_stream) => {
-            let output = rustfmt(&token_stream).unwrap();
-            println!("{}", output);
-            token_stream.parse().unwrap()
+            let mut config: rustfmt::config::Config = Default::default();
+            let mut out: Vec<u8> = vec!();
+            config.set().write_mode(rustfmt::config::WriteMode::Plain);
+            config.set().error_on_line_overflow(false);
+            let stream: String = token_stream.as_str().into();
+            match rustfmt::format_input(rustfmt::Input::Text(stream),
+                                        & config,
+                                        Some(& mut out)) {
+                Ok(_) => {
+                    let output = String::from_utf8(out).unwrap();
+                    TokenStream::from_str(& output).unwrap()
+                },
+                Err(e) => {
+                    println!("{}", e.0);
+                    panic!("cannot generate gobjects")
+                }
+            }
         }
         Err(e) => {
             println!("{:?}", e);
             panic!("cannot generate gobjects")
         }
     }
-}
-
-fn rustfmt(token_stream: &quote::Tokens) -> Result<String> {
-    let mut process =
-        Command::new("rustfmt")
-        .stdin(Stdio::piped())
-        .spawn()?;
-
-    write!(process.stdin.as_mut().unwrap(), "{}", token_stream.as_str())?;
-    let output = process.wait_with_output()?;
-    Ok(String::from_utf8(output.stdout).unwrap())
 }
