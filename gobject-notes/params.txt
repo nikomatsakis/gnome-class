@@ -1,0 +1,121 @@
+-*- org -*-
+
+* class_init() does this:
+
+  props[PROP_ICON_NAME] =
+    g_param_spec_string ("icon-name",
+                         P_("Icon Name"),
+                         P_("The name of the icon used to automatically populate the button"),
+                         NULL,
+                         GTK_PARAM_READWRITE|G_PARAM_EXPLICIT_NOTIFY);
+
+  props[PROP_FOO] =
+    g_param_spec_blah (...);
+
+  g_object_class_install_properties (gobject_class, LAST_PROP, props);
+
+  Those props[N] remain for the duration of the program for static
+  types.  The code uses them in ::set_property() and ::get_property()
+
+* This last function is a shortcut for:
+void
+g_object_class_install_property (GObjectClass *class,
+				 guint	       property_id,
+				 GParamSpec   *pspec)
+
+property_id > 0, plus extra validation inside the pspec
+
+* Note that properties are numbered starting from 1 (this is from GtkButton):
+
+enum {
+  PROP_0,
+  PROP_LABEL,
+  PROP_RELIEF,
+  PROP_USE_UNDERLINE,
+  PROP_ICON_NAME,
+
+  /* actionable properties */
+  PROP_ACTION_NAME,
+  PROP_ACTION_TARGET,
+  LAST_PROP = PROP_ACTION_NAME
+};
+
+* Most parameters have default values; scalars have min/max values.
+
+* Complex parameters: arrays (gtype for element type), enums, flags,
+  objects, boxed values.
+
+* Vala syntax: https://wiki.gnome.org/Projects/Vala/PropertiesSample
+
+public class PropertyDemo : Object {
+    /* Property-backing fields */
+
+    private string _name;
+    private string _read_only;
+
+    /* Properties */
+
+    public string automatic { get; set; }
+
+    public string name {
+        get { return _name; }
+        set { _name = value; }
+    }
+
+    public string read_only {
+        get { return _read_only; }
+    }
+
+    public PropertyDemo (string name) {
+        this.automatic = "InitialAutomatic"; // is this translated to being the default value?
+        _name = name;
+        _read_only = "InitialReadOnly";
+    }
+}
+
+** More Vala syntax
+
+    public int construct_only_prop {
+        construct {
+            _c_o_prop = value;
+        }
+        get {
+            return _c_o_prop;
+        }
+    }
+
+    public int construct_get_set_prop {
+        construct set {
+            _c_g_s_prop = value;
+        }
+        get {
+            return _c_g_s_prop;
+        }
+    }
+
+    // this bit is from https://wiki.gnome.org/Projects/Vala/Tutorial#Properties
+    [Description(nick = "age in years", blurb = "This is the person's age in years")]
+    public int age { get; set; default = 32; }
+
+    /* Creation method */
+
+    public MyConstructor (int a, int b, int c) {
+        Object (construct_only_prop: a, construct_get_set_prop: b); // construct superclass
+        this.get_set_prop = c;
+    }
+
+
+    /* Construct block, gets called after all properties have been set.  This uses GObjectClass::constructor */
+
+    construct {
+        stdout.printf ("++++++++++ construct block +++++++++++++++\n\n");
+        this.get_set_prop = 5;
+        stdout.printf ("++++++++++ end of construct block ++++++++\n\n");
+    }
+
+
+    myobj = g_object_new (G_TYPE_SOME_CLASS,
+                          "prop1", oasidjf,
+ );
+
+* Vala examples at https://github.com/aruiz/rust-vala
