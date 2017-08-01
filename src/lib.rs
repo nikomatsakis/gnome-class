@@ -54,7 +54,7 @@ pub fn gobject_gen(input: TokenStream) -> TokenStream {
                     panic!("cannot generate gobjects")
                 }
             }
-        }
+        },
         Err(e) => {
             println!("{:?}", e);
             panic!("cannot generate gobjects")
