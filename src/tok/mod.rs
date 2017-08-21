@@ -37,6 +37,7 @@ pub enum Tok<'input> {
     SelfKeyword, // `self`
     SuperKeyword, // `super`
     ExtendsKeyword, // `extends`
+    SignalKeyword, // `signal`
     Id(&'input str), // identifier
     ThinArrow, // `->`
     Underscore, // `_`
@@ -78,6 +79,7 @@ const KEYWORDS: &'static [(&'static str, Tok<'static>)] = &[
     ("fn", FnKeyword),
     ("init", InitKeyword),
     ("extends", ExtendsKeyword),
+    ("signal", SignalKeyword),
     ("self", SelfKeyword),
     ("super", SuperKeyword),
     ("as", AsKeyword),
