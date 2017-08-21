@@ -289,6 +289,16 @@ impl<'ast> ClassContext<'ast> {
             })
     }
 
+    pub fn signals(&self) -> impl Iterator<Item = &'ast Signal> {
+        self.class
+            .members
+            .iter()
+            .filter_map(|member| match *member {
+                Member::Signal(ref s) => Some(s),
+                _ => None,
+            })
+    }
+
     pub fn method_names(&self) -> Vec<Identifier> {
         self.methods()
             .map(|method| method.name)
