@@ -26,6 +26,8 @@ gobject_gen! {
         fn get(&self) -> u32 {
             self.private().f.get()
         }
+
+        signal my_signal(&self);
     }
 }
 
