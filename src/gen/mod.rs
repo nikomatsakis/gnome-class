@@ -135,8 +135,11 @@ impl<'ast> ClassContext<'ast> {
         let init_fn = self.init_fn();
         let method_names = &self.method_names();
         let method_fn_tys = &self.method_fn_tys();
+        let signal_id_names = &self.signal_id_names();
 
         quote! {
+            use gnome_class_shims::libc;
+
             #[repr(C)]
             pub struct #InstanceName {
                 ptr: *mut #GObject
@@ -168,7 +171,10 @@ impl<'ast> ClassContext<'ast> {
             #[repr(C)]
             pub struct #GClassName {
                 parent_class: #ParentGClass,
+
                 #(#method_names: Option<#method_fn_tys>,)*
+
+                #(#signal_id_names: libc::c_uint,)* // g_signal_newv() returns guint
             }
         }
     }
@@ -297,6 +303,17 @@ impl<'ast> ClassContext<'ast> {
                 Member::Signal(ref s) => Some(s),
                 _ => None,
             })
+    }
+
+    /// From a signal called `foo`, generate `foo_signal_id`.  This is used to
+    /// store the signal ids from g_signal_newv() in the Class structure.
+    pub fn signal_id_names(&self) -> Vec<Identifier> {
+        self.signals()
+            .map(|signal|
+                 Identifier {
+                     str: intern(&format!("{}_signal_id", signal.name.str))
+                 })
+            .collect()
     }
 
     pub fn method_names(&self) -> Vec<Identifier> {

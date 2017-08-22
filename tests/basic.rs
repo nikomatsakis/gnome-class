@@ -27,7 +27,7 @@ gobject_gen! {
             self.private().f.get()
         }
 
-        signal my_signal(&self);
+        signal added(&self);
     }
 }
 
