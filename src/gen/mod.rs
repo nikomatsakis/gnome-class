@@ -30,6 +30,12 @@ pub fn classes(program: &Program) -> Result<Tokens> {
     Ok(quote! { #(#class_tokens)* })
 }
 
+fn signal_id_name(signal: &Signal) -> Identifier {
+    Identifier {
+        str: intern(&format!("{}_signal_id", signal.name.str))
+    }
+}
+
 struct ClassContext<'ast> {
     program: &'ast Program,
     class: &'ast Class,
@@ -309,10 +315,7 @@ impl<'ast> ClassContext<'ast> {
     /// store the signal ids from g_signal_newv() in the Class structure.
     pub fn signal_id_names(&self) -> Vec<Identifier> {
         self.signals()
-            .map(|signal|
-                 Identifier {
-                     str: intern(&format!("{}_signal_id", signal.name.str))
-                 })
+            .map(|signal| signal_id_name (signal))
             .collect()
     }
 
