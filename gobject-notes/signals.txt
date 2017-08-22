@@ -1,5 +1,70 @@
 -*- org -*- 
 
+* Generated code
+
+Inside class_init(), we register each signal.
+
+** TODO Translate signal's signature into GTypes.  For example
+
+   class Foo {
+     signal bar (a: c_uint) -> c_uint;
+
+     signal baz (); // no params, no return value
+   }
+
+   would become
+
+     bar_id = g_signal_newv ("bar",
+                             class_gtype,
+                             G_SIGNAL_RUN_FIRST, // appropriate flags here
+                             class_closure,
+                             accumulator,
+                             accu_data,
+                             c_marshaller,
+                             G_TYPE_UINT,  // return type
+                             1,            // n_params
+                             vec![G_TYPE_UINT] as *mut GType); // params
+
+     baz_id = g_signal_newv ("baz",
+                             ...,
+                             G_TYPE_NONE, // return type
+                             0,           // n_params
+                             NULL);       // params
+
+** TODO Define syntax to declare signal flags, and use the flags when calling g_signal_newv()
+
+** TODO How to emit the signals?  Should we generate a helper struct with an impl...
+
+   class Foo {
+     signal bar (a: c_uint) -> c_uint;
+
+     signal baz (); // no params, no return value
+   }
+
+   struct FooSignals {
+       bar_id: c_uint; // g_signal_newv() returns guint
+       baz_id: c_uint;
+   }
+
+   impl FooSignals {
+       pub fn emit_bar(&self, a: c_uint) -> c_uint {
+           let mut return_value: GValue;
+           gobject_sys::g_signal_emitv(instance_and_params,
+                                       self.bar_id,   // where do we get self?
+                                       detail,        // GQuark
+                                       &return_value);
+           // demarshal
+           return return_value.???
+       }
+
+       pub fn emit_baz() {
+           // analogous
+       }
+   }
+
+   Where do FooSignals' methods get their self?  Can it be a trait on
+   FooClass or something?
+
 * From https://wiki.gnome.org/Projects/Vala/Tutorial#Signals
 
 public class Test : GLib.Object {
