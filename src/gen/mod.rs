@@ -339,10 +339,6 @@ impl<'ast> ClassContext<'ast> {
     fn signal_declarations(&self) -> Vec<Tokens> {
         self.signals()
             .map(|signal| {
-                // FIXME: we register each signal, but discard the result of g_signal_new().  Therefore,
-                // each signal emission will require a g_signal_lookup() (or the moral equivalent of
-                // g_signal_emit_by_name()).
-                //
                 // FIXME: we are not specifying the proper signature (return, args) for the signal
                 // handler.  We need a way to translate Rust type names into G_TYPE_* ids.
                 //
