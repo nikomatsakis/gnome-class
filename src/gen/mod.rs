@@ -350,19 +350,21 @@ impl<'ast> ClassContext<'ast> {
                 //
                 // FIXME: We are not passing a class_closure, marshaller, etc.
 
+                let signal_id_name = signal_id_name(&signal);
                 let signal_name = ByteString(signal.name);
                 quote! {
-                    gobject_sys::g_signal_newv (#signal_name as *const u8 as *const i8,
-                                                (*g_object_class).g_type_class.g_type,
-                                                gobject_sys::G_SIGNAL_RUN_FIRST, // flags
-                                                ptr::null_mut(),                 // class_closure,
-                                                None,                            // accumulator
-                                                ptr::null_mut(),                 // accu_data
-                                                None,                            // c_marshaller,
-                                                gobject_sys::G_TYPE_NONE,        // return_type
-                                                0,                               // n_params,
-                                                ptr::null_mut()                  // param_types
-                                                );
+                    klass.#signal_id_name =
+                        gobject_sys::g_signal_newv (#signal_name as *const u8 as *const i8,
+                                                    (*g_object_class).g_type_class.g_type,
+                                                    gobject_sys::G_SIGNAL_RUN_FIRST, // flags
+                                                    ptr::null_mut(),                 // class_closure,
+                                                    None,                            // accumulator
+                                                    ptr::null_mut(),                 // accu_data
+                                                    None,                            // c_marshaller,
+                                                    gobject_sys::G_TYPE_NONE,        // return_type
+                                                    0,                               // n_params,
+                                                    ptr::null_mut()                  // param_types
+                        );
                 }
             })
             .collect()
