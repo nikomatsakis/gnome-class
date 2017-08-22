@@ -1,3 +1,4 @@
+pub extern crate libc;
 pub extern crate gobject_sys;
 pub extern crate glib_sys;
 
