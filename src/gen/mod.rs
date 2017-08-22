@@ -316,6 +316,38 @@ impl<'ast> ClassContext<'ast> {
             .collect()
     }
 
+    fn signal_declarations(&self) -> Vec<Tokens> {
+        self.signals()
+            .map(|signal| {
+                // FIXME: we register each signal, but discard the result of g_signal_new().  Therefore,
+                // each signal emission will require a g_signal_lookup() (or the moral equivalent of
+                // g_signal_emit_by_name()).
+                //
+                // FIXME: we are not specifying the proper signature (return, args) for the signal
+                // handler.  We need a way to translate Rust type names into G_TYPE_* ids.
+                //
+                // FIXME: we are not passing signal flags
+                //
+                // FIXME: We are not passing a class_closure, marshaller, etc.
+
+                let byte_string = ByteString(signal.name);
+                quote! {
+                    gobject_sys::g_signal_newv (#byte_string as *const u8 as *const i8,
+                                                (*g_object_class).g_type_class.g_type,
+                                                gobject_sys::G_SIGNAL_RUN_FIRST, // flags
+                                                ptr::null_mut(),                 // class_closure,
+                                                None,                            // accumulator
+                                                ptr::null_mut(),                 // accu_data
+                                                None,                            // c_marshaller,
+                                                gobject_sys::G_TYPE_NONE,        // return_type
+                                                0,                               // n_params,
+                                                ptr::null_mut()                  // param_types
+                                                );
+                }
+            })
+            .collect()
+    }
+
     pub fn method_fn_tys(&self) -> Vec<Tokens> {
         self.methods()
             .map(|method| {
@@ -546,8 +578,11 @@ impl<'ast> ClassContext<'ast> {
         };
 
         // Class initializer. Sets up the finalizer, private field
-        // size, and initializes the fields for each of our methods.
+        // size, initializes the fields for each of our methods,
+        // and registers the signals.
         let method_assignments = self.method_assignments();
+        let signal_declarations = self.signal_declarations();
+
         let class_init = quote! {
             extern fn class_init(klass: gpointer,
                                  _klass_data: gpointer)
@@ -563,6 +598,8 @@ impl<'ast> ClassContext<'ast> {
                     let klass = klass as *mut #GClassName;
                     let klass: &mut #GClassName = &mut *klass;
                     #(#method_assignments)*
+
+                    #(#signal_declarations)*
                 }
             }
         };
