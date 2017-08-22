@@ -350,9 +350,9 @@ impl<'ast> ClassContext<'ast> {
                 //
                 // FIXME: We are not passing a class_closure, marshaller, etc.
 
-                let byte_string = ByteString(signal.name);
+                let signal_name = ByteString(signal.name);
                 quote! {
-                    gobject_sys::g_signal_newv (#byte_string as *const u8 as *const i8,
+                    gobject_sys::g_signal_newv (#signal_name as *const u8 as *const i8,
                                                 (*g_object_class).g_type_class.g_type,
                                                 gobject_sys::G_SIGNAL_RUN_FIRST, // flags
                                                 ptr::null_mut(),                 // class_closure,
