@@ -64,8 +64,12 @@ Method: Method = {
 };
 
 Signal: Signal = {
-    "signal" <name:Id> <sig:FnSig> <code:CodeBlock> => Signal { name, sig, Some(code) },
-    "signal" <name:Id> <sig:FnSig> => Signal { name, sig, None }
+    "signal" <name:Id> <sig:FnSig> <code:SignalBody> => Signal { name, sig, code }
+};
+
+SignalBody: Option<CodeBlock> = {
+    <CodeBlock> => Some(<>),
+    ";" => None
 };
 
 FnDef: FnDef = {
@@ -180,5 +184,6 @@ extern {
         "+" => Tok::Plus,
         "," => Tok::Comma,
         "&" => Tok::Ampersand,
+        ";" => Tok::Semi
     }
 }
