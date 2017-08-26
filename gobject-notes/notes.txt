@@ -1,0 +1,29 @@
+-*- org -*- 
+
+* TODO In class structures, reserve slots for API expansions without ABI breaks
+
+#[repr(C)]
+pub struct GtkBoxClass {
+    pub parent_class: GtkContainerClass,
+    pub _gtk_reserved1: Option<unsafe extern "C" fn()>,
+    pub _gtk_reserved2: Option<unsafe extern "C" fn()>,
+    pub _gtk_reserved3: Option<unsafe extern "C" fn()>,
+    pub _gtk_reserved4: Option<unsafe extern "C" fn()>,
+}
+
+Maybe have something like 
+
+gobject_gen! {
+    class Foo: glib::Object {
+        struct FooPrivate {
+            ....
+        }
+
+        signal ...;
+        fn ...;
+
+        reserve_slots(N);       // <------ this; to be decremented when needed
+    }
+}
+
+* Reordering class fields is an ABI break.  Shoule we warn about this / how?
