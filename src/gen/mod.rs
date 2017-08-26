@@ -47,7 +47,7 @@ struct ClassContext<'ast> {
     ParentGClass: Tokens,
     GObject: Tokens,
     GObjectClass: Tokens,
-    InstanceTrait: Identifier,
+    InstanceExt: Identifier,
 }
 
 impl<'ast> ClassContext<'ast> {
@@ -94,8 +94,9 @@ impl<'ast> ClassContext<'ast> {
             str: intern(&format!("__methods_from_{}", InstanceName.str))
         };
 
-        let InstanceTrait = Identifier {
-            str: intern(&format!("{}Trait", class.name.str))
+        // Public trait with all the class's methods
+        let InstanceExt = Identifier {
+            str: intern(&format!("{}Ext", class.name.str))
         };
 
         Ok(ClassContext {
@@ -109,7 +110,7 @@ impl<'ast> ClassContext<'ast> {
             MethodsFrom,
             GObject,
             GObjectClass,
-            InstanceTrait,
+            InstanceExt,
         })
     }
 
@@ -119,8 +120,8 @@ impl<'ast> ClassContext<'ast> {
             self.impls(),
             self.methods_declared_in_instance(),
             self.always_impl(),
-            self.instance_trait(),
-            self.instance_trait_impl(),
+            self.instance_ext(),
+            self.instance_ext_impl(),
             self.c_symbols(),
         ];
 
@@ -185,23 +186,23 @@ impl<'ast> ClassContext<'ast> {
         }
     }
 
-    fn instance_trait(&self) -> Tokens {
-        let InstanceTrait = self.InstanceTrait;
+    fn instance_ext(&self) -> Tokens {
+        let InstanceExt = self.InstanceExt;
         let method_trait_fns = &self.method_trait_fns();
 
         quote! {
-            pub trait #InstanceTrait {
+            pub trait #InstanceExt {
                 #(#method_trait_fns)*
             }
         }
     }
 
-    fn instance_trait_impl(&self) -> Tokens {
+    fn instance_ext_impl(&self) -> Tokens {
         let InstanceName = self.class.name;
-        let InstanceTrait = self.InstanceTrait;
+        let InstanceExt = self.InstanceExt;
         let method_redirects = self.method_redirects();
         quote! {
-            impl #InstanceTrait for #InstanceName {
+            impl #InstanceExt for #InstanceName {
                 #(#method_redirects)*
             }
         }
