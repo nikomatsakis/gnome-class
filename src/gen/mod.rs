@@ -122,6 +122,7 @@ impl<'ast> ClassContext<'ast> {
             self.always_impl(),
             self.instance_ext(),
             self.instance_ext_impl(),
+            self.signal_trampolines(),
             self.c_symbols(),
         ];
 
@@ -193,6 +194,16 @@ impl<'ast> ClassContext<'ast> {
         quote! {
             pub trait #InstanceExt {
                 #(#method_trait_fns)*
+
+                // FIXME: property setters/getters like in glib-rs
+                //
+                // fn get_property_foo(&self) -> type;
+                //
+                // fn set_property_foo(&self, v: type);
+
+                // FIXME: methods to connect to signals like in glib-rs
+                //
+                // fn connect_signalname<F: Fn(&Self, type, type) -> type + 'static>(&self, f: F) -> u64;
             }
         }
     }
@@ -202,9 +213,60 @@ impl<'ast> ClassContext<'ast> {
         let InstanceExt = self.InstanceExt;
         let method_redirects = self.method_redirects();
         quote! {
+            // FIXME: impl<O: IsA<#InstanceName> + IsA<glib::object::Object>> #InstanceExt for O {
             impl #InstanceExt for #InstanceName {
                 #(#method_redirects)*
+
+                // FIXME: property setters/getters like in glib-rs
+                //
+                // fn get_property_foo(&self) -> type {
+                //     let mut value = Value::from(&false); // FIXME: Value::from(&what)?
+                //     unsafe {
+                //         gobject_ffi:g_object_get_property(self.to_glib_none().0, "foo".to_glib_none().0, value.to_glib_none_mut().0);
+                //     }
+                //     value.get().unwrap()
+                // }
+                //
+                // fn set_property_foo(&self, v: type) {
+                //     unsafe {
+                //         gobject_ffi:g_object_set_property(self.to_glib_none().0, "foo".to_glib_none().0, Value::from(&v).to_glib_none().0);
+                //     }
+                // }
+
+                // FIXME: methods to connect to signals like in glib-rs
+                //
+                // fn connect_signalname<F: Fn(&Self, type, type) -> type + 'static>(&self, f: F) -> u64 {
+                //     unsafe {
+                //         let f: Box_<Box_<Fn(&Self, type, type) -> type + 'static>> = Box_::new(Box_::new(f));
+                //         connect(self.to_glib_none().0, "signalname",
+                //             transmute(signalname_trampoline::<Self> as usize), Box_::into_raw(f) as *mut _)
+                //     }
+                // }
             }
+        }
+    }
+
+    fn signal_trampolines(&self) -> Tokens {
+        let InstanceName = self.class.name;
+        let InstanceExt = self.InstanceExt;
+
+        quote! {
+            // FIXME: signal handler trampolines like in glib-rs
+            //
+            // unsafe extern "C" fn signalname_trampoline<P>(this: *mut ffi::InstanceName, argname: type, argname: type, f: glib_ffi:gpointer) -> type
+            // where P: IsA<InstanceName> {
+            //     callback_guard!();
+            //     let f: &&(Fn(&P, type, type) -> type + 'static) = transmute(f);
+            //
+            //     // with return value:
+            //     f(&InstanceName::from_glib_none(this).downcast_unchecked(), &from_glib_none(argname), &from_glib_none(argname))).to_glib()
+            //
+            //     // without return value:
+            //     f(&InstanceName::from_glib_none(this).downcast_unchecked(), &from_glib_none(argname), &from_glib_none(argname)))
+            //
+            //     // those are by-reference arguments.  For by-value arguments,
+            //     from_glib(argname)
+            // }
         }
     }
 
