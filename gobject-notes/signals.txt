@@ -7,9 +7,9 @@ Inside class_init(), we register each signal.
 ** TODO Translate signal's signature into GTypes.  For example
 
    class Foo {
-     signal bar (a: c_uint) -> c_uint;
+     signal bar (&self, a: c_uint) -> c_uint;
 
-     signal baz (); // no params, no return value
+     signal baz (&self); // no params, no return value
    }
 
    would become
@@ -36,9 +36,9 @@ Inside class_init(), we register each signal.
 ** TODO How to emit the signals?  Should we generate a helper struct with an impl...
 
    class Foo {
-     signal bar (a: c_uint) -> c_uint;
+     signal bar (&self, a: c_uint) -> c_uint;
 
-     signal baz (); // no params, no return value
+     signal baz (&self); // no params, no return value
    }
 
    struct FooSignals {
@@ -87,7 +87,7 @@ public class Test : GLib.Object {
 
 * Documentation: https://wiki.gnome.org/Projects/Vala/Manual/Classes#Signals
 
-* Signal flags:
+* Signal flags in Vala:
 
     [Signal (action=true, detailed=true, run=true, no_recurse=true, no_hooks=true)]
     public signal void sig_1 ();
@@ -138,9 +138,13 @@ guint            g_signal_new_class_handler (const gchar        *signal_name,
                                return_type, n_params, args);
 }
 
-** The preferred way is not to have a slot in the class struct, but to use g_signal_new_class_handler()
+** Would the preferred way be not to have a slot in the class struct, but to use g_signal_new_class_handler()
    and have derived classes use g_signal_override_class_handler() if
-   they want to override the default handler.
+   they want to override the default handler?
+
+   C likes having a slot in the class struct, if we are deriving
+   classes from C.  Disadvantage: we have to maintain a parallel C
+   struct.  But we are already doing it for methods, anyway.
 
 * Flags
 
@@ -183,6 +187,8 @@ typedef enum
   G_SIGNAL_MUST_COLLECT = 1 << 7,
   G_SIGNAL_DEPRECATED   = 1 << 8
 } GSignalFlags;
+
+** TODO Deal with G_SIGNAL_TYPE_STATIC_SCOPE at some point, to avoid unnecessary value copies.
 
 * Discussion with Niko
 
