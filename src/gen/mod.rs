@@ -116,6 +116,7 @@ impl<'ast> ClassContext<'ast> {
 
     pub fn gen_class(&self) -> Result<Tokens> {
         let all = vec![
+            self.imports(),
             self.type_decls(),
             self.impls(),
             self.methods_declared_in_instance(),
@@ -132,6 +133,13 @@ impl<'ast> ClassContext<'ast> {
     fn callback_guard(&self) -> Tokens {
         quote! {
             let _guard = ::glib::CallbackGuard::new();
+        }
+    }
+
+    fn imports(&self) -> Tokens {
+        quote! {
+            use std::u16;
+            use gnome_class_shims::libc;
         }
     }
 
@@ -152,9 +160,6 @@ impl<'ast> ClassContext<'ast> {
         let signal_id_names = &self.signal_id_names();
 
         quote! {
-            use std::u16;
-            use gnome_class_shims::libc;
-
             #[repr(C)]
             pub struct #InstanceName {
                 pub parent: *mut #GObject
