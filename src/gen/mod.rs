@@ -150,7 +150,7 @@ impl<'ast> ClassContext<'ast> {
 
             #[repr(C)]
             pub struct #InstanceName {
-                ptr: *mut #GObject
+                pub parent: *mut #GObject
             }
 
             #[repr(C)]
@@ -288,11 +288,11 @@ impl<'ast> ClassContext<'ast> {
 
                 unsafe fn to_gobject_ptr(this: *const Self)
                                          -> *mut #GObject {
-                    (*this).ptr
+                    (*this).parent
                 }
 
                 unsafe fn from_gobject_ptr(g: *mut #GObject) -> Self {
-                    #InstanceName { ptr: g }
+                    #InstanceName { parent: g }
                 }
             }
 
@@ -537,7 +537,7 @@ impl<'ast> ClassContext<'ast> {
                 pub fn upcast(&self) -> &#ParentInstance {
                     use gnome_class_shims::GInstance;
                     unsafe {
-                        GInstance::borrow_gobject_ptr(&self.ptr)
+                        GInstance::borrow_gobject_ptr(&self.parent)
                     }
                 }
             }
