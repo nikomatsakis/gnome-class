@@ -1,8 +1,5 @@
 #![feature(proc_macro)]
 
-// FIXME: remove the need for this
-#[macro_use] extern crate lazy_static;
-
 // FIXME: can we combine these two?
 extern crate gnome_class_shims;
 extern crate gobject_gen;

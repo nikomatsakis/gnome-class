@@ -734,6 +734,7 @@ impl<'ast> ClassContext<'ast> {
                                                      GTypeFlags};
                 use gnome_class_shims::glib_sys::{GType, gpointer};
                 use std::{mem, ptr};
+                use std::sync::{Once, ONCE_INIT};
 
                 // All these helper functions are intentionally
                 // hidden inside of `get_type` so as not to
@@ -743,11 +744,16 @@ impl<'ast> ClassContext<'ast> {
                 #class_init
                 #register
 
-                lazy_static! {
-                    static ref GTYPE: GType = register();
-                }
+                unsafe {
+                    static mut GTYPE: GType = gobject_sys::G_TYPE_INVALID;
+                    static ONCE: Once = ONCE_INIT;
 
-                *GTYPE
+                    ONCE.call_once(|| {
+                        GTYPE = register();
+                    });
+
+                    GTYPE
+                }
             }
         }
     }
