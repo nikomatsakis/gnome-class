@@ -154,6 +154,15 @@ impl<'ast> ClassContext<'ast> {
             }
 
             #[repr(C)]
+            pub struct #GClassName {
+                parent_class: #ParentGClass,
+
+                #(#method_names: Option<#method_fn_tys>,)*
+
+                #(#signal_id_names: libc::c_uint,)* // g_signal_newv() returns guint
+            }
+
+            #[repr(C)]
             pub struct #FieldsName {
                 parent: #ParentInstance,
 
@@ -174,15 +183,6 @@ impl<'ast> ClassContext<'ast> {
 
             impl #PrivateName {
                 pub fn new() -> Self #init_fn
-            }
-
-            #[repr(C)]
-            pub struct #GClassName {
-                parent_class: #ParentGClass,
-
-                #(#method_names: Option<#method_fn_tys>,)*
-
-                #(#signal_id_names: libc::c_uint,)* // g_signal_newv() returns guint
             }
         }
     }
