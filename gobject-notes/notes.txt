@@ -1,5 +1,15 @@
 -*- org -*- 
 
+* TODO Support subclassing from anything other than GObject
+
+** Grammar supports "class Foo extends Bar"
+
+** Need to support "class Foo: ParentClass, Iface1, Iface2" instead
+
+* TODO Virtual + non-virtual methods?
+
+Virtual ones have a slot in FooClass; non-virtual ones don't.
+
 * TODO In class structures, reserve slots for API expansions without ABI breaks
 
 #[repr(C)]
