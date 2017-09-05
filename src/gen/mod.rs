@@ -146,6 +146,7 @@ impl<'ast> ClassContext<'ast> {
         let signal_id_names = &self.signal_id_names();
 
         quote! {
+            use std::u16;
             use gnome_class_shims::libc;
 
             #[repr(C)]
@@ -691,12 +692,18 @@ impl<'ast> ClassContext<'ast> {
         let register = quote! {
             fn register() -> GType {
                 unsafe {
+                    let class_size = mem::size_of::<#GClassName>();
+                    assert!(class_size <= u16::MAX as usize);
+
+                    let instance_size = mem::size_of::<#FieldsName>();
+                    assert!(instance_size <= u16::MAX as usize);
+
                     gobject_sys::g_type_register_static_simple(
                         #ParentInstance::get_type(),
                         #byte_string as *const u8 as *const i8,
-                        mem::size_of::<#GClassName>() as u32,
+                        class_size as u32,
                         Some(class_init),
-                        mem::size_of::<#FieldsName>() as u32,
+                        instance_size as u32,
                         Some(instance_init),
                         GTypeFlags::empty())
                 }
