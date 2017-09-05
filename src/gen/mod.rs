@@ -129,6 +129,12 @@ impl<'ast> ClassContext<'ast> {
         Ok(quote! { #(#all)* })
     }
 
+    fn callback_guard(&self) -> Tokens {
+        quote! {
+            let _guard = ::glib::CallbackGuard::new();
+        }
+    }
+
     fn type_decls(&self) -> Tokens {
         let FieldsName = self.FieldsName;
         let InstanceName = self.class.name;
@@ -619,6 +625,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn get_type_fn(&self) -> Tokens {
+        let callback_guard = self.callback_guard();
         let InstanceName = self.class.name;
         let FieldsName = self.GClassName;
         let GClassName = self.GClassName;
@@ -712,6 +719,8 @@ impl<'ast> ClassContext<'ast> {
 
         quote! {
             fn get_type() -> ::gnome_class_shims::glib_sys::GType {
+                #callback_guard
+
                 use gnome_class_shims as shims;
                 use gnome_class_shims::gobject_sys::{self,
                                                      GObject,

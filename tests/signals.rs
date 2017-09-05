@@ -6,6 +6,7 @@
 // FIXME: can we combine these two?
 extern crate gnome_class_shims;
 extern crate gobject_gen;
+extern crate glib;
 
 use gobject_gen::gobject_gen;
 use gnome_class_shims::gobject_sys;
