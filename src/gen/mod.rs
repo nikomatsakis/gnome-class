@@ -117,14 +117,14 @@ impl<'ast> ClassContext<'ast> {
     pub fn gen_class(&self) -> Result<Tokens> {
         let all = vec![
             self.imports(),
-            self.type_decls(),
-            self.impls(),
-            self.methods_declared_in_instance(),
-            self.always_impl(),
-            self.instance_ext(),
-            self.instance_ext_impl(),
-            self.signal_trampolines(),
-            self.c_symbols(),
+//            self.type_decls(),
+//            self.impls(),
+//            self.methods_declared_in_instance(),
+//            self.always_impl(),
+//            self.instance_ext(),
+//            self.instance_ext_impl(),
+//            self.signal_trampolines(),
+//            self.c_symbols(),
         ];
 
         Ok(quote! { #(#all)* })
@@ -138,8 +138,23 @@ impl<'ast> ClassContext<'ast> {
 
     fn imports(&self) -> Tokens {
         quote! {
-            use std::u16;
-            use gnome_class_shims::libc;
+            extern crate glib_sys as glib_ffi;
+            extern crate gobject_sys as gobject_ffi;
+            extern crate glib;
+            extern crate libc;
+
+            use glib_ffi;
+            use gobject_ffi;
+
+            use glib;
+            use glib::{IsA, Value};
+            use glib::object::Downcast;
+            use glib::signal::connect;
+            use glib::translate::*;
+
+            use std::ptr;
+            use std::mem;
+            use std::mem::transmute;
         }
     }
 
