@@ -117,6 +117,8 @@ impl<'ast> ClassContext<'ast> {
     pub fn gen_class(&self) -> Result<Tokens> {
         let all = vec![
             self.imports(),
+            self.glib_wrapper(),
+            self.imp_module(),
 //            self.type_decls(),
 //            self.impls(),
 //            self.methods_declared_in_instance(),
@@ -140,7 +142,10 @@ impl<'ast> ClassContext<'ast> {
         quote! {
             extern crate glib_sys as glib_ffi;
             extern crate gobject_sys as gobject_ffi;
+
+            #[macro_use]
             extern crate glib;
+
             extern crate libc;
 
             use glib_ffi;
@@ -152,9 +157,97 @@ impl<'ast> ClassContext<'ast> {
             use glib::signal::connect;
             use glib::translate::*;
 
+            use libc;
             use std::ptr;
             use std::mem;
             use std::mem::transmute;
+
+            // mod ffi;
+            pub mod imp {
+                pub use ffi::*;
+            }
+        }
+    }
+
+    fn get_type_fn_name(&self) -> Identifier {
+        Identifier {
+            str: intern(&format!("{}_get_type", self.lower_case_class_name()))
+        }
+    }
+
+    fn glib_wrapper(&self) -> Tokens {
+        let InstanceName = self.class.name;
+        let get_type_fn_name = self.get_type_fn_name();
+
+        quote! {
+            glib_wrapper! {
+                pub struct #InstanceName(Object<imp::#InstanceName>); // FIXME: parent classes/interfaces
+
+                match fn {
+                    get_type => || imp::#get_type_fn_name(),
+                }
+            }
+        }
+    }
+
+    fn imp_module(&self) -> Tokens {
+        let get_type_fn = self.imp_get_type_fn();
+        quote! {
+            pub mod imp {
+                extern crate glib_sys as glib_ffi;
+                extern crate glib_sys as gobject_ffi;
+
+                use glib_ffi;
+                use gobject_ffi;
+
+                use std::mem;
+                use libc;
+
+                #get_type_fn
+            }
+        }
+    }
+
+    fn imp_get_type_fn(&self) -> Tokens {
+        let callback_guard = self.callback_guard();
+        let get_type_fn_name = self.get_type_fn_name();
+        let GClassName = self.GClassName;
+        let InstanceName = self.class.name;
+        let ParentInstance = &self.ParentInstance;
+        let instance_name_string = ByteString(InstanceName);
+
+        quote! {
+            #[no_mangle]
+            pub unsafe extern "C" fn #get_type_fn_name() -> glib_ffi::GType {
+                #callback_guard
+
+                use std::sync::{Once, ONCE_INIT};
+
+                static mut TYPE: glib_ffi::GType = gobject_ffi::G_TYPE_INVALID;
+                static ONCE: Once = ONCE_INIT;
+
+                ONCE.call_once(|| {
+                    let class_size = mem::size_of::<#GClassName>();
+                    assert!(class_size <= u16::MAX as usize);
+
+                    let instance_size = mem::size_of::<#InstanceName>();
+                    assert!(instance_size <= u16::MAX as usize);
+
+                    TYPE = gobject_ffi::g_type_register_static_simple(
+                        #ParentInstance::get_type(), // FIXME: is this available?
+                        #instance_name_string as *const libc::c_char,
+                        class_size as u32,
+                        Some(#GClassName::init),
+                        instance_size as u32,
+                        Some(#InstanceName::init),
+                        gobject_ffi::GTypeFlags::empty()
+                    );
+
+                    // FIXME: add interfaces
+                });
+
+                TYPE
+            }
         }
     }
 
