@@ -26,6 +26,40 @@ mod param;
 mod parser;
 mod tok;
 
+/// Generates the code to create a derived glib::Object
+///
+/// This procedural macro defines an extension to the Rust language so
+/// that one can create GObjects using only safe code.  All the
+/// boilerplate needed to register the GObject type, its signals and
+/// properties, etc., is automatically generated.
+///
+/// # Syntax: simple class derived from glib::Object
+///
+/// ```ignore
+/// #[macro_use]
+/// extern crate glib;  // see "Necessary imports" below on why this is needed
+///
+/// use std::cell::Cell;
+///
+/// gobject_gen! {
+///     class Foo {
+///         struct FooPrivate {
+///             val: Cell<u32>
+///         }
+///
+///         // FIXME: continue the documentation
+///     }
+/// }
+/// ```
+///
+/// # Necessary imports
+/// The generated code depends on the glib crate's macros, so you must
+/// import glib like this before using `gobject_gen!()`:
+///
+/// ```ignore
+/// #[macro_use]
+/// extern crate glib;
+/// ```
 #[proc_macro]
 pub fn gobject_gen(input: TokenStream) -> TokenStream {
     let input = input.to_string();
