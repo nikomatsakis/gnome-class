@@ -44,9 +44,11 @@ struct ClassContext<'ast> {
     GClassName: Identifier,
     MethodsFrom: Identifier,
     ParentInstance: Tokens,
-    ParentGClass: Tokens,
+    ParentInstanceFfi: Tokens,
+    ParentClassFfi: Tokens,
     GObject: Tokens,
-    GObjectClass: Tokens,
+    GObjectFfi: Tokens,
+    GObjectClassFfi: Tokens,
     InstanceExt: Identifier,
 }
 
@@ -74,9 +76,9 @@ impl<'ast> ClassContext<'ast> {
             str: intern(&format!("{}Class", class.name.str))
         };
 
-        let GObject = quote! { ::gnome_class_shims::gobject_sys::GObject };
-        let GObjectClass = quote! { ::gnome_class_shims::gobject_sys::GObjectClass };
-        let GObjectRef = quote! { ::gnome_class_shims::GObjectRef };
+        let GObject = quote! { ::glib::Object };
+        let GObjectFfi = quote! { ::gobject_ffi::GObject };
+        let GObjectClassFfi = quote! { ::gobject_ffi::GObjectClass };
 
         // GObject is hardcoded in various places below
         let ParentInstance =
@@ -84,9 +86,15 @@ impl<'ast> ClassContext<'ast> {
                  .as_ref()
                  .map(|c| c.ty())
                  .map(|c| quote! { #c })
-                 .unwrap_or_else(|| GObjectRef.clone());
-        let ParentGClass = quote! {
-            <#ParentInstance as ::gnome_class_shims::GInstance>::Class
+                 .unwrap_or_else(|| GObject.clone());
+        let ParentInstanceFfi =
+            class.extends
+                 .as_ref()
+                 .map(|c| c.ty())
+                 .map(|c| quote! { #c })
+                 .unwrap_or_else(|| GObjectFfi.clone());
+        let ParentClassFfi = quote! {
+            <#ParentInstance as ::glib::Wrapper>::GlibType
         };
 
         let InstanceName = class.name;
@@ -105,11 +113,13 @@ impl<'ast> ClassContext<'ast> {
             private_struct,
             FieldsName,
             GClassName,
-            ParentInstance,
-            ParentGClass,
             MethodsFrom,
+            ParentInstance,
+            ParentInstanceFfi,
+            ParentClassFfi,
             GObject,
-            GObjectClass,
+            GObjectFfi,
+            GObjectClassFfi,
             InstanceExt,
         })
     }
@@ -119,7 +129,6 @@ impl<'ast> ClassContext<'ast> {
             self.imports(),
             self.glib_wrapper(),
             self.imp_module(),
-//            self.type_decls(),
 //            self.impls(),
 //            self.methods_declared_in_instance(),
 //            self.always_impl(),
@@ -247,62 +256,6 @@ impl<'ast> ClassContext<'ast> {
                 });
 
                 TYPE
-            }
-        }
-    }
-
-    fn type_decls(&self) -> Tokens {
-        let FieldsName = self.FieldsName;
-        let InstanceName = self.class.name;
-        let ParentInstance = &self.ParentInstance;
-        let PrivateName = self.private_struct.name;
-        let GClassName = self.GClassName;
-        let GObject = &self.GObject;
-        let ParentGClass = &&self.ParentGClass;
-
-        let private_struct_fields = &self.private_struct.fields;
-
-        let init_fn = self.init_fn();
-        let method_names = &self.method_names();
-        let method_fn_tys = &self.method_fn_tys();
-        let signal_id_names = &self.signal_id_names();
-
-        quote! {
-            #[repr(C)]
-            pub struct #InstanceName {
-                pub parent: *mut #GObject
-            }
-
-            #[repr(C)]
-            pub struct #GClassName {
-                parent_class: #ParentGClass,
-
-                #(#method_names: Option<#method_fn_tys>,)*
-
-                #(#signal_id_names: libc::c_uint,)* // g_signal_newv() returns guint
-            }
-
-            #[repr(C)]
-            pub struct #FieldsName {
-                parent: #ParentInstance,
-
-                // The GObject runtime will store some private data in here.
-                _phantom: ::std::marker::PhantomData<#PrivateName>,
-
-                // This type, while zero-sized, is not constructible.
-                // This assures that no Rust code can ever create an
-                // instance of `#FieldsName` -- the only instances
-                // are created by the GObject runtime. This is
-                // important for the `GInstance` impl.
-                _no_construct: ::gnome_class_shims::NoConstruct,
-            }
-
-            struct #PrivateName {
-                #(#private_struct_fields),*
-            }
-
-            impl #PrivateName {
-                pub fn new() -> Self #init_fn
             }
         }
     }
