@@ -234,7 +234,7 @@ impl<'ast> ClassContext<'ast> {
                     assert!(instance_size <= u16::MAX as usize);
 
                     TYPE = gobject_ffi::g_type_register_static_simple(
-                        #ParentInstance::get_type(), // FIXME: is this available?
+                        #ParentInstance::static_type().to_glib(),
                         #instance_name_string as *const libc::c_char,
                         class_size as u32,
                         Some(#GClassName::init),
