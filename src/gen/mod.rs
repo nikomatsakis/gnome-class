@@ -200,7 +200,9 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn imp_module(&self) -> Tokens {
+        let instance_struct = self.imp_instance_struct();
         let get_type_fn = self.imp_get_type_fn();
+
         quote! {
             pub mod imp {
                 extern crate glib_sys as glib_ffi;
@@ -212,7 +214,20 @@ impl<'ast> ClassContext<'ast> {
                 use std::mem;
                 use libc;
 
+                #instance_struct
                 #get_type_fn
+            }
+        }
+    }
+
+    fn imp_instance_struct(&self) -> Tokens {
+        let InstanceName = self.class.name;
+        let ParentInstanceFfi = &self.ParentInstanceFfi;
+
+        quote! {
+            #[repr(C)]
+            pub struct #InstanceName {
+                pub parent: #ParentInstanceFfi,
             }
         }
     }
