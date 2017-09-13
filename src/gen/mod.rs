@@ -411,11 +411,13 @@ impl<'ast> ClassContext<'ast> {
         let InstanceName = self.class.name;
         let instance_get_class_fn = self.instance_get_class_fn();
         let instance_get_priv_fn = self.instance_get_priv_fn();
+        let instance_init_fn = self.instance_init_fn();
 
         quote! {
             impl #InstanceName {
                 #instance_get_class_fn
                 #instance_get_priv_fn
+                #instance_init_fn
                 // FIXME
             }
         }
@@ -435,7 +437,6 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn instance_get_priv_fn(&self) -> Tokens {
-        let InstanceName = self.class.name;
         let PrivateName = self.private_struct.name;
         let get_type_fn_name = self.get_type_fn_name();
 
@@ -449,6 +450,29 @@ impl<'ast> ClassContext<'ast> {
 
                     &*private
                 }
+            }
+        }
+    }
+
+    fn instance_init_fn(&self) -> Tokens {
+        let callback_guard = self.callback_guard();
+        let get_type_fn_name = self.get_type_fn_name();
+        let PrivateName = self.private_struct.name;
+
+        quote! {
+            // Instance struct and private data initialization, called from GObject
+            unsafe extern "C" fn init(obj: *mut gobject_ffi::GTypeInstance, _klass: glib_ffi::gpointer) {
+                #callback_guard
+
+                let private = gobject_ffi::g_type_instance_get_private(
+                    obj as *mut gobject_ffi::GTypeInstance,
+                    #get_type_fn_name(),
+                ) as *mut #PrivateName;
+
+                // Here we initialize the private data.  GObject gives it to us all zero-initialized
+                // but we don't really want to have any Drop impls run here so just overwrite the
+                // data
+                ptr::write(private, #PrivateName::new());
             }
         }
     }
