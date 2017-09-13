@@ -3,6 +3,8 @@
 // FIXME: can we combine these two?
 extern crate gnome_class_shims;
 extern crate gobject_gen;
+
+#[macro_use]
 extern crate glib;
 
 use gobject_gen::gobject_gen;
