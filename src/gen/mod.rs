@@ -214,6 +214,8 @@ impl<'ast> ClassContext<'ast> {
     fn imp_module(&self) -> Tokens {
         let instance_struct = self.imp_instance_struct();
         let class_struct = self.imp_class_struct();
+        let properties_enum = self.imp_properties_enum();
+        let signals_enum = self.imp_signals_enum();
         let get_type_fn = self.imp_get_type_fn();
 
         quote! {
@@ -228,6 +230,8 @@ impl<'ast> ClassContext<'ast> {
 
                 #instance_struct
                 #class_struct
+                #properties_enum
+                #signals_enum
                 #get_type_fn
             }
         }
@@ -254,6 +258,28 @@ impl<'ast> ClassContext<'ast> {
             pub struct #ClassName {
                 pub parent_class: #ParentClassFfi,
                 // FIXME: method/signal prototypes
+            }
+        }
+    }
+
+    fn imp_properties_enum(&self) -> Tokens {
+        quote! {
+            #[repr(u32)]
+            enum Properties {
+                FIXMEDummy = 1,
+                // first one starts at 1
+                // FIXME - do not emit this enum at all if there are no properties
+            }
+        }
+    }
+
+    fn imp_signals_enum(&self) -> Tokens {
+        quote! {
+            #[repr(u32)]
+            enum Signals {
+                FIXMEDummy = 0,
+                // first one starts at 0
+                // FIXME - do not emit this enum at all if there are no signals
             }
         }
     }
