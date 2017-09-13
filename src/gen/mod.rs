@@ -40,6 +40,7 @@ struct ClassContext<'ast> {
     program: &'ast Program,
     class: &'ast Class,
     private_struct: &'ast PrivateStruct,
+    ModuleName: Identifier,
     FieldsName: Identifier,
     GClassName: Identifier,
     MethodsFrom: Identifier,
@@ -66,6 +67,10 @@ impl<'ast> ClassContext<'ast> {
         let private_struct = match private_struct {
             Some(p) => p,
             None => bail!("no private struct found")
+        };
+
+        let ModuleName = Identifier {
+            str: intern(&format!("{}Mod", class.name.str))
         };
 
         let FieldsName = Identifier {
@@ -111,6 +116,7 @@ impl<'ast> ClassContext<'ast> {
             program,
             class,
             private_struct,
+            ModuleName,
             FieldsName,
             GClassName,
             MethodsFrom,
@@ -138,7 +144,15 @@ impl<'ast> ClassContext<'ast> {
 //            self.c_symbols(),
         ];
 
-        Ok(quote! { #(#all)* })
+        let ModuleName = &self.ModuleName;
+
+        Ok(quote! {
+            pub mod #ModuleName {
+                #(#all)*
+            }
+
+            pub use #ModuleName::*;
+        })
     }
 
     fn callback_guard(&self) -> Tokens {
