@@ -225,6 +225,9 @@ impl<'ast> ClassContext<'ast> {
             self.imp_signals_enum(),
             self.imp_private_struct(),
             self.imp_class_private_struct(),
+            self.imp_instance(),
+            self.imp_class(),
+            // FIXME self.imp_extern_funcs(),
             self.imp_get_type_fn(),
         ];
 
@@ -363,6 +366,18 @@ impl<'ast> ClassContext<'ast> {
                 properties:   ptr::null(),
                 signals:      ptr::null(),
             };
+        }
+    }
+
+    fn imp_instance(&self) -> Tokens {
+        quote! {
+            // FIXME
+        }
+    }
+
+    fn imp_class(&self) -> Tokens {
+        quote! {
+            // FIXME
         }
     }
 
