@@ -233,7 +233,10 @@ impl<'ast> ClassContext<'ast> {
 
         quote! {
             pub mod imp {
+                // Bring in our grandparent's stuff so the user's implementation
+                // can use what they had already defined there.
                 use super::super::*;
+
                 use super::glib;
                 use super::glib_ffi;
                 use super::gobject_ffi;
@@ -447,9 +450,9 @@ impl<'ast> ClassContext<'ast> {
                     let private = gobject_ffi::g_type_instance_get_private(
                         self as *const _ as *mut gobject_ffi::GTypeInstance,
                         #get_type_fn_name(),
-                    ) as *const #PrivateName;
+                    ) as *const Option<#PrivateName>;
 
-                    &*private
+                    (&*private).as_ref().unwrap()
                 }
             }
         }
@@ -468,12 +471,12 @@ impl<'ast> ClassContext<'ast> {
                 let private = gobject_ffi::g_type_instance_get_private(
                     obj as *mut gobject_ffi::GTypeInstance,
                     #get_type_fn_name(),
-                ) as *mut #PrivateName;
+                ) as *mut Option<#PrivateName>;
 
                 // Here we initialize the private data.  GObject gives it to us all zero-initialized
                 // but we don't really want to have any Drop impls run here so just overwrite the
-                // data
-                ptr::write(private, #PrivateName::new());
+                // data.
+                ptr::write(private, Some(#PrivateName::new()));
             }
         }
     }
@@ -501,7 +504,9 @@ impl<'ast> ClassContext<'ast> {
             unsafe extern "C" fn init(klass: glib_ffi::gpointer, _klass_data: glib_ffi::gpointer) {
                 #callback_guard
 
-                gobject_ffi::g_type_class_add_private(klass, mem::size_of::<#PrivateName>());
+                // This is an Option<_> so that we can replace its value with None on finalize() to
+                // release all memory it holds
+                gobject_ffi::g_type_class_add_private(klass, mem::size_of::<Option<#PrivateName>>());
 
                 // GObjectClass methods; properties
                 {
