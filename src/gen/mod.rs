@@ -323,7 +323,7 @@ impl<'ast> ClassContext<'ast> {
 
                     TYPE = gobject_ffi::g_type_register_static_simple(
                         <#ParentInstance as glib::StaticType>::static_type().to_glib(),
-                        #instance_name_string as *const libc::c_char,
+                        #instance_name_string as *const u8 as *const i8,
                         class_size as u32,
                         Some(#GClassName::init),
                         instance_size as u32,
