@@ -376,8 +376,58 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn imp_class(&self) -> Tokens {
+        let GClassName = &self.GClassName;
+        let class_init_fn = self.class_init_fn();
+
         quote! {
-            // FIXME
+            impl #GClassName {
+                #class_init_fn
+                // FIXME
+            }
+        }
+    }
+
+    fn class_init_fn(&self) -> Tokens {
+        let callback_guard = self.callback_guard();
+        let InstanceName = self.class.name;
+        let GClassName = &self.GClassName;
+        let ParentClassFfi = &self.ParentClassFfi;
+        let PrivateName = self.private_struct.name;
+
+        quote! {
+            unsafe extern "C" fn init(klass: glib_ffi::gpointer, _klass_data: glib_ffi::gpointer) {
+                #callback_guard
+
+                gobject_ffi::g_type_class_add_private(klass, mem::size_of::<#PrivateName>());
+
+                // GObjectClass methods; properties
+                {
+                    let gobject_class = &mut *(klass as *mut gobject_ffi::GObjectClass);
+                    gobject_class.finalize = Some(#InstanceName::finalize);
+                    // FIXME: gobject_class.set_property = Some(#InstanceName::set_property);
+                    // FIXME: gobject_class.get_property = Some(#InstanceName::get_property);
+
+                    // FIXME
+                    // let mut properties = Vec::new();
+                    //
+                    // create each property
+
+                }
+
+                // Methods
+                {
+                    let klass = &mut *(klass as *mut #GClassName);
+                    // FIXME: klass.method1 = Some(#InstanceName::method1_trampoline);
+                    // FIXME: klass.method2 = Some(#InstanceName::method2_trampoline);
+                }
+
+                // Signals
+                {
+                    // FIXME
+                }
+
+                PRIV.parent_class = gobject_ffi::g_type_class_peek_parent(klass) as *const #ParentClassFfi;
+            }
         }
     }
 
