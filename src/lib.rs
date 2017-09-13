@@ -133,13 +133,20 @@ mod tok;
 /// ```
 ///
 /// # Necessary imports
-/// The generated code depends on the glib crate's macros, so you must
-/// import glib like this before using `gobject_gen!()`:
+///
+/// The generated code depends on external crates which you must put in your `Cargo.toml`:
+///
+/// * The `libc` crate
+/// * The `glib` crate and its macros
+///
+/// At the top of your crate's main file, you must declare macro use
+/// for the `glib` crate:
 ///
 /// ```ignore
 /// #[macro_use]
 /// extern crate glib;
 /// ```
+///
 #[proc_macro]
 pub fn gobject_gen(input: TokenStream) -> TokenStream {
     let input = input.to_string();
