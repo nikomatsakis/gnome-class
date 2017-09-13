@@ -384,13 +384,13 @@ impl<'ast> ClassContext<'ast> {
             // }
         }
     }
-
+/*
     fn impls(&self) -> Tokens {
         let InstanceName = self.class.name;
         let FieldsName = self.FieldsName;
         let GClassName = self.GClassName;
         let GObject = &self.GObject;
-        let ParentGClass = &self.ParentGClass;
+        let ParentClassFfi = &self.ParentClassFfi;
 
         let get_type_fn = self.get_type_fn();
 
@@ -416,7 +416,7 @@ impl<'ast> ClassContext<'ast> {
             }
 
             unsafe impl ::gnome_class_shims::GSubclass for #GClassName {
-                type ParentClass = #ParentGClass;
+                type ParentClass = #ParentClassFfi;
             }
 
             unsafe impl ::gnome_class_shims::GFields for #FieldsName {
@@ -442,6 +442,7 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
+*/
 
     pub fn init_fn(&self) -> Tokens {
         let init_member = self.class.members
