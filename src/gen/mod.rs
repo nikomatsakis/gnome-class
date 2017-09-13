@@ -81,9 +81,9 @@ impl<'ast> ClassContext<'ast> {
             str: intern(&format!("{}Class", class.name.str))
         };
 
-        let GObject = quote! { ::glib::Object };
-        let GObjectFfi = quote! { ::gobject_ffi::GObject };
-        let GObjectClassFfi = quote! { ::gobject_ffi::GObjectClass };
+        let GObject = quote! { glib::Object };
+        let GObjectFfi = quote! { gobject_ffi::GObject };
+        let GObjectClassFfi = quote! { gobject_ffi::GObjectClass };
 
         // GObject is hardcoded in various places below
         let ParentInstance =
@@ -99,7 +99,7 @@ impl<'ast> ClassContext<'ast> {
                  .map(|c| quote! { #c })
                  .unwrap_or_else(|| GObjectFfi.clone());
         let ParentClassFfi = quote! {
-            <#ParentInstance as ::glib::Wrapper>::GlibType
+            <#ParentInstance as glib::wrapper::Wrapper>::GlibType
         };
 
         let InstanceName = class.name;
@@ -157,7 +157,7 @@ impl<'ast> ClassContext<'ast> {
 
     fn callback_guard(&self) -> Tokens {
         quote! {
-            let _guard = ::glib::CallbackGuard::new();
+            let _guard = glib::CallbackGuard::new();
         }
     }
 
@@ -166,29 +166,27 @@ impl<'ast> ClassContext<'ast> {
             extern crate glib_sys as glib_ffi;
             extern crate gobject_sys as gobject_ffi;
 
-            #[macro_use]
+            // #[macro_use]
             extern crate glib;
 
             extern crate libc;
 
-            use glib_ffi;
-            use gobject_ffi;
-
-            use glib;
             use glib::{IsA, Value};
             use glib::object::Downcast;
             use glib::signal::connect;
             use glib::translate::*;
 
-            use libc;
             use std::ptr;
             use std::mem;
             use std::mem::transmute;
 
+            // #[cfg(feature = "bindings")]
             // mod ffi;
-            pub mod imp {
-                pub use ffi::*;
-            }
+
+            // #[cfg(feature = "bindings")]
+            // pub mod imp {
+            //     pub use ffi::*;
+            // }
         }
     }
 
@@ -219,14 +217,13 @@ impl<'ast> ClassContext<'ast> {
 
         quote! {
             pub mod imp {
-                extern crate glib_sys as glib_ffi;
-                extern crate glib_sys as gobject_ffi;
-
-                use glib_ffi;
-                use gobject_ffi;
+                use super::glib;
+                use super::glib_ffi;
+                use super::gobject_ffi;
+                use super::libc;
 
                 use std::mem;
-                use libc;
+                use glib::translate::*;
 
                 #instance_struct
                 #get_type_fn
@@ -260,6 +257,7 @@ impl<'ast> ClassContext<'ast> {
                 #callback_guard
 
                 use std::sync::{Once, ONCE_INIT};
+                use std::u16;
 
                 static mut TYPE: glib_ffi::GType = gobject_ffi::G_TYPE_INVALID;
                 static ONCE: Once = ONCE_INIT;
@@ -272,7 +270,7 @@ impl<'ast> ClassContext<'ast> {
                     assert!(instance_size <= u16::MAX as usize);
 
                     TYPE = gobject_ffi::g_type_register_static_simple(
-                        #ParentInstance::static_type().to_glib(),
+                        <#ParentInstance as glib::StaticType>::static_type().to_glib(),
                         #instance_name_string as *const libc::c_char,
                         class_size as u32,
                         Some(#GClassName::init),
@@ -793,6 +791,7 @@ impl<'ast> ClassContext<'ast> {
         let byte_string = ByteString(self.class.name);
         let register = quote! {
             fn register() -> GType {
+                use std::u16;
                 unsafe {
                     let class_size = mem::size_of::<#GClassName>();
                     assert!(class_size <= u16::MAX as usize);
