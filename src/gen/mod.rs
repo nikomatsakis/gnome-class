@@ -217,6 +217,7 @@ impl<'ast> ClassContext<'ast> {
             self.imp_class_struct(),
             self.imp_properties_enum(),
             self.imp_signals_enum(),
+            self.imp_private_struct(),
             self.imp_get_type_fn(),
         ];
 
@@ -322,6 +323,17 @@ impl<'ast> ClassContext<'ast> {
                 });
 
                 TYPE
+            }
+        }
+    }
+
+    fn imp_private_struct(&self) -> Tokens {
+        let PrivateName = self.private_struct.name;
+        let private_struct_fields = &self.private_struct.fields;
+
+        quote! {
+            struct #PrivateName {
+                #(#private_struct_fields),*
             }
         }
     }
