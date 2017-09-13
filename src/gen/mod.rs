@@ -212,11 +212,13 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn imp_module(&self) -> Tokens {
-        let instance_struct = self.imp_instance_struct();
-        let class_struct = self.imp_class_struct();
-        let properties_enum = self.imp_properties_enum();
-        let signals_enum = self.imp_signals_enum();
-        let get_type_fn = self.imp_get_type_fn();
+        let all = vec![
+            self.imp_instance_struct(),
+            self.imp_class_struct(),
+            self.imp_properties_enum(),
+            self.imp_signals_enum(),
+            self.imp_get_type_fn(),
+        ];
 
         quote! {
             pub mod imp {
@@ -228,11 +230,7 @@ impl<'ast> ClassContext<'ast> {
                 use std::mem;
                 use glib::translate::*;
 
-                #instance_struct
-                #class_struct
-                #properties_enum
-                #signals_enum
-                #get_type_fn
+                #(#all)*
             }
         }
     }
