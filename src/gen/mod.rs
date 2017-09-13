@@ -418,6 +418,7 @@ impl<'ast> ClassContext<'ast> {
             self.instance_get_class_fn(),
             self.instance_get_priv_fn(),
             self.instance_init_fn(),
+            self.instance_finalize_fn(),
         ];
 
         quote! {
@@ -477,6 +478,29 @@ impl<'ast> ClassContext<'ast> {
                 // but we don't really want to have any Drop impls run here so just overwrite the
                 // data.
                 ptr::write(private, Some(#PrivateName::new()));
+            }
+        }
+    }
+
+    fn instance_finalize_fn(&self) -> Tokens {
+        let callback_guard = self.callback_guard();
+        let get_type_fn_name = self.get_type_fn_name();
+        let PrivateName = self.private_struct.name;
+
+        quote! {
+            unsafe extern "C" fn finalize(obj: *mut gobject_ffi::GObject) {
+                #callback_guard
+
+                let private = gobject_ffi::g_type_instance_get_private(
+                    obj as *mut gobject_ffi::GTypeInstance,
+                    #get_type_fn_name(),
+                ) as *mut Option<#PrivateName>;
+
+                // Drop contents of private data by replacing its
+                // Option container with None
+                let _ = (*private).take();
+
+                (*PRIV.parent_class).finalize.map(|f| f(obj));
             }
         }
     }
