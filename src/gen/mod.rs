@@ -43,6 +43,7 @@ struct ClassContext<'ast> {
     ModuleName: Identifier,
     FieldsName: Identifier,
     GClassName: Identifier,
+    PrivateClassName: Identifier,
     MethodsFrom: Identifier,
     ParentInstance: Tokens,
     ParentInstanceFfi: Tokens,
@@ -79,6 +80,10 @@ impl<'ast> ClassContext<'ast> {
 
         let GClassName = Identifier {
             str: intern(&format!("{}Class", class.name.str))
+        };
+
+        let PrivateClassName = Identifier {
+            str: intern(&format!("{}ClassPrivate", class.name.str))
         };
 
         let GObject = quote! { glib::Object };
@@ -119,6 +124,7 @@ impl<'ast> ClassContext<'ast> {
             ModuleName,
             FieldsName,
             GClassName,
+            PrivateClassName,
             MethodsFrom,
             ParentInstance,
             ParentInstanceFfi,
@@ -218,6 +224,7 @@ impl<'ast> ClassContext<'ast> {
             self.imp_properties_enum(),
             self.imp_signals_enum(),
             self.imp_private_struct(),
+            self.imp_class_private_struct(),
             self.imp_get_type_fn(),
         ];
 
@@ -229,6 +236,8 @@ impl<'ast> ClassContext<'ast> {
                 use super::libc;
 
                 use std::mem;
+                use std::ptr;
+
                 use glib::translate::*;
 
                 #(#all)*
@@ -335,6 +344,25 @@ impl<'ast> ClassContext<'ast> {
             struct #PrivateName {
                 #(#private_struct_fields),*
             }
+        }
+    }
+
+    fn imp_class_private_struct(&self) -> Tokens {
+        let PrivateClassName = &self.PrivateClassName;
+        let ParentClassFfi = &self.ParentClassFfi;
+
+        quote! {
+            struct #PrivateClassName {
+                parent_class: *const #ParentClassFfi,
+                properties:   *const Vec<*const gobject_ffi::GParamSpec>,
+                signals:      *const Vec<u32>
+            }
+
+            static mut PRIV: #PrivateClassName = #PrivateClassName {
+                parent_class: ptr::null(),
+                properties:   ptr::null(),
+                signals:      ptr::null(),
+            };
         }
     }
 
