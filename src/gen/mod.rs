@@ -233,6 +233,7 @@ impl<'ast> ClassContext<'ast> {
 
         quote! {
             pub mod imp {
+                use super::super::*;
                 use super::glib;
                 use super::glib_ffi;
                 use super::gobject_ffi;
