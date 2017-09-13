@@ -370,8 +370,27 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn imp_instance(&self) -> Tokens {
+        let InstanceName = self.class.name;
+        let instance_get_class_fn = self.instance_get_class_fn();
+
         quote! {
-            // FIXME
+            impl #InstanceName {
+                #instance_get_class_fn
+                // FIXME
+            }
+        }
+    }
+
+    fn instance_get_class_fn(&self) -> Tokens {
+        let GClassName = &self.GClassName;
+
+        quote! {
+            fn get_class(&self) -> &#GClassName {
+                unsafe {
+                    let klass = (*(self as *const _ as *const gobject_ffi::GTypeInstance)).g_class;
+                    &*(klass as *const #GClassName)
+                }
+            }
         }
     }
 
