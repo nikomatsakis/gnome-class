@@ -409,16 +409,16 @@ impl<'ast> ClassContext<'ast> {
 
     fn imp_instance(&self) -> Tokens {
         let InstanceName = self.class.name;
-        let instance_get_class_fn = self.instance_get_class_fn();
-        let instance_get_priv_fn = self.instance_get_priv_fn();
-        let instance_init_fn = self.instance_init_fn();
+
+        let all = vec![
+            self.instance_get_class_fn(),
+            self.instance_get_priv_fn(),
+            self.instance_init_fn(),
+        ];
 
         quote! {
             impl #InstanceName {
-                #instance_get_class_fn
-                #instance_get_priv_fn
-                #instance_init_fn
-                // FIXME
+                #(#all)*
             }
         }
     }
