@@ -33,7 +33,87 @@ mod tok;
 /// boilerplate needed to register the GObject type, its signals and
 /// properties, etc., is automatically generated.
 ///
-/// # Syntax: simple class derived from glib::Object
+/// # Syntax overview {#syntax-overview}
+///
+/// The macro is invoked as follows:
+///
+/// ```ignore
+/// #[macro_use]
+/// extern crate glib;  // see "Necessary imports" below on why this is needed
+///
+/// gobject_gen! {
+///     class Foo {
+///         struct FooPrivate {
+///             // ... your instance data here
+///         }
+///
+///         // Optional private_init() function, see below
+///
+///         // Methods and signals;, their order defines the ABI of your class
+///     }
+/// }
+/// ```
+///
+/// # Private structure and the optional `private_init()` function
+///
+/// All GObject classes defined through this macro must have a
+/// declaration for a private structure, which is used for each
+/// instance's private data.
+///
+/// Within the macro invocation, you can declare the private structure
+/// as for `FooPrivate` in the [syntax overview][syntax-overview] above.
+///
+/// If you don't do anything else, all the fields in your `FooPrivate` structure
+/// will be initialized to `Default::default()` — this implies that all the types 
+/// of your struct's fields must implement the `Default` trait.
+///
+/// Alternatively, you can define a special `private_init()` function
+/// that will be used to initialize your private structure from custom
+/// values.  This function must return a value of the same type as
+/// your private structure; this value will be used by the GObject
+/// system to initialize your `FooPrivate`:
+///
+/// ```ignore
+/// gobject_gen! {
+///     class FooWithCustomInit {
+///         struct FooPrivate {
+///             bar: SomeType,
+///             baz: SomeOtherType,
+///         }
+///
+///         private_init() -> FooPrivate {
+///             // Provide the initial value of FooPrivate as our return value
+///             FooPrivate {
+///                 bar: SomeType::new(...),
+///                 baz: SomeOtherType::new(...),
+///             }
+///         }
+///     }
+/// }
+/// ```
+///
+/// **Note**: the `private_init()` function does not take `&self`.
+/// Its only purpose is to provide an initial value for your private
+/// structure.  At the point which `private_init()` is run, your
+/// `FooWithCustomInit` instance is not even fully initialized nor
+/// constructed.  From `private_init()`, just return a `FooPrivate`
+/// that is suitable for your instance's initial state.
+///
+/// [syntax-overview]: #syntax-overview
+///
+/// # ABI considerations
+///
+/// FIXME
+///
+/// # Declaring methods
+///
+/// FIXME
+///
+/// # Declaring signals
+///
+/// FIXME
+///
+/// # Example: simple class derived from glib::Object
 ///
 /// ```ignore
 /// #[macro_use]

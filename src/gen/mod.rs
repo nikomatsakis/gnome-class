@@ -342,10 +342,48 @@ impl<'ast> ClassContext<'ast> {
     fn imp_private_struct(&self) -> Tokens {
         let PrivateName = self.private_struct.name;
         let private_struct_fields = &self.private_struct.fields;
+        let private_init_fn_body = &self.private_init_fn_body();
 
         quote! {
             struct #PrivateName {
                 #(#private_struct_fields),*
+            }
+
+            impl #PrivateName {
+                pub fn new() -> Self #private_init_fn_body
+            }
+        }
+    }
+
+    fn private_init_fn_body(&self) -> Tokens {
+        // If the user had a "private_init()" method, we want to use it as an initializer
+        // for the private struct.
+        //
+        // Otherwise, just initialize all of the struct's fields to Default::default().
+
+        let private_init_member =
+            self.class.members
+            .iter()
+            .filter_map(|m| match *m {
+                Member::PrivateInit(ref f) => Some(f),
+                _ => None,
+            })
+            .next();
+
+        if let Some(i) = private_init_member {
+            quote! { #i }
+        } else {
+            let PrivateName = self.private_struct.name;
+            let private_struct_field_names =
+                self.private_struct.fields
+                                   .iter()
+                                   .map(|f| f.name);
+            quote! {
+                {
+                    #PrivateName {
+                        #(#private_struct_field_names: Default::default()),*
+                    }
+                }
             }
         }
     }
@@ -612,32 +650,6 @@ impl<'ast> ClassContext<'ast> {
         }
     }
 */
-
-    pub fn init_fn(&self) -> Tokens {
-        let init_member = self.class.members
-                                    .iter()
-                                    .filter_map(|m| match *m {
-                                        Member::Init(ref f) => Some(f),
-                                        _ => None,
-                                    })
-                                    .next();
-        if let Some(i) = init_member {
-            quote! { #i }
-        } else {
-            let PrivateName = self.private_struct.name;
-            let private_struct_field_names =
-                self.private_struct.fields
-                                   .iter()
-                                   .map(|f| f.name);
-            quote! {
-                {
-                    #PrivateName {
-                        #(#private_struct_field_names: Default::default()),*
-                    }
-                }
-            }
-        }
-    }
 
     pub fn methods(&self) -> impl Iterator<Item = &'ast Method> {
         self.class

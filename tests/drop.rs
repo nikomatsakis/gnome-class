@@ -39,7 +39,7 @@ gobject_gen! {
             dc: RefCell<DropCounter>
         }
 
-        init {
+        private_init() -> DummyPrivate {
             DummyPrivate {
                 dc: RefCell::new(DropCounter::new())
             }

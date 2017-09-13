@@ -33,7 +33,7 @@ pub enum Tok<'input> {
     AsKeyword, // `as`
     StructKeyword, // `struct`
     FnKeyword, // `fn`
-    InitKeyword, // `init`
+    PrivateInitKeyword, // `private_init`
     SelfKeyword, // `self`
     SuperKeyword, // `super`
     ExtendsKeyword, // `extends`
@@ -77,7 +77,7 @@ const KEYWORDS: &'static [(&'static str, Tok<'static>)] = &[
     ("class", ClassKeyword),
     ("struct", StructKeyword),
     ("fn", FnKeyword),
-    ("init", InitKeyword),
+    ("private_init", PrivateInitKeyword),
     ("extends", ExtendsKeyword),
     ("signal", SignalKeyword),
     ("self", SelfKeyword),

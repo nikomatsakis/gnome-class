@@ -16,7 +16,7 @@ pub struct Class {
 #[derive(Debug)]
 pub enum Member {
     PrivateStruct(PrivateStruct),
-    Init(CodeBlock),
+    PrivateInit(CodeBlock),
     Method(Method),
     Signal(Signal),
 }
