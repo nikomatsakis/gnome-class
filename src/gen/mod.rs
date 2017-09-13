@@ -213,6 +213,7 @@ impl<'ast> ClassContext<'ast> {
 
     fn imp_module(&self) -> Tokens {
         let instance_struct = self.imp_instance_struct();
+        let class_struct = self.imp_class_struct();
         let get_type_fn = self.imp_get_type_fn();
 
         quote! {
@@ -226,6 +227,7 @@ impl<'ast> ClassContext<'ast> {
                 use glib::translate::*;
 
                 #instance_struct
+                #class_struct
                 #get_type_fn
             }
         }
@@ -239,6 +241,19 @@ impl<'ast> ClassContext<'ast> {
             #[repr(C)]
             pub struct #InstanceName {
                 pub parent: #ParentInstanceFfi,
+            }
+        }
+    }
+
+    fn imp_class_struct(&self) -> Tokens {
+        let ClassName = self.GClassName;
+        let ParentClassFfi = &self.ParentClassFfi;
+
+        quote! {
+            #[repr(C)]
+            pub struct #ClassName {
+                pub parent_class: #ParentClassFfi,
+                // FIXME: method/signal prototypes
             }
         }
     }
