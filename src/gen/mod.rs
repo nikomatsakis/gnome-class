@@ -372,10 +372,12 @@ impl<'ast> ClassContext<'ast> {
     fn imp_instance(&self) -> Tokens {
         let InstanceName = self.class.name;
         let instance_get_class_fn = self.instance_get_class_fn();
+        let instance_get_priv_fn = self.instance_get_priv_fn();
 
         quote! {
             impl #InstanceName {
                 #instance_get_class_fn
+                #instance_get_priv_fn
                 // FIXME
             }
         }
@@ -389,6 +391,25 @@ impl<'ast> ClassContext<'ast> {
                 unsafe {
                     let klass = (*(self as *const _ as *const gobject_ffi::GTypeInstance)).g_class;
                     &*(klass as *const #GClassName)
+                }
+            }
+        }
+    }
+
+    fn instance_get_priv_fn(&self) -> Tokens {
+        let InstanceName = self.class.name;
+        let PrivateName = self.private_struct.name;
+        let get_type_fn_name = self.get_type_fn_name();
+
+        quote! {
+            fn get_priv(&self) -> &#PrivateName {
+                unsafe {
+                    let private = gobject_ffi::g_type_instance_get_private(
+                        self as *const _ as *mut gobject_ffi::GTypeInstance,
+                        #get_type_fn_name(),
+                    ) as *const #PrivateName;
+
+                    &*private
                 }
             }
         }
