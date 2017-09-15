@@ -104,7 +104,7 @@ impl<'ast> ClassContext<'ast> {
                  .map(|c| quote! { #c })
                  .unwrap_or_else(|| GObjectFfi.clone());
         let ParentClassFfi = quote! {
-            <#ParentInstance as glib::wrapper::Wrapper>::GlibType
+            <#ParentInstance as glib::wrapper::Wrapper>::GlibClassType
         };
 
         let InstanceName = class.name;
