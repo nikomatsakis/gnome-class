@@ -272,11 +272,40 @@ impl<'ast> ClassContext<'ast> {
         let ClassName = self.GClassName;
         let ParentClassFfi = &self.ParentClassFfi;
 
+        // ABI: we are generating the imp::FooClass with the parent_class, and the slots to signals/methods.
+        // This defines the C ABI for the class structure.
+        //
+        // FIXME: we should check that the extern "C" signatures only have types representable by C.
+
+        let slots: Vec<Tokens> = self.members_with_slots()
+            .map(|member| {
+                let (slot_name, slot_fn_ty) = match *member {
+                    Member::Method(ref method) => (method.name,
+                                                   MethodTy {
+                                                       class_name: self.class.name,
+                                                       sig: &method.fn_def.sig
+                                                   }),
+
+                    Member::Signal(ref signal) => (signal.name,
+                                                   MethodTy {
+                                                       class_name: self.class.name,
+                                                       sig: &signal.sig
+                                                   }),
+
+                    _ => unreachable! ()
+                };
+
+                quote! {
+                    pub #slot_name: #slot_fn_ty,
+                }
+            })
+            .collect();
+
         quote! {
             #[repr(C)]
             pub struct #ClassName {
                 pub parent_class: #ParentClassFfi,
-                // FIXME: method/signal prototypes
+                #(#slots)*
             }
         }
     }
@@ -785,6 +814,17 @@ impl<'ast> ClassContext<'ast> {
             })
     }
 
+    pub fn members_with_slots(&self) -> impl Iterator<Item = &'ast Member> {
+        self.class
+            .members
+            .iter()
+            .filter_map(|member| match *member {
+                Member::Method(_) => Some(member),
+                Member::Signal(_) => Some(member),
+                _ => None,
+            })
+    }
+
     /// From a signal called `foo`, generate `foo_signal_id`.  This is used to
     /// store the signal ids from g_signal_newv() in the Class structure.
     pub fn signal_id_names(&self) -> Vec<Identifier> {
@@ -1223,7 +1263,7 @@ impl<'ast> ToTokens for MethodTy<'ast> {
 
         quote_in! {
             tokens,
-            extern fn(&#class_name, #(#arg_tys),*) #return_ty
+            Option<unsafe extern "C" fn(*mut #class_name, #(#arg_tys),*) #return_ty>
         }
     }
 }
