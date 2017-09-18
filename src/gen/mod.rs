@@ -583,6 +583,7 @@ impl<'ast> ClassContext<'ast> {
         let GClassName = &self.GClassName;
         let ParentClassFfi = &self.ParentClassFfi;
         let PrivateName = self.private_struct.name;
+        let slot_assignments = self.slot_assignments();
 
         quote! {
             unsafe extern "C" fn init(klass: glib_ffi::gpointer, _klass_data: glib_ffi::gpointer) {
@@ -606,11 +607,10 @@ impl<'ast> ClassContext<'ast> {
 
                 }
 
-                // Methods
+                // Slots
                 {
                     let klass = &mut *(klass as *mut #GClassName);
-                    // FIXME: klass.method1 = Some(#InstanceName::method1_trampoline);
-                    // FIXME: klass.method2 = Some(#InstanceName::method2_trampoline);
+                    #(#slot_assignments)*
                 }
 
                 // Signals
@@ -823,6 +823,28 @@ impl<'ast> ClassContext<'ast> {
                 Member::Signal(_) => Some(member),
                 _ => None,
             })
+    }
+
+    fn slot_assignments(&self) -> Vec<Tokens> {
+        let InstanceName = self.class.name;
+
+        self.members_with_slots()
+            .map(|member| {
+                let slot_name = match *member {
+                    Member::Method(ref method) => method.name,
+                    Member::Signal(ref signal) => signal.name,
+                    _ => unreachable!()
+                };
+
+                let slot_trampoline = Identifier {
+                    str: intern(&format!("{}_trampoline", slot_name.str))
+                };
+
+                quote! {
+                    klass.#slot_name = Some(#InstanceName::#slot_trampoline);
+                }
+            })
+            .collect()
     }
 
     /// From a signal called `foo`, generate `foo_signal_id`.  This is used to
