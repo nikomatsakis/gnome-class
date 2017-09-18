@@ -141,6 +141,7 @@ impl<'ast> ClassContext<'ast> {
             self.imports(),
             self.glib_wrapper(),
             self.imp_module(),
+            self.pub_impl(),
 //            self.impls(),
 //            self.methods_declared_in_instance(),
 //            self.always_impl(),
@@ -227,7 +228,7 @@ impl<'ast> ClassContext<'ast> {
             self.imp_class_private_struct(),
             self.imp_instance(),
             self.imp_class(),
-            // FIXME self.imp_extern_funcs(),
+            self.imp_extern_funcs(),
             self.imp_get_type_fn(),
         ];
 
@@ -340,6 +341,35 @@ impl<'ast> ClassContext<'ast> {
 
                 TYPE
             }
+        }
+    }
+
+    fn pub_impl(&self) -> Tokens {
+        let InstanceName = self.class.name;
+        let pub_new_method = self.pub_new_method();
+
+        quote! {
+            impl #InstanceName {
+                #pub_new_method
+            }
+        }
+    }
+
+    fn pub_new_method(&self) -> Tokens {
+        let InstanceName = self.class.name;
+        let imp_new_fn_name = self.imp_new_fn_name();
+
+        // FIXME: we should take construct-only arguments and other convenient args to new()
+        quote! {
+            pub fn new() -> #InstanceName {
+                unsafe { from_glib_full(imp::#imp_new_fn_name(/* FIXME: args */)) }
+            }
+        }
+    }
+
+    fn imp_new_fn_name(&self) -> Identifier {
+        Identifier {
+            str: intern(&format!("{}_new", self.lower_case_class_name()))
         }
     }
 
@@ -559,6 +589,36 @@ impl<'ast> ClassContext<'ast> {
                 }
 
                 PRIV.parent_class = gobject_ffi::g_type_class_peek_parent(klass) as *const #ParentClassFfi;
+            }
+        }
+    }
+
+    fn imp_extern_funcs(&self) -> Tokens {
+        let imp_new_fn = self.imp_new_fn();
+
+        quote! {
+            #imp_new_fn
+        }
+    }
+
+    fn imp_new_fn(&self) -> Tokens {
+        let imp_new_fn_name = self.imp_new_fn_name();
+        let InstanceName = self.class.name;
+        let callback_guard = self.callback_guard();
+        let get_type_fn_name = self.get_type_fn_name();
+
+        quote! {
+            #[no_mangle]
+            pub unsafe extern "C" fn #imp_new_fn_name(/* FIXME: args */) -> *mut #InstanceName {
+                #callback_guard
+
+                let this = gobject_ffi::g_object_newv(
+                    #get_type_fn_name(),
+                    0,
+                    ptr::null_mut()
+                );
+
+                this as *mut #InstanceName
             }
         }
     }
