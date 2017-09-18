@@ -142,11 +142,11 @@ impl<'ast> ClassContext<'ast> {
             self.glib_wrapper(),
             self.imp_module(),
             self.pub_impl(),
+            self.instance_ext(),
+            self.instance_ext_impl(),
 //            self.impls(),
 //            self.methods_declared_in_instance(),
 //            self.always_impl(),
-//            self.instance_ext(),
-//            self.instance_ext_impl(),
 //            self.signal_trampolines(),
 //            self.c_symbols(),
         ];
@@ -653,8 +653,7 @@ impl<'ast> ClassContext<'ast> {
         let InstanceExt = self.InstanceExt;
         let method_redirects = self.method_redirects();
         quote! {
-            // FIXME: impl<O: IsA<#InstanceName> + IsA<glib::object::Object>> #InstanceExt for O {
-            impl #InstanceExt for #InstanceName {
+            impl<O: IsA<#InstanceName> + IsA<glib::object::Object>> #InstanceExt for O {
                 #(#method_redirects)*
 
                 // FIXME: property setters/getters like in glib-rs
@@ -959,28 +958,27 @@ impl<'ast> ClassContext<'ast> {
         }
     }
 
-    /// Returns, for each method `foo`, something like:
-    ///
-    /// ```notest
-    /// fn foo(&self, arg: u32) {
-    ///     (get_class(self).foo.unwrap())(self, arg)
-    /// }
-    /// ```
     fn method_redirects(&self) -> Vec<Tokens> {
         self.methods()
             .map(|method| {
                 let name = method.name;
+                let ffi_name = self.method_ffi_name(method);
                 let arg_decls = method.fn_def.sig.arg_decls();
                 let arg_names = method.fn_def.sig.arg_names();
                 let return_ty = method.fn_def.sig.return_ty();
                 quote! {
                     fn #name(&self, #arg_decls) #return_ty {
-                        let klass = ::gnome_class_shims::get_class(self);
-                        (klass.#name.unwrap())(self, #arg_names)
+                        unsafe { imp::#ffi_name(self.to_glib_none().0, #arg_names) }
                     }
                 }
             })
             .collect()
+    }
+
+    fn method_ffi_name(&self, method: &Method) -> Identifier {
+        Identifier {
+            str: intern(&format!("{}_{}", self.lower_case_class_name(), method.name.str))
+        }
     }
 
     fn lower_case_class_name(&self) -> String {
