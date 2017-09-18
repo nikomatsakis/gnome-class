@@ -196,10 +196,14 @@ impl<'ast> ClassContext<'ast> {
         }
     }
 
-    fn get_type_fn_name(&self) -> Identifier {
+    fn exported_fn_name(&self, method_name: &str) -> Identifier {
         Identifier {
-            str: intern(&format!("{}_get_type", self.lower_case_class_name()))
+            str: intern(&format!("{}_{}", self.lower_case_class_name(), method_name))
         }
+    }
+
+    fn get_type_fn_name(&self) -> Identifier {
+        self.exported_fn_name("get_type")
     }
 
     fn glib_wrapper(&self) -> Tokens {
@@ -367,9 +371,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn imp_new_fn_name(&self) -> Identifier {
-        Identifier {
-            str: intern(&format!("{}_new", self.lower_case_class_name()))
-        }
+        self.exported_fn_name("new")
     }
 
     fn imp_private_struct(&self) -> Tokens {
@@ -971,9 +973,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn method_ffi_name(&self, method: &Method) -> Identifier {
-        Identifier {
-            str: intern(&format!("{}_{}", self.lower_case_class_name(), method.name.str))
-        }
+        self.exported_fn_name(&method.name.str.to_string())
     }
 
     fn lower_case_class_name(&self) -> String {
