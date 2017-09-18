@@ -281,13 +281,13 @@ impl<'ast> ClassContext<'ast> {
             .map(|member| {
                 let (slot_name, slot_fn_ty) = match *member {
                     Member::Method(ref method) => (method.name,
-                                                   MethodTy {
+                                                   SlotTy {
                                                        class_name: self.class.name,
                                                        sig: &method.fn_def.sig
                                                    }),
 
                     Member::Signal(ref signal) => (signal.name,
-                                                   MethodTy {
+                                                   SlotTy {
                                                        class_name: self.class.name,
                                                        sig: &signal.sig
                                                    }),
@@ -883,7 +883,7 @@ impl<'ast> ClassContext<'ast> {
     pub fn method_fn_tys(&self) -> Vec<Tokens> {
         self.methods()
             .map(|method| {
-                let method_fn_ty = MethodTy {
+                let method_fn_ty = SlotTy {
                     class_name: self.class.name,
                     sig: &method.fn_def.sig
                 };
@@ -1250,12 +1250,12 @@ impl ToTokens for CodeBlock {
     }
 }
 
-struct MethodTy<'ast> {
+struct SlotTy<'ast> {
     class_name: Identifier,
     sig: &'ast FnSig,
 }
 
-impl<'ast> ToTokens for MethodTy<'ast> {
+impl<'ast> ToTokens for SlotTy<'ast> {
     fn to_tokens(&self, tokens: &mut Tokens) {
         let class_name = self.class_name;
         let arg_tys = self.sig.args.iter().map(|a| &a.ty);
