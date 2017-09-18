@@ -70,21 +70,21 @@ impl<'ast> ClassContext<'ast> {
             None => bail!("no private struct found")
         };
 
-        let ModuleName = Identifier {
-            str: intern(&format!("{}Mod", class.name.str))
-        };
+        // If our class name is "Foo" and we have a suffix "Bar", generates a "FooBar" Identifier.
+        // These are used for the generated module name, instance/class struct names, etc.
+        macro_rules! container_name {
+            ($class:expr, $suffix:expr) => {
+                Identifier {
+                    str: intern(&format!("{}{}", $class.name.str, $suffix))
+                }
+            };
+        }
 
-        let FieldsName = Identifier {
-            str: intern(&format!("{}Fields", class.name.str))
-        };
-
-        let GClassName = Identifier {
-            str: intern(&format!("{}Class", class.name.str))
-        };
-
-        let PrivateClassName = Identifier {
-            str: intern(&format!("{}ClassPrivate", class.name.str))
-        };
+        let ModuleName       = container_name!(class, "Mod"); // toplevel "InstanceMod" module name
+        let FieldsName       = container_name!(class, "Fields");
+        let GClassName       = container_name!(class, "Class");
+        let PrivateClassName = container_name!(class, "ClassPrivate");
+        let InstanceExt      = container_name!(class, "Ext"); // public trait with all the class's methods
 
         let GObject = quote! { glib::Object };
         let GObjectFfi = quote! { gobject_ffi::GObject };
@@ -110,11 +110,6 @@ impl<'ast> ClassContext<'ast> {
         let InstanceName = class.name;
         let MethodsFrom = Identifier {
             str: intern(&format!("__methods_from_{}", InstanceName.str))
-        };
-
-        // Public trait with all the class's methods
-        let InstanceExt = Identifier {
-            str: intern(&format!("{}Ext", class.name.str))
         };
 
         Ok(ClassContext {
