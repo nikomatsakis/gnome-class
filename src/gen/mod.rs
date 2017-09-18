@@ -479,6 +479,12 @@ impl<'ast> ClassContext<'ast> {
             self.instance_get_priv_fn(),
             self.instance_init_fn(),
             self.instance_finalize_fn(),
+            // self.instance_set_property_fn(),
+            // self.instance_get_property_fn(),
+            // self.instance_method_trampolines()
+            // self.instance_signal_trampolines()
+            // self.instance_method_impls()
+            // self.instance_default_signal_handlers()
         ];
 
         quote! {
