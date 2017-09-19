@@ -1286,12 +1286,12 @@ struct SlotTy<'ast> {
 impl<'ast> ToTokens for SlotTy<'ast> {
     fn to_tokens(&self, tokens: &mut Tokens) {
         let class_name = self.class_name;
-        let arg_tys = self.sig.args.iter().map(|a| &a.ty);
+        let arg_decls = self.sig.arg_decls();
         let return_ty = self.sig.return_ty();
 
         quote_in! {
             tokens,
-            Option<unsafe extern "C" fn(*mut #class_name, #(#arg_tys),*) #return_ty>
+            Option<unsafe extern "C" fn(this: *mut #class_name, #arg_decls) #return_ty>
         }
     }
 }
