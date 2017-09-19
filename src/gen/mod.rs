@@ -141,7 +141,6 @@ impl<'ast> ClassContext<'ast> {
             self.instance_ext_impl(),
 //            self.impls(),
 //            self.methods_declared_in_instance(),
-//            self.always_impl(),
 //            self.signal_trampolines(),
 //            self.c_symbols(),
         ];
@@ -976,51 +975,6 @@ impl<'ast> ClassContext<'ast> {
                 }
             })
             .collect()
-    }
-
-    fn always_impl(&self) -> Tokens {
-        let InstanceName = self.class.name;
-        let PrivateName = self.private_struct.name;
-        let ParentInstance = &self.ParentInstance;
-
-        quote! {
-            impl #InstanceName {
-                pub fn new() -> #InstanceName {
-                    use gnome_class_shims::GInstance;
-                    use gnome_class_shims::gobject_sys::{self, GObject};
-                    use std::ptr;
-
-                    unsafe {
-                        let data: *mut GObject =
-                            gobject_sys::g_object_new(
-                                #InstanceName::get_type(),
-                                ptr::null_mut());
-                        #InstanceName::from_gobject_ptr(data)
-                    }
-                }
-
-                #[allow(dead_code)]
-                fn private(&self) -> &#PrivateName {
-                    use gnome_class_shims::GInstance;
-                    use gnome_class_shims::gobject_sys::{self, GTypeInstance};
-
-                    unsafe {
-                        let this = GInstance::to_gobject_ptr(self) as *mut GTypeInstance;
-                        let private = gobject_sys::g_type_instance_get_private(this, #InstanceName::get_type());
-                        let private = private as *const #PrivateName;
-                        &*private
-                    }
-                }
-
-                #[allow(dead_code)]
-                pub fn upcast(&self) -> &#ParentInstance {
-                    use gnome_class_shims::GInstance;
-                    unsafe {
-                        GInstance::borrow_gobject_ptr(&self.parent)
-                    }
-                }
-            }
-        }
     }
 
     fn method_redirects(&self) -> Vec<Tokens> {
