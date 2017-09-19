@@ -296,7 +296,7 @@ impl<'ast> ClassContext<'ast> {
                 };
 
                 quote! {
-                    pub #slot_name: #slot_fn_ty,
+                    pub #slot_name: Option<unsafe extern "C" fn#slot_fn_ty>,
                 }
             })
             .collect();
@@ -1291,7 +1291,7 @@ impl<'ast> ToTokens for SlotTy<'ast> {
 
         quote_in! {
             tokens,
-            Option<unsafe extern "C" fn(this: *mut #class_name, #arg_decls) #return_ty>
+            (this: *mut #class_name, #arg_decls) #return_ty
         }
     }
 }
