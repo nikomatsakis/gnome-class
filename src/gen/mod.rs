@@ -480,7 +480,7 @@ impl<'ast> ClassContext<'ast> {
             self.instance_finalize_fn(),
             // self.instance_set_property_fn(),
             // self.instance_get_property_fn(),
-            // self.instance_method_trampolines()
+            self.instance_method_trampolines()
             // self.instance_signal_trampolines()
             // self.instance_method_impls()
             // self.instance_default_signal_handlers()
@@ -567,6 +567,39 @@ impl<'ast> ClassContext<'ast> {
 
                 (*PRIV.parent_class).finalize.map(|f| f(obj));
             }
+        }
+    }
+
+    fn instance_method_trampolines(&self) -> Tokens {
+        let callback_guard = self.callback_guard();
+        let InstanceName = self.class.name;
+
+        let impls: Vec<Tokens> = self.methods()
+            .map(|method| {
+                let trampoline_name = Self::slot_trampoline_name(&method.name);
+                let method_impl_name = Self::slot_impl_name(&method.name);
+
+                let slot_ty = SlotTy {
+                    class_name: self.class.name,
+                    sig: &method.fn_def.sig
+                };
+
+                let arg_names = method.fn_def.sig.arg_names();
+
+                quote! {
+                    unsafe extern "C" fn #trampoline_name#slot_ty {
+                        #callback_guard
+
+                        let instance: &super::#InstanceName = &from_glib_borrow(this);
+
+                        instance.#method_impl_name(#arg_names)
+                    }
+                }
+            })
+            .collect();
+
+        quote! {
+            #(#impls)*
         }
     }
 
@@ -830,6 +863,18 @@ impl<'ast> ClassContext<'ast> {
             })
     }
 
+    fn slot_trampoline_name(slot_name: &Identifier) -> Identifier {
+        Identifier {
+            str: intern(&format!("{}_trampoline", slot_name.str))
+        }
+    }
+
+    fn slot_impl_name(slot_name: &Identifier) -> Identifier {
+        Identifier {
+            str: intern(&format!("{}_impl", slot_name.str))
+        }
+    }
+
     fn slot_assignments(&self) -> Vec<Tokens> {
         let InstanceName = self.class.name;
 
@@ -841,12 +886,10 @@ impl<'ast> ClassContext<'ast> {
                     _ => unreachable!()
                 };
 
-                let slot_trampoline = Identifier {
-                    str: intern(&format!("{}_trampoline", slot_name.str))
-                };
+                let trampoline_name = Self::slot_trampoline_name(&slot_name);
 
                 quote! {
-                    klass.#slot_name = Some(#InstanceName::#slot_trampoline);
+                    klass.#slot_name = Some(#InstanceName::#trampoline_name);
                 }
             })
             .collect()
