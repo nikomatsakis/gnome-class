@@ -22,12 +22,14 @@ version = "0.13.1"
 
 [dependencies]
 lalrpop-intern = "0.13.1"
-error-chain = "0.10.0"
+error-chain = "0.11.0-rc.2"
 quote = "0.3.15"
 unicode-xid = "0.0.4"
 rustfmt = "*"
+glib = "0.3.0"
+gobject-sys = "0.4.0"
+libc = "0.2"
 
 [dev-dependencies]
-glib-sys = "0.3.1"
+glib-sys = "0.4.0"
 lazy_static = "0.2.2"
-gnome-class-shims = { path = "gnome-class-shims" }

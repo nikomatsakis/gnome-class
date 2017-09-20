@@ -1,0 +1,204 @@
+-*- org -*- 
+
+* TODO Support subclassing from anything other than GObject
+
+** Grammar supports "class Foo extends Bar"
+
+** Need to support "class Foo: ParentClass, Iface1, Iface2" instead
+
+* TODO Virtual + non-virtual methods?
+
+Virtual ones have a slot in FooClass; non-virtual ones don't.
+
+* TODO In class structures, reserve slots for API expansions without ABI breaks
+
+#[repr(C)]
+pub struct GtkBoxClass {
+    pub parent_class: GtkContainerClass,
+    pub _gtk_reserved1: Option<unsafe extern "C" fn()>,
+    pub _gtk_reserved2: Option<unsafe extern "C" fn()>,
+    pub _gtk_reserved3: Option<unsafe extern "C" fn()>,
+    pub _gtk_reserved4: Option<unsafe extern "C" fn()>,
+}
+
+Maybe have something like 
+
+gobject_gen! {
+    class Foo: glib::Object {
+        struct FooPrivate {
+            ....
+        }
+
+        signal ...;
+        fn ...;
+
+        reserve_slots(N);       // <------ this; to be decremented when needed
+    }
+}
+
+* Reordering class fields is an ABI break.  Shoule we warn about this / how?
+
+* Conversation with acrichto about proc-macros-2
+
+<federico> acrichto: ping
+<acrichto> federico: pong
+<federico> acrichto: hey there!
+<acrichto> :D
+<federico> acrichto: I want to move gnome-class to proc-macros-2
+<acrichto> nice!
+<federico> I'm rather tired of not getting meaningful error messages :)
+<acrichto> federico: I'd love to help out! I've had lots of fun with proc macros lately
+<acrichto> do you want a rundown of how proc-macro2 works?
+<federico> acrichto: do you have any pointers?  I don't even know if gnome-class's scheme of "tokens to string, lalrpop on that, generated code to tokens" was widely used before
+<federico> acrichto: yes, that would be very helpful.  I haven't looked closely for docs yet
+<acrichto> ok sure yeah
+<acrichto> so just to make sure I understand, you're using macro_rules! right now, right?
+<acrichto> or procedural macros?
+<acrichto> or rather, you're doing something like -- gnome_class! { ... }
+<acrichto> right?
+<federico> #[proc_macro]
+<acrichto> ok excellent
+<federico> it starts here:
+<federico> https://github.com/federicomenaquintero/gnome-class/blob/master/src/lib.rs#L150
+<federico> and the code generator is here:
+<federico> https://github.com/federicomenaquintero/gnome-class/blob/master/src/gen/mod.rs
+<federico> lalrpop and our own ast:
+<acrichto> heh ok
+<acrichto> so this isn't gonna be an easy transition
+<federico> https://github.com/federicomenaquintero/gnome-class/blob/master/src/parser/grammar.lalrpop
+<federico> https://github.com/federicomenaquintero/gnome-class/blob/master/src/ast.rs
+<acrichto> so lemme give you some background on proc-macro2 and such
+<federico> sure
+<acrichto> so right now the only *stable* thing is #[proc_macro_derive]
+<acrichto> which given a TokenStream calls .to_string() and returns another parsed tokenstream
+<acrichto> as you've found out, this trashes all span information and makes errors awful
+<acrichto> so the next step is to preserve span information of all the tokens in the stream itself
+<acrichto> TokenStream is, after all, a stream of tokens!
+<acrichto> so right now this is all unstable upstream
+<acrichto> but hopefully not for too too long!
+<acrichto> so proc-macro2 is sort of a bolt-on on top of this
+<acrichto> where the idea of proc-macro2 was to cater to both stable and unstable users
+<acrichto> where the crate itself provides a copy of the `proc_macro` (upstream rustc crate) api
+<acrichto> and then you can tell proc_macro2 to implement itself either in terms of a stable string-based implementation or an unstable token-based implementation
+<acrichto> so in general, proc_macro2 is solving the serde use case of it works on stable, but on nightly you can get excellent span information
+<acrichto> another intention of it was to ease the transition from string-based procedural mcaros to token-based ones
+<acrichto> in that you could write a token-based one *today*, comiple on stable, and then eventually you'll just magically get better errors
+<acrichto> b/c we can switch the implementation of proc_macro2 by default
+<acrichto> but anyway, the tl;dr; is that proc_macro2 may not be precisely what you want to use (if you're tied to nightly for other reasons)
+<acrichto> but it is probably a good spot to start!
+<acrichto> https://docs.rs/proc-macro2/0.1.3/proc_macro2/
+<acrichto> the api docs there are basically teh same as the upstream proc_macro crate itself
+<acrichto> https://github.com/rust-lang/rust/blob/master/src/libproc_macro/lib.rs
+<acrichto> we still need to host comipler docs :(
+<acrichto> make sense so far?
+<federico> yeah, makes sense
+<federico> maybe I have the wrong mental model, but:
+<federico> 1. if I get a TokenStream (and I can indeed use the tokens I get, given that our mini-language is a superset of rust), I can probably remove gnome-class/src/tok
+<federico> 2. I wouldn't know if using lalrpop with tokens from the TokenStream makes sense
+<federico> 3. (... I'd prefer not to parse the TokenStream by hand...)
+<acrichto> (1) is correct yeah, you wouldn't need to define your own tokens, you'd just use tokens from proc_macro (or proc_macro2, they're the same)
+<acrichto> (2) is also probably a "no" to lalrpop in that it most likely is intended mainly for usage with strings, not token streams (although I could be wrong!)
+<federico> 4. AFAICT our ast.rs is fine as it is; maybe the proc-macro stuff already has nice representations for types, return values, arguments, etc.
+<acrichto> and with (3), that's where I can help :)
+<acrichto> lemme get some links
+<acrichto> ok so this the exact same problem for another project
+<acrichto> syn -- https://github.com/dtolnay/syn
+<acrichto> where that's basically a rust parser
+<acrichto> but intended for procedural macros
+<acrichto> so historically it's operated with strings, but now all of a sudden it needed to work with tokens isntead
+<federico> lalrpop lets you have your own tokenizer, and it has its own concept of spans; not sure if it's compatible with proc-macros's model
+<acrichto> so we rewrote it!
+<acrichto> yeah niko I think would have to comment about lalrpop
+<acrichto> in whether that'd be compatible
+<acrichto> I'm sure he'd like it to be at the very least :)
+<acrichto> but an alternate strategy, at least, would require two things
+<acrichto> oh so also before I go further
+<acrichto> one fundamental ability you'll need to add is to *go back* to a TokenStream
+<acrichto> that is, you'll take a TokenStream, parse it, munge it, create a new AST, and then convert that back to a TokenStream
+<acrichto> and then that'll later get parsed as valid rust
+<acrichto> but ok, so what you'll probably want to do here is to at least start out exploring a few projects
+<acrichto> first up there's syn, the rust syntax parser
+<acrichto> (the master branch, not published on crates.io)
+<acrichto> this branches uses a variant of the `nom` parsing framework, basically a recursive descent parser
+<acrichto> here's how it parses for loops, for example -- https://github.com/dtolnay/syn/blob/master/src/expr.rs#L1419-L1438
+<acrichto> the idea is that you'd define this `Synom` trait for all your AST constructs
+<acrichto> and then it's relatively simple composition to build up a composite parser
+<acrichto> not exactly the fastest parser in the world, but it was easy enough to use I found personaly
+<acrichto> again though, if you want to stick with lalrpop, it may still be possible
+<acrichto> to auto-generate these parsers for you
+<acrichto> I'm just not 100% sure how the spans and such would work
+<acrichto> but that should at least get you to a parsed AST
+<acrichto> and you'll need to modify your AST as well to contain span information in it (but sounds like you already do?)
+<acrichto> once you've got all that working the `quote` crate comes into play
+<acrichto> https://github.com/dtolnay/quote/
+<acrichto> where that crate is intended to basically assist in creating a TokenStream
+<acrichto> for example, this is how a forloop is tokenized -- https://github.com/dtolnay/syn/blob/master/src/expr.rs#L2489-L2502
+<acrichto> that has it all baked in how to create tokens with spans and whatnot
+<acrichto> so you could implement ToTokens for all your AST types
+<acrichto> and compose them together and whatnot
+<acrichto> oh lol you're already using `quote`
+<acrichto> in that case you'd just upgrade the dep
+<acrichto> and then it'll whine *a lot* about "you need to pass a span here"
+<acrichto> and you'll basically just start threading spans through the AST after that
+<acrichto> so that was a quite a bit
+<acrichto> any of that doesn't make sense though?
+<federico> no, it makes perfect sense
+<federico> I'm a bit scared of nom - had a very bad time with it in librsvg, but this is higher level than what I was doing there
+<acrichto> yeah I haven't used nom much historically
+<federico> do you have an example that already uses quote?
+<acrichto> and I wouldn't call the syn parsers easy to read/write
+<acrichto> you can use quote! in general like -- https://github.com/alexcrichton/futures-await/blob/master/futures-async-macro/src/lib.rs#L172-L177
+<acrichto> to just create arbitrary instances of TokenStream
+<federico> we basically quote a lot of boilerplate, and insert stringified symbol names, and then just paste big blobs of the user's method implementations in the middle
+<acrichto> yeah definitely
+<acrichto> so actually, you may want to explore this crate too -- https://github.com/alexcrichton/futures-await/blob/master/futures-async-macro/src/lib.rs
+<acrichto> that's the implementation of #[async] right now
+<acrichto> and so one thing you'll have to deal with
+<acrichto> is in general you get tokens from a user
+<acrichto> but you'll manufacture your own as well
+<acrichto> the stuff you manufacture tends to be boilerplate/wrappers
+<acrichto> but often error spans will still go to those locations
+<acrichto> on the tokens you manufacture
+<acrichto> futures-await does a bit of hackery to ensure that things are spanned right
+<acrichto> basically taking existing spans and applying them to generated tokens
+<acrichto> for example the `respan` function there
+<acrichto> note, again, though, that this isn't very pretty
+<acrichto> working with syn/proc-macro2 isn't exactly the most ergonomic thing in the world right now
+<acrichto> but it gets you nice errors at lesat!
+<acrichto> and we're of course always looking for what idioms to move to standard libraries and such
+<federico> yeah, I'm looking at respan() and replace_bang()
+<acrichto> oh so one important thing, quote! -the-macro will insert "bad spans"
+<acrichto> basically the default one
+<federico> hmm, is replace_bang() conceptually different from quote! { blah blah #thing blah }?
+<acrichto> yeah
+<acrichto> specifically w/ spans
+<acrichto> it allowed me to do --
+<acrichto> let a = quote! { a ! b };
+<acrichto> let a = change_all_span(a);
+<acrichto> let a = replace_bang(a, what_i_wanted_to_quote_but_not_chang_spans);
+<acrichto> I couldn't think of another way to "change all tokens with the default span but leave actual spans alone"
+<federico> I should look at what's in a Span - but does this let me know the difference between "error in the boilerplate" and "error in the user's code"?
+<acrichto> oh right now a Span is entirely opaque
+<acrichto> it's just a Copy/Clone thing
+<acrichto> w/ no accessors
+<federico> about tokenization:
+<federico> acrichto: https://gist.github.com/federicomenaquintero/4f55c251d50787bee2d60b5e26e5fc93
+<federico> we have stuff like "class Foo", "private_init()", "signal bar(&self)", "virtual fn blah()"
+<federico> class, private_init, signal, virtual - those are more or less reserved words in our mini-language
+<acrichto> sure yeah
+<federico> would they get tokenized as identifiers, or do I need to declare them somehow?
+<acrichto> nah yeah they're all just a Term
+<acrichto> https://docs.rs/proc-macro2/0.1.3/proc_macro2/enum.TokenNode.html
+<acrichto> every single token is one of those 4
+<acrichto> so all word-like things are a Term
+<acrichto> rust keyword or not
+<federico> oh, perfect
+
+<federico> acrichto: so, the code generator already spits a quote::Tokens
+<acrichto> nice!
+<federico> we then stringify that, rustfmt the string, and then TokenStream::from_str(rustfmted_string) - and that's what our #[proc_macro] returns
+<acrichto> yeah w/ proc-macro2 you'd just all .into
+<acrichto> quote::Tokens -> TokenStream directly
+<federico> cool, then I think I'll start there
+<federico> I should then be able to specify whatever compile-time flag or feature or whatever to be able to look at the generated code, right?
+<federico> (right now I println!() the rustfmt_string and eyeball that...)

@@ -16,14 +16,23 @@ pub struct Class {
 #[derive(Debug)]
 pub enum Member {
     PrivateStruct(PrivateStruct),
-    Init(CodeBlock),
+    PrivateInit(CodeBlock),
     Method(Method),
+    Signal(Signal),
 }
 
 #[derive(Debug)]
 pub struct PrivateStruct {
     pub name: Identifier,
     pub fields: Vec<VarTy>
+}
+
+#[derive(Debug)]
+pub struct Signal {
+    pub name: Identifier,
+    pub sig: FnSig,
+    pub code: Option<CodeBlock>,
+    // FIXME: signal flags
 }
 
 #[derive(Debug)]

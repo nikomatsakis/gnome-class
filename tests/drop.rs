@@ -1,11 +1,9 @@
 #![feature(proc_macro)]
 
-// FIXME: remove the need for this
-#[macro_use] extern crate lazy_static;
-
-// FIXME: can we combine these two?
-extern crate gnome_class_shims;
 extern crate gobject_gen;
+
+#[macro_use]
+extern crate glib;
 use gobject_gen::gobject_gen;
 
 use std::cell::RefCell;
@@ -39,14 +37,14 @@ gobject_gen! {
             dc: RefCell<DropCounter>
         }
 
-        init {
+        private_init() -> DummyPrivate {
             DummyPrivate {
                 dc: RefCell::new(DropCounter::new())
             }
         }
 
         fn set_dc(&self, dc: DropCounter) {
-            let mut self_dc = self.private().dc.borrow_mut();
+            let mut self_dc = self.get_priv().dc.borrow_mut();
             *self_dc = dc;
         }
     }

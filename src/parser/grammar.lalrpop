@@ -32,16 +32,18 @@ Id: Identifier = {
 };
 
 IdStr: &'input str = {
-    "init" => "init",
+    "private_init" => "private_init",
     "class" => "class",
     "extends" => "extends",
+    "signal" => "signal",
     OtherId => <>,
 };
 
 Member: Member = {
     PrivateStruct => Member::PrivateStruct(<>),
-    Init => Member::Init(<>),
+    PrivateInit => Member::PrivateInit(<>),
     Method => Member::Method(<>),
+    Signal => Member::Signal(<>),
 };
 
 PrivateStruct: PrivateStruct = {
@@ -51,14 +53,24 @@ PrivateStruct: PrivateStruct = {
     }
 };
 
-Init: CodeBlock = {
-    "init" <CodeBlock>
+PrivateInit: CodeBlock = {
+    // We do "let _ = name" so we can ignore "name"
+    "private_init" "(" ")" "->" <name:Id> <code:CodeBlock> => { let _ = name; code }
 };
 
 Method: Method = {
     "fn" <name:Id> <fn_def:FnDef> => {
         Method { name, fn_def }
     }
+};
+
+Signal: Signal = {
+    "signal" <name:Id> <sig:FnSig> <code:SignalBody> => Signal { name, sig, code }
+};
+
+SignalBody: Option<CodeBlock> = {
+    <CodeBlock> => Some(<>),
+    ";" => None
 };
 
 FnDef: FnDef = {
@@ -154,10 +166,11 @@ extern {
         "as" => Tok::AsKeyword,
         "struct" => Tok::StructKeyword,
         "fn" => Tok::FnKeyword,
-        "init" => Tok::InitKeyword,
+        "private_init" => Tok::PrivateInitKeyword,
         "self" => Tok::SelfKeyword,
         "super" => Tok::SuperKeyword,
         "extends" => Tok::ExtendsKeyword,
+        "signal" => Tok::SignalKeyword,
         "{..}" => Tok::Block(<&'input str>),
         OtherId => Tok::Id(<&'input str>),
         ":" => Tok::Colon,
@@ -172,5 +185,6 @@ extern {
         "+" => Tok::Plus,
         "," => Tok::Comma,
         "&" => Tok::Ampersand,
+        ";" => Tok::Semi
     }
 }

@@ -1,5 +1,70 @@
 -*- org -*- 
 
+* Generated code
+
+Inside class_init(), we register each signal.
+
+** TODO Translate signal's signature into GTypes.  For example
+
+   class Foo {
+     signal bar (&self, a: c_uint) -> c_uint;
+
+     signal baz (&self); // no params, no return value
+   }
+
+   would become
+
+     bar_id = g_signal_newv ("bar",
+                             class_gtype,
+                             G_SIGNAL_RUN_FIRST, // appropriate flags here
+                             class_closure,
+                             accumulator,
+                             accu_data,
+                             c_marshaller,
+                             G_TYPE_UINT,  // return type
+                             1,            // n_params
+                             vec![G_TYPE_UINT] as *mut GType); // params
+
+     baz_id = g_signal_newv ("baz",
+                             ...,
+                             G_TYPE_NONE, // return type
+                             0,           // n_params
+                             NULL);       // params
+
+** TODO Define syntax to declare signal flags, and use the flags when calling g_signal_newv()
+
+** TODO How to emit the signals?  Should we generate a helper struct with an impl...
+
+   class Foo {
+     signal bar (&self, a: c_uint) -> c_uint;
+
+     signal baz (&self); // no params, no return value
+   }
+
+   struct FooSignals {
+       bar_id: c_uint; // g_signal_newv() returns guint
+       baz_id: c_uint;
+   }
+
+   impl FooSignals {
+       pub fn emit_bar(&self, a: c_uint) -> c_uint {
+           let mut return_value: GValue;
+           gobject_sys::g_signal_emitv(instance_and_params,
+                                       self.bar_id,   // where do we get self?
+                                       detail,        // GQuark
+                                       &return_value);
+           // demarshal
+           return return_value.???
+       }
+
+       pub fn emit_baz() {
+           // analogous
+       }
+   }
+
+   Where do FooSignals' methods get their self?  Can it be a trait on
+   FooClass or something?
+
 * From https://wiki.gnome.org/Projects/Vala/Tutorial#Signals
 
 public class Test : GLib.Object {
@@ -20,10 +85,16 @@ public class Test : GLib.Object {
 }
 
 
-* Signal flags:
+* Documentation: https://wiki.gnome.org/Projects/Vala/Manual/Classes#Signals
+
+* Signal flags in Vala:
 
     [Signal (action=true, detailed=true, run=true, no_recurse=true, no_hooks=true)]
     public signal void sig_1 ();
+
+    public signal gboolean sig_2 (args) {
+        // default handler goes here
+    }
 
 * Prototypes
 
@@ -67,6 +138,14 @@ guint            g_signal_new_class_handler (const gchar        *signal_name,
                                return_type, n_params, args);
 }
 
+** Would the preferred way be not to have a slot in the class struct, but to use g_signal_new_class_handler()
+   and have derived classes use g_signal_override_class_handler() if
+   they want to override the default handler?
+
+   C likes having a slot in the class struct, if we are deriving
+   classes from C.  Disadvantage: we have to maintain a parallel C
+   struct.  But we are already doing it for methods, anyway.
+
 * Flags
 
 /**
@@ -108,3 +187,119 @@ typedef enum
   G_SIGNAL_MUST_COLLECT = 1 << 7,
   G_SIGNAL_DEPRECATED   = 1 << 8
 } GSignalFlags;
+
+** TODO Deal with G_SIGNAL_TYPE_STATIC_SCOPE at some point, to avoid unnecessary value copies.
+
+* Discussion with Niko
+
+<nmatsakis> ok so
+<nmatsakis> you basically want to (for now?) hard code various names?
+<federico> if we could cover the fundamental types (the definitions in https://github.com/gtk-rs/sys/blob/master/gobject-sys/src/lib.rs#L18 ) for the first pass, it would be a *great* start
+<federico> nmatsakis: yeah, I'm happy hardcoding for now
+<nmatsakis> federico: did you understand my associated constant idea?
+<nmatsakis> seems like that might be easier
+<nmatsakis> that is, you might do something like this:
+<nmatsakis> well, actually, maybe constant isn't what you want even
+<federico> is that where a trait forces the impl to define some constants for its own case?
+<nmatsakis> wait, are these GType constants specific to signals?
+<nmatsakis> they're not, right?
+<nmatsakis> (sorry, caching back in)
+<nmatsakis> *paging
+<federico> they are constants that gobject uses to identify types
+<nmatsakis> ok, so, we have this trait and method: https://github.com/federicomenaquintero/gnome-class/blob/master/gnome-class-shims/src/lib.rs#L26
+<nmatsakis> you could imagine a base trait like
+<federico> the fundamental types are really constants - that block in the URL above.  What we define with our own gclass::get_type() are also GTypes, but those are generated at runtime
+<nmatsakis> trait HasGType { fn get_type() -> GType; }
+<nmatsakis> and then
+<nmatsakis> impl HasGType for i32 { fn get_type() -> GType { G_TYPE_CHAR } }
+<federico> niiiiiiice
+<nmatsakis> and then you could just do `i32::get_type()`
+<nmatsakis> well, probably this:
+<nmatsakis> `<X as HasGType>::get_type()` where `X` is the "generated" version of the type the user wrote
+<nmatsakis> (not that it matters, but after inlining etc the compiler will convert that into a constant anyway...)
+<federico> nmatsakis: this is very elegant
+<nmatsakis> the nice thing is, it will work automatically with the user's types... 
+<federico> nmatsakis: with that HasGType in place, would you remove get_type() from GInstance and instead impl HasGType for GInstance instead?
+<nmatsakis> yep
+<federico> awesome
+<nmatsakis> probably `trait GInstance: HasGType`
+<nmatsakis> and maybe some kind of more consistent naming scheme :P
+<nmatsakis> (least of our worries I guess)
+<federico> yep
+<federico> on a related note:
+<federico> while writing tests/signals.rs, I wanted to do
+<nmatsakis> PS I'm very excited to see you hacking on signals =)
+<federico>   let obj = Signaler::new();
+<federico>   let type = obj.get_type();
+<federico> but that's not a method with a &self
+<federico> so I did
+<federico>   let obj_type = Signaler::get_type();
+<federico> but that's not really what I want; I'm calling a standalone get_type() function instead of a specific instance's
+<nmatsakis> hmm
+<federico> nmatsakis: I didn't quite grok how to move things around to do that
+<nmatsakis> well yeah so you sort of want the ability to do both
+<nmatsakis> (right?)
+<federico> nmatsakis: I'm excited, too!  I was rather scared of procedural macros, but I started reading grammar.lalrpop and went from there, and it's quite nice to work in
+<federico> (... modulo deciphering error messages inside the proc macro)
+<nmatsakis> in theory acrichto was working on fixing that
+<nmatsakis> in particular, he was making it possible to have spans
+<nmatsakis> I should ask him what's up with that
+<federico> nmatsakis: yeah, I want a gimme_gtype_for_this_class_for_which_i_dont_have_an_instance() and gimme_gtype_for_this_instance(obj)
+<nmatsakis> right so if we give them distinct names
+<nmatsakis> would be easy enough
+<nmatsakis> I guess have to look at where the best place would be
+<nmatsakis> but it would look something like `fn get_dynamic_type(&self) -> GType`
+<federico> right
+<federico> probably get_instance_type() is more glib-like
+<nmatsakis> k
+<federico> ok, I'll look into that
+<federico> having separate names makes it easier
+<nmatsakis> seems like ..
+<nmatsakis> probaly just add something to GInstance
+<federico> so let's say I have the HasGType trait in place
+<nmatsakis> e.g.
+<nmatsakis> fn get_instance_type(&self) -> GType { some_function_that_gets_gtype_from_a_gobject(self.to_gobject_ptr()) }
+<federico> then the generator would spit <sometype as HasGType>::get_type() - and if sometype is not supported, the compiler would flame me 
+<nmatsakis> yes
+<nmatsakis> (unrelated, but one thing I've been contemplating, which would be relevant here,
+<nmatsakis> is the ability to give more custom errors for cases like these)
+<federico> hmm, I guess that's fine.  I'd love to give back an error like "only these types are supported for gtyping: ..."
+<nmatsakis> i.e., it'd be cool if we could make it say "this is not a valid signal type"
+<nmatsakis> or something
+<federico> yeah
+<nmatsakis> yeah, for now that won't be as nice, 
+<nmatsakis> though there *is* a sort of hack here that is relevant
+<nmatsakis> (it's unstable as all get out though)
+<nmatsakis> (and not really on a path to stability)
+<nmatsakis> which is that you can tag a trait with a message to display when it is not implemented
+<nmatsakis> (but I want to do something much more flexible eventually)
+<nmatsakis> still, might be useful to use for now
+<federico> nmatsakis: in the future, G_TYPE_VARIANT is a thing that lets you define a complex type (struct with these fields, array of blah, etc.) - we can probably do that later
+<nmatsakis> since we're using unstable features a lot anyway :)
+<nmatsakis> ah, yeah
+<federico> ok, I'll try to get this going tomorrow
+<federico> nmatsakis: this is really useful info, thank you :)
+<federico> what else did I want to ask...
+<nmatsakis> federico: my pleasure, will of course be around tomorrow too :)
+<federico> nmatsakis: just so I know - if the grammar reads in, say "i32", what Type would ast get for that?
+<nmatsakis> federico: https://github.com/federicomenaquintero/gnome-class/blob/master/src/ast.rs#L65
+<nmatsakis> I believe
+<nmatsakis> then probably https://github.com/federicomenaquintero/gnome-class/blob/master/src/ast.rs#L90
+<nmatsakis> is the Path
+<nmatsakis> with https://github.com/federicomenaquintero/gnome-class/blob/master/src/ast.rs#L97
+<nmatsakis> being `i32`
+<nmatsakis> (or the interned version thereof)
+<federico> aha
+<federico> what's PathId.tys?
+<federico> uuh, if I impl HasGType for i32 and stuff, can that go into gnome-class-shims?  what with it being an extern crate... or does that impl need to go in the generated code?
+<federico> ok, gk 
+<federico> going to the supermarket
+<federico> nmatsakis: thanks again; I now have lots of interesting stuff to do tomorrow :)
+<nmatsakis> federico: nice
+<nmatsakis> federico: ah, I missed your question about PathId.tys --
+<nmatsakis> federico: I think that refers to a path like `Vec<u32, f32>`
+<nmatsakis> federico: the u32, f32 are the "tys"
+<nmatsakis> federico: as for the impls of HAsGType, they would go in the same crate that defines the trait
+<nmatsakis> federico: so gnome-class-shims
+<nmatsakis> federico: in particular I mean the impls for "builtin" types like u32 etc
+<federico> nmatsakis: got it, thanks
