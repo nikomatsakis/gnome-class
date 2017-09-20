@@ -44,7 +44,6 @@ struct ClassContext<'ast> {
     FieldsName: Identifier,
     GClassName: Identifier,
     PrivateClassName: Identifier,
-    MethodsFrom: Identifier,
     ParentInstance: Tokens,
     ParentInstanceFfi: Tokens,
     ParentClassFfi: Tokens,
@@ -107,11 +106,6 @@ impl<'ast> ClassContext<'ast> {
             <#ParentInstance as glib::wrapper::Wrapper>::GlibClassType
         };
 
-        let InstanceName = class.name;
-        let MethodsFrom = Identifier {
-            str: intern(&format!("__methods_from_{}", InstanceName.str))
-        };
-
         Ok(ClassContext {
             program,
             class,
@@ -120,7 +114,6 @@ impl<'ast> ClassContext<'ast> {
             FieldsName,
             GClassName,
             PrivateClassName,
-            MethodsFrom,
             ParentInstance,
             ParentInstanceFfi,
             ParentClassFfi,
@@ -139,10 +132,7 @@ impl<'ast> ClassContext<'ast> {
             self.pub_impl(),
             self.instance_ext(),
             self.instance_ext_impl(),
-//            self.impls(),
-//            self.methods_declared_in_instance(),
 //            self.signal_trampolines(),
-//            self.c_symbols(),
         ];
 
         let ModuleName = &self.ModuleName;
@@ -930,17 +920,6 @@ impl<'ast> ClassContext<'ast> {
             .collect()
     }
 
-    fn method_assignments(&self) -> Vec<Tokens> {
-        let InstanceName = self.class.name;
-        let MethodsFrom = &self.MethodsFrom;
-        self.method_names()
-            .iter()
-            .map(|method_name| {
-                quote! { klass.#method_name = Some(<#InstanceName as #MethodsFrom::Trait>::#method_name); }
-            })
-            .collect()
-    }
-
     fn signal_declarations(&self) -> Vec<Tokens> {
         self.signals()
             .map(|signal| {
@@ -983,27 +962,6 @@ impl<'ast> ClassContext<'ast> {
             .collect()
     }
 
-    fn methods_declared_in_instance(&self) -> Tokens {
-        let InstanceName = self.class.name;
-        let method_trait_fns = &self.method_trait_fns();
-        let method_impl_fns = &self.method_impl_fns();
-        let MethodsFrom = &self.MethodsFrom;
-
-        quote! {
-            #[allow(non_snake_case)]
-            mod #MethodsFrom {
-                use super::*;
-                pub trait Trait {
-                    #(extern #method_trait_fns)*
-                }
-            }
-
-            impl #MethodsFrom::Trait for #InstanceName {
-                #(extern #method_impl_fns)*
-            }
-        }
-    }
-
     /// Returns, for each method, something like
     ///
     /// ```notest
@@ -1017,25 +975,6 @@ impl<'ast> ClassContext<'ast> {
                 let return_ty = method.fn_def.sig.return_ty();
                 quote! {
                     fn #name(&self, #arg_decls) #return_ty;
-                }
-            })
-            .collect()
-    }
-
-    /// Returns, for each method, something like
-    ///
-    /// ```notest
-    /// fn foo(&self, arg: u32) { ... }
-    /// ```
-    pub fn method_impl_fns(&self) -> Vec<Tokens> {
-        self.methods()
-            .map(|method| {
-                let name = method.name;
-                let arg_decls = method.fn_def.sig.arg_decls();
-                let return_ty = method.fn_def.sig.return_ty();
-                let code = &method.fn_def.code;
-                quote! {
-                    fn #name(&self, #arg_decls) #return_ty #code
                 }
             })
             .collect()
