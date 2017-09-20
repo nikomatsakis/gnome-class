@@ -644,6 +644,8 @@ impl<'ast> ClassContext<'ast> {
 
                         let instance: &super::#InstanceName = &from_glib_borrow(this);
 
+                        // FIXME: do we need to from_glib_*() each argument?
+                        // FIXME: do we need to .to_glib() the return value?
                         instance.#method_impl_name(#arg_names)
                     }
                 }
@@ -715,9 +717,11 @@ impl<'ast> ClassContext<'ast> {
 
     fn imp_extern_funcs(&self) -> Tokens {
         let imp_new_fn = self.imp_new_fn();
+        let imp_extern_methods = self.imp_extern_methods();
 
         quote! {
             #imp_new_fn
+            #(#imp_extern_methods)*
         }
     }
 
@@ -741,6 +745,32 @@ impl<'ast> ClassContext<'ast> {
                 this as *mut #InstanceName
             }
         }
+    }
+
+    fn imp_extern_methods(&self) -> Vec<Tokens> {
+        let InstanceName = self.class.name;
+        let callback_guard = self.callback_guard();
+
+        self.methods()
+            .map(|method| {
+                let arg_decls   = method.fn_def.sig.arg_decls();
+                let arg_names   = method.fn_def.sig.arg_names();
+                let return_ty   = method.fn_def.sig.return_ty();
+                let method_name = method.name;
+                let ffi_name    = self.method_ffi_name(method);
+
+                quote! {
+                    #[no_mangle]
+                    pub unsafe extern "C" fn #ffi_name(this: *mut #InstanceName, #arg_decls) #return_ty {
+                        #callback_guard
+
+                        let klass = (*this).get_class();
+                        // We unwrap() because klass.method_name is always set to a method_trampoline
+                        (klass.#method_name.as_ref().unwrap())(this, #arg_names)
+                    }
+                }
+            })
+            .collect()
     }
 
     fn instance_ext(&self) -> Tokens {
