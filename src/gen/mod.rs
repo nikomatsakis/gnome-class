@@ -464,9 +464,11 @@ impl<'ast> ClassContext<'ast> {
             }
 
             static mut PRIV: #PrivateClassName = #PrivateClassName {
-                parent_class: ptr::null(),
-                properties:   ptr::null(),
-                signals:      ptr::null(),
+                // we use this instead of "ptr::null()" because using
+                // function calls to set constants is feature-gated.
+                parent_class: 0 as *const _,
+                properties:   0 as *const _,
+                signals:      0 as *const _,
             };
         }
     }
