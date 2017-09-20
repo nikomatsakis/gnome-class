@@ -7,6 +7,8 @@ extern crate gobject_gen;
 #[macro_use]
 extern crate glib;
 
+extern crate libc;
+
 use gobject_gen::gobject_gen;
 use gnome_class_shims::gobject_sys;
 use gnome_class_shims::GInstance;
@@ -14,6 +16,8 @@ use std::cell::Cell;
 use std::ffi::CStr;
 use std::mem;
 use std::slice;
+use glib::object::*;
+use glib::translate::*;
 
 gobject_gen! {
     class Signaler {
@@ -39,7 +43,7 @@ gobject_gen! {
 #[test]
 fn has_value_changed_signal() {
     let obj: Signaler = Signaler::new();
-    let obj_type = Signaler::get_type();
+    let obj_type = obj.get_type().to_glib();
 
     unsafe {
         let mut n_ids: libc::c_uint = mem::zeroed();
