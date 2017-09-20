@@ -24,13 +24,13 @@ gobject_gen! {
         signal value_changed(&self);
 
         fn set_value(&self, v: u32) {
-            let private = self.private();
+            let private = self.get_priv();
             private.val.set(v);
             // private.emit_value_changed();
         }
 
         fn get_value(&self) -> u32 {
-            let private = self.private();
+            let private = self.get_priv();
             private.val.get()
         }
     }

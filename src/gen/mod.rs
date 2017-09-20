@@ -228,7 +228,7 @@ impl<'ast> ClassContext<'ast> {
             self.imp_signals_enum(),
             self.imp_private_struct(),
             self.imp_class_private_struct(),
-            self.imp_slot_default_handlers(),
+            self.imp_slot_impls(),
             self.imp_instance(),
             self.imp_class(),
             self.imp_extern_funcs(),
@@ -471,7 +471,7 @@ impl<'ast> ClassContext<'ast> {
         }
     }
 
-    fn imp_slot_default_handlers(&self) -> Tokens {
+    fn imp_slot_impls(&self) -> Tokens {
         // We are inside the "mod imp".  We will create function
         // implementations for the default handlers for methods and
         // signals as "impl super::Foo { ... }", so that the &self in
@@ -479,8 +479,22 @@ impl<'ast> ClassContext<'ast> {
         // corresponds to the GObject-ABI structs within "mod imp".
 
         let InstanceName = self.class.name;
+        let get_priv = self.imp_get_priv_fn();
+        let impls = self.imp_slot_default_handlers();
 
-        let impls: Vec<Tokens> = self.members_with_slots()
+        quote! {
+            impl super::#InstanceName {
+                #get_priv
+
+                #(#impls)*
+            }
+        }
+    }
+
+    fn imp_slot_default_handlers(&self) -> Vec<Tokens> {
+        let InstanceName = self.class.name;
+
+        self.members_with_slots()
             .map(|member| {
                 let (slot_name, slot_impl_ty, code) = match *member {
                     Member::Method(ref method) => (&method.name,
@@ -503,13 +517,7 @@ impl<'ast> ClassContext<'ast> {
                     fn #slot_impl_name#slot_impl_ty #code
                 }
             })
-            .collect();
-
-        quote! {
-            impl super::#InstanceName {
-                #(#impls)*
-            }
-        }
+            .collect()
     }
 
     fn imp_instance(&self) -> Tokens {
@@ -517,7 +525,6 @@ impl<'ast> ClassContext<'ast> {
 
         let all = vec![
             self.instance_get_class_fn(),
-            self.instance_get_priv_fn(),
             self.instance_init_fn(),
             self.instance_finalize_fn(),
             // self.instance_set_property_fn(),
@@ -548,7 +555,8 @@ impl<'ast> ClassContext<'ast> {
         }
     }
 
-    fn instance_get_priv_fn(&self) -> Tokens {
+    fn imp_get_priv_fn(&self) -> Tokens {
+        let InstanceName = self.class.name;
         let PrivateName = self.private_struct.name;
         let get_type_fn_name = self.get_type_fn_name();
 
@@ -556,7 +564,7 @@ impl<'ast> ClassContext<'ast> {
             fn get_priv(&self) -> &#PrivateName {
                 unsafe {
                     let private = gobject_ffi::g_type_instance_get_private(
-                        self as *const _ as *mut gobject_ffi::GTypeInstance,
+                        <Self as ToGlibPtr<*mut #InstanceName>>::to_glib_none(self).0 as *mut gobject_ffi::GTypeInstance,
                         #get_type_fn_name(),
                     ) as *const Option<#PrivateName>;
 
@@ -577,8 +585,8 @@ impl<'ast> ClassContext<'ast> {
                 #callback_guard
 
                 let private = gobject_ffi::g_type_instance_get_private(
-                    obj as *mut gobject_ffi::GTypeInstance,
-                    #get_type_fn_name(),
+                    obj,
+                    #get_type_fn_name()
                 ) as *mut Option<#PrivateName>;
 
                 // Here we initialize the private data.  GObject gives it to us all zero-initialized

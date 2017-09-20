@@ -17,14 +17,14 @@ gobject_gen! {
         }
 
         fn add(&self, x: u32) -> u32 {
-            let private = self.private();
+            let private = self.get_priv();
             let v = private.f.get() + x;
             private.f.set(v);
             v
         }
 
         fn get(&self) -> u32 {
-            self.private().f.get()
+            self.get_priv().f.get()
         }
     }
 }

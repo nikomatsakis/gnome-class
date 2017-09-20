@@ -46,7 +46,7 @@ gobject_gen! {
         }
 
         fn set_dc(&self, dc: DropCounter) {
-            let mut self_dc = self.private().dc.borrow_mut();
+            let mut self_dc = self.get_priv().dc.borrow_mut();
             *self_dc = dc;
         }
     }
