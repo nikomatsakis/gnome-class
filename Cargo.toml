@@ -33,4 +33,3 @@ libc = "0.2"
 [dev-dependencies]
 glib-sys = "0.4.0"
 lazy_static = "0.2.2"
-gnome-class-shims = { path = "gnome-class-shims" }
