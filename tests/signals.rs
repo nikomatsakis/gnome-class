@@ -1,8 +1,7 @@
 #![feature(proc_macro)]
 
-// FIXME: can we combine these two?
-extern crate gnome_class_shims;
 extern crate gobject_gen;
+extern crate gobject_sys;
 
 #[macro_use]
 extern crate glib;
@@ -10,8 +9,6 @@ extern crate glib;
 extern crate libc;
 
 use gobject_gen::gobject_gen;
-use gnome_class_shims::gobject_sys;
-use gnome_class_shims::GInstance;
 use std::cell::Cell;
 use std::ffi::CStr;
 use std::mem;

@@ -1,7 +1,5 @@
 #![feature(proc_macro)]
 
-// FIXME: can we combine these two?
-extern crate gnome_class_shims;
 extern crate gobject_gen;
 
 #[macro_use]
