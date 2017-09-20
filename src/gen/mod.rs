@@ -228,6 +228,7 @@ impl<'ast> ClassContext<'ast> {
             self.imp_signals_enum(),
             self.imp_private_struct(),
             self.imp_class_private_struct(),
+            self.imp_slot_default_handlers(),
             self.imp_instance(),
             self.imp_class(),
             self.imp_extern_funcs(),
@@ -467,6 +468,47 @@ impl<'ast> ClassContext<'ast> {
                 properties:   ptr::null(),
                 signals:      ptr::null(),
             };
+        }
+    }
+
+    fn imp_slot_default_handlers(&self) -> Tokens {
+        // We are inside the "mod imp".  We will create function
+        // implementations for the default handlers for methods and
+        // signals as "impl super::Foo { ... }", so that the &self in
+        // those functions will refer to the Rust wrapper object that
+        // corresponds to the GObject-ABI structs within "mod imp".
+
+        let InstanceName = self.class.name;
+
+        let impls: Vec<Tokens> = self.members_with_slots()
+            .map(|member| {
+                let (slot_name, slot_impl_ty, code) = match *member {
+                    Member::Method(ref method) => (&method.name,
+                                                   SlotImplTy {
+                                                       sig:  &method.fn_def.sig
+                                                   },
+                                                   &method.fn_def.code),
+
+                    Member::Signal(ref signal) => (&signal.name,
+                                                   SlotImplTy {
+                                                       sig:  &signal.sig
+                                                   },
+                                                   signal.code.as_ref().unwrap()), // FIXME: signals with no default handler?
+                    _ => unreachable!()
+                };
+
+                let slot_impl_name = Self::slot_impl_name(slot_name);
+
+                quote! {
+                    fn #slot_impl_name#slot_impl_ty #code
+                }
+            })
+            .collect();
+
+        quote! {
+            impl super::#InstanceName {
+                #(#impls)*
+            }
         }
     }
 
@@ -1292,6 +1334,23 @@ impl<'ast> ToTokens for SlotTy<'ast> {
         }
     }
 }
+
+struct SlotImplTy<'ast> {
+    sig:  &'ast FnSig,
+}
+
+impl<'ast> ToTokens for SlotImplTy<'ast> {
+    fn to_tokens(&self, tokens: &mut Tokens) {
+        let arg_decls = self.sig.arg_decls();
+        let return_ty = self.sig.return_ty();
+
+        quote_in! {
+            tokens,
+            (&self, #arg_decls) #return_ty
+        }
+    }
+}
+
 
 /// Helper methods for printing out various bits of
 /// a method signature. For each of the comments below,
