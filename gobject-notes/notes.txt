@@ -1,5 +1,15 @@
 -*- org -*- 
 
+* TODO include a floating ref guard:
+
+<slomo> federico_: ok :) basically, you need something like this
+everywhere: https://github.com/sdroege/gst-plugin-rs/blob/dda3b5ff1a6d99d5f55d15465c4ab8b145f0b817/gst-plugin/src/base_sink.rs#L517
+. it's defined here https://github.com/sdroege/gst-plugin-rs/blob/dda3b5ff1a6d99d5f55d15465c4ab8b145f0b817/gst-plugin/src/lib.rs#L32-L58
+
+<slomo> federico_: otherwise you get a floating reference somewhere in
+your vfuncs or elsewhere, and treat them as (transfer none). which
+then ref_sinks it, stealing the reference from somewhere else
+
 * TODO Support subclassing from anything other than GObject
 
 ** Grammar supports "class Foo extends Bar"
