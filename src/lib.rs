@@ -156,12 +156,12 @@ pub fn gobject_gen(input: TokenStream) -> TokenStream {
     };
 
     match result {
-        Ok(token_stream) => {
+        Ok(tokens) => {
             let mut config: rustfmt::config::Config = Default::default();
             let mut out: Vec<u8> = vec!();
             config.set().write_mode(rustfmt::config::WriteMode::Plain);
             config.set().error_on_line_overflow(false);
-            let stream: String = token_stream.as_str().into();
+            let stream: String = tokens.as_str().into();
             match rustfmt::format_input(rustfmt::Input::Text(stream),
                                         & config,
                                         Some(& mut out)) {
