@@ -36,6 +36,9 @@ gobject_gen! {
     }
 }
 
+
+
+
 * Reordering class fields is an ABI break.  Shoule we warn about this / how?
 
 * Conversation with acrichto about proc-macros-2
@@ -202,3 +205,16 @@ gobject_gen! {
 <federico> cool, then I think I'll start there
 <federico> I should then be able to specify whatever compile-time flag or feature or whatever to be able to look at the generated code, right?
 <federico> (right now I println!() the rustfmt_string and eyeball that...)
+
+<federico> nmatsakis: I haven't read the lalrpop docs about spans carefully... is it compatible with the scheme in proc-macros-2?
+<nmatsakis> presumably
+<nmatsakis> I'm not sure... oh there are *some* docs here
+<nmatsakis> https://github.com/nikomatsakis/lalrpop/blob/master/doc/lexer_tutorial.md
+<nmatsakis> but basically lalrpop lets you define a custom tokenizer
+<nmatsakis> in which you can specify any type you want as your tokens
+<nmatsakis> if you like, you can include locations
+<nmatsakis> in which case your tokenizer needs to yield up tuples like (L1, T, L2)
+<nmatsakis> where L1 and L2 are the "start" and "end" locations for the token T
+<nmatsakis> (your tokenizer itself is just something that gives an Iterator)
+<nmatsakis> so essentially it should be compatible with just about *any* scheme,
+<nmatsakis> so long as 'locations' have a type
