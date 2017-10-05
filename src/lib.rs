@@ -11,6 +11,7 @@ extern crate lalrpop_intern;
 extern crate lalrpop_util;
 #[macro_use] extern crate quote;
 extern crate proc_macro;
+extern crate proc_macro2;
 extern crate unicode_xid;
 extern crate rustfmt;
 
@@ -148,6 +149,7 @@ mod tok;
 ///
 #[proc_macro]
 pub fn gobject_gen(input: TokenStream) -> TokenStream {
+    let input: proc_macro2::TokenStream = input.into();
     let input = input.to_string();
 
     let result: Result<quote::Tokens> = do catch {
