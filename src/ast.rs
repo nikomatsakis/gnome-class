@@ -1,19 +1,16 @@
 use lalrpop_intern::InternedString;
 use quote::Tokens;
 
-#[derive(Debug)]
 pub struct Program {
     pub classes: Vec<Class>
 }
 
-#[derive(Debug)]
 pub struct Class {
     pub name: Identifier,
     pub extends: Option<Path>,
     pub members: Vec<Member>
 }
 
-#[derive(Debug)]
 pub enum Member {
     PrivateStruct(PrivateStruct),
     PrivateInit(CodeBlock),
@@ -27,7 +24,6 @@ pub struct PrivateStruct {
     pub fields: Vec<VarTy>
 }
 
-#[derive(Debug)]
 pub struct Signal {
     pub name: Identifier,
     pub sig: FnSig,
@@ -41,13 +37,11 @@ pub struct FnSig {
     pub return_ty: Option<Type>,
 }
 
-#[derive(Debug)]
 pub struct Method {
     pub name: Identifier,
     pub fn_def: FnDef,
 }
 
-#[derive(Debug)]
 pub struct FnDef {
     pub sig: FnSig,
     pub code: CodeBlock,
@@ -72,7 +66,6 @@ pub enum Type {
 }
 
 /// Some uninterpreted tokens that always begin/end with `{`/`}`.
-#[derive(Debug)]
 pub struct CodeBlock {
     pub tokens: Tokens,
 }
