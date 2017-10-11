@@ -1,10 +1,10 @@
 #![feature(proc_macro)]
 
 extern crate gobject_gen;
-extern crate gobject_sys;
+// extern crate gobject_sys;
 
-#[macro_use]
-extern crate glib;
+// #[macro_use]
+// extern crate glib;
 
 extern crate libc;
 
@@ -13,9 +13,10 @@ use std::cell::Cell;
 use std::ffi::CStr;
 use std::mem;
 use std::slice;
+/*
 use glib::object::*;
 use glib::translate::*;
-/*
+
 gobject_gen! {
     class Signaler {
         struct SignalerPrivate {

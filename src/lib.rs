@@ -7,8 +7,8 @@
 #![allow(dead_code)]
 
 #[macro_use] extern crate error_chain;
-extern crate lalrpop_intern;
-extern crate lalrpop_util;
+// extern crate lalrpop_intern;
+// extern crate lalrpop_util;
 #[macro_use] extern crate quote;
 extern crate proc_macro;
 extern crate proc_macro2;
@@ -27,7 +27,7 @@ mod errors;
 //mod gen;
 mod param;
 mod parser;
-mod tok;
+//mod tok;
 
 /// Generates the code to create a derived glib::Object
 ///

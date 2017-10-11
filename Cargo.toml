@@ -2,7 +2,7 @@
 name = "gobject-gen"
 version = "0.1.0"
 authors = ["Niko Matsakis <niko@alum.mit.edu>"]
-build = "build.rs" # LALRPOP preprocessing
+# build = "build.rs" # LALRPOP preprocessing
 
 [lib]
 proc-macro = true
@@ -17,11 +17,11 @@ version = "0.2.1"
 [dependencies.lalrpop-util]
 version = "0.13.1"
 
-[build-dependencies.lalrpop]
-version = "0.13.1"
+# [build-dependencies.lalrpop]
+# version = "0.13.1"
 
 [dependencies]
-lalrpop-intern = "0.13.1"
+# lalrpop-intern = "0.13.1"
 error-chain = "0.11.0-rc.2"
 quote = { git = "https://github.com/dtolnay/quote" }
 unicode-xid = "0.0.4"

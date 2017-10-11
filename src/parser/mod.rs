@@ -1,21 +1,26 @@
 use ast;
 use errors::*;
-use lalrpop_util::ParseError;
-use tok::{self, Tok};
+//use lalrpop_util::ParseError;
+//use tok::{self, Tok};
 
-mod grammar;
+//mod tokens;
+
+//mod grammar;
 
 pub fn parse_program(input: &str) -> Result<ast::Program> {
+    unimplemented!()
+    /*
     let tokenizer = tok::Tokenizer::new(input, 0);
     match grammar::parse_Program(tokenizer) {
         Ok(p) => Ok(p),
         Err(e) => bail!("parse error: {:?}", e),
     }
+     */
 }
 
+/*
 type ParseResult<'input, T> =
     ::std::result::Result<T, ParseError<usize, Tok<'input>, Error>>;
-
 fn parse_members(input: &str,
                  offset: usize)
                  -> ParseResult<Vec<ast::Member>> {
@@ -37,3 +42,5 @@ fn parse_var_tys(input: &str,
     let tokenizer = tok::Tokenizer::new(contents, offset + 1);
     grammar::parse_VarTys(tokenizer)
 }
+ */
+
