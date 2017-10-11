@@ -15,7 +15,7 @@ use std::mem;
 use std::slice;
 use glib::object::*;
 use glib::translate::*;
-
+/*
 gobject_gen! {
     class Signaler {
         struct SignalerPrivate {
@@ -36,9 +36,10 @@ gobject_gen! {
         }
     }
 }
-
+*/
 #[test]
 #[ignore] // We don't create signals yet
+#[cfg(None)]
 fn has_value_changed_signal() {
     let obj: Signaler = Signaler::new();
     let obj_type = obj.get_type().to_glib();

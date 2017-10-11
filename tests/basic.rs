@@ -7,7 +7,7 @@ extern crate glib;
 use gobject_gen::gobject_gen;
 
 use std::cell::Cell;
-
+/*
 gobject_gen! {
     class Counter {
         struct CounterPrivate {
@@ -26,8 +26,9 @@ gobject_gen! {
         }
     }
 }
-
+*/
 #[test]
+#[cfg(None)]
 fn test() {
     let c: Counter = Counter::new();
 
