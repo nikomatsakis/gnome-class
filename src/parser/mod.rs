@@ -45,7 +45,7 @@ fn parse_var_tys(input: &str,
 }
  */
 
-use synom::{Synom, Cursor, PResult, parse_error};
+use synom::{Synom, Cursor, PResult, parse_error, SynomBuffer};
 use syn;
 
 impl Synom for ast::Class {
@@ -84,9 +84,23 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works() {
+    fn parses_class_name() {
         let raw = "class Foo {}";
 
         let token_stream = raw.parse::<TokenStream>().unwrap();
+
+        // We can't use
+        //
+        //   let class: ast::Class = syn::parse(token_stream).unwrap().1;
+        //
+        // because syn::parse() takes a proc_macro::TokenStream, not a
+        // proc_macro2::TokenStream.
+        //
+        // So, we'll do the conversion to a Cursor by hand.
+
+        let buffer = SynomBuffer::new(token_stream);
+        let cursor = buffer.begin();
+        let class: ast::Class = ast::Class::parse(cursor).unwrap().1;
+        assert_eq!(class.name.as_ref(), "Foo");
     }
 }
