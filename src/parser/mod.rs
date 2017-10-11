@@ -1,6 +1,7 @@
 use ast;
 use errors::*;
 //use lalrpop_util::ParseError;
+use proc_macro::{TokenStream, TokenTree, TokenNode, Term, Delimiter};
 //use tok::{self, Tok};
 
 //mod tokens;
@@ -44,3 +45,48 @@ fn parse_var_tys(input: &str,
 }
  */
 
+use synom::{Synom, Cursor, PResult, parse_error};
+use syn;
+
+impl Synom for ast::Class {
+    named!(parse -> Self, do_parse!(
+        call!(keyword("class"))    >>
+        name:  syn!(syn::Ident)    >>
+        block: syn!(syn::Block)    >>
+        (ast::Class {
+            name: name,
+            extends: None, // FIXME
+            members: Vec::new() // FIXME
+        })
+    ));
+}
+
+/// Creates a parsing function for use with synom's call!().  For
+/// example, if you need to parse a keyword "foo" as part of a bigger
+/// parser, you could do this:
+///
+/// ```ignore
+/// call!(keyword("foo"))
+/// ```
+fn keyword<'a>(name: &'static str) -> Box<Fn(Cursor<'a>) -> PResult<()>> {
+    Box::new(move |input: Cursor<'a>| {
+        if let Some((rest, _, s)) = input.word() {
+            if s.as_str() == name {
+                return Ok((rest, ()));
+            }
+        }
+        parse_error() // FIXME: use a meaningful error message when synom allows for it
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        let raw = "class Foo {}";
+
+        let token_stream = raw.parse::<TokenStream>().unwrap();
+    }
+}
