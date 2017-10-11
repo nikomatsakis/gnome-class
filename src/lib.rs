@@ -24,7 +24,7 @@ use std::str::FromStr;
 
 mod ast;
 mod errors;
-mod gen;
+//mod gen;
 mod param;
 mod parser;
 mod tok;
@@ -157,7 +157,8 @@ pub fn gobject_gen(input: TokenStream) -> TokenStream {
 
     let result: Result<quote::Tokens> = do catch {
         let program = parser::parse_program(&input)?;
-        gen::classes(&program)
+        //gen::classes(&program)
+        Ok(quote!{})
     };
 
     match result {
