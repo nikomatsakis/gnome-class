@@ -15,6 +15,9 @@ extern crate proc_macro2;
 extern crate unicode_xid;
 extern crate rustfmt;
 
+extern crate syn;
+#[macro_use] extern crate synom;
+
 use proc_macro::TokenStream;
 use errors::*;
 use std::str::FromStr;

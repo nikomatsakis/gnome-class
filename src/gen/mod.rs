@@ -6,6 +6,7 @@ use errors::*;
 use lalrpop_intern::{self, intern};
 use quote::{Ident, Tokens, ToTokens};
 use std::convert::Into;
+use syn::Ident;
 
 macro_rules! quote_in {
     ($tokens:expr, $($t:tt)*) => {
@@ -30,27 +31,25 @@ pub fn classes(program: &Program) -> Result<Tokens> {
     Ok(quote! { #(#class_tokens)* })
 }
 
-fn signal_id_name(signal: &Signal) -> Identifier {
-    Identifier {
-        str: intern(&format!("{}_signal_id", signal.name.str))
-    }
+fn signal_id_name(signal: &Signal) -> Ident {
+    Ident::from(&format!("{}_signal_id", signal.name.str))
 }
 
 struct ClassContext<'ast> {
     program: &'ast Program,
     class: &'ast Class,
     private_struct: &'ast PrivateStruct,
-    ModuleName: Identifier,
-    FieldsName: Identifier,
-    GClassName: Identifier,
-    PrivateClassName: Identifier,
+    ModuleName: Ident,
+    FieldsName: Ident,
+    GClassName: Ident,
+    PrivateClassName: Ident,
     ParentInstance: Tokens,
     ParentInstanceFfi: Tokens,
     ParentClassFfi: Tokens,
     GObject: Tokens,
     GObjectFfi: Tokens,
     GObjectClassFfi: Tokens,
-    InstanceExt: Identifier,
+    InstanceExt: Ident,
 }
 
 impl<'ast> ClassContext<'ast> {
@@ -69,13 +68,11 @@ impl<'ast> ClassContext<'ast> {
             None => bail!("no private struct found")
         };
 
-        // If our class name is "Foo" and we have a suffix "Bar", generates a "FooBar" Identifier.
+        // If our class name is "Foo" and we have a suffix "Bar", generates a "FooBar" Ident.
         // These are used for the generated module name, instance/class struct names, etc.
         macro_rules! container_name {
             ($class:expr, $suffix:expr) => {
-                Identifier {
-                    str: intern(&format!("{}{}", $class.name.str, $suffix))
-                }
+                Ident::from(&format!("{}{}", $class.name.str, $suffix))
             };
         }
 
@@ -185,13 +182,11 @@ impl<'ast> ClassContext<'ast> {
         }
     }
 
-    fn exported_fn_name(&self, method_name: &str) -> Identifier {
-        Identifier {
-            str: intern(&format!("{}_{}", self.lower_case_class_name(), method_name))
-        }
+    fn exported_fn_name(&self, method_name: &str) -> Ident {
+        Ident::from(&format!("{}_{}", self.lower_case_class_name(), method_name))
     }
 
-    fn get_type_fn_name(&self) -> Identifier {
+    fn get_type_fn_name(&self) -> Ident {
         self.exported_fn_name("get_type")
     }
 
@@ -389,7 +384,7 @@ impl<'ast> ClassContext<'ast> {
         }
     }
 
-    fn imp_new_fn_name(&self) -> Identifier {
+    fn imp_new_fn_name(&self) -> Ident {
         self.exported_fn_name("new")
     }
 
@@ -874,16 +869,12 @@ impl<'ast> ClassContext<'ast> {
             })
     }
 
-    fn slot_trampoline_name(slot_name: &Identifier) -> Identifier {
-        Identifier {
-            str: intern(&format!("{}_trampoline", slot_name.str))
-        }
+    fn slot_trampoline_name(slot_name: &Ident) -> Ident {
+        Ident::from(&format!("{}_trampoline", slot_name.as_ref()))
     }
 
-    fn slot_impl_name(slot_name: &Identifier) -> Identifier {
-        Identifier {
-            str: intern(&format!("{}_impl", slot_name.str))
-        }
+    fn slot_impl_name(slot_name: &Ident) -> Ident {
+        Ident::from(&format!("{}_impl", slot_name.str))
     }
 
     fn slot_assignments(&self) -> Vec<Tokens> {
@@ -908,13 +899,13 @@ impl<'ast> ClassContext<'ast> {
 
     /// From a signal called `foo`, generate `foo_signal_id`.  This is used to
     /// store the signal ids from g_signal_newv() in the Class structure.
-    pub fn signal_id_names(&self) -> Vec<Identifier> {
+    pub fn signal_id_names(&self) -> Vec<Ident> {
         self.signals()
             .map(|signal| signal_id_name (signal))
             .collect()
     }
 
-    pub fn method_names(&self) -> Vec<Identifier> {
+    pub fn method_names(&self) -> Vec<Ident> {
         self.methods()
             .map(|method| method.name)
             .collect()
@@ -997,8 +988,8 @@ impl<'ast> ClassContext<'ast> {
             .collect()
     }
 
-    fn method_ffi_name(&self, method: &Method) -> Identifier {
-        self.exported_fn_name(&method.name.str.to_string())
+    fn method_ffi_name(&self, method: &Method) -> Ident {
+        self.exported_fn_name(method.name.as_ref())
     }
 
     fn lower_case_class_name(&self) -> String {
@@ -1034,28 +1025,13 @@ impl ToTokens for Type {
     }
 }
 
-impl ToTokens for Identifier {
-    fn to_tokens(&self, tokens: &mut Tokens) {
-        lalrpop_intern::read(|interner| {
-            Ident::new(interner.data(self.str)).to_tokens(tokens);
-        })
-    }
-}
-
-struct ByteString(Identifier);
+struct ByteString(Ident);
 
 impl ToTokens for ByteString {
     fn to_tokens(&self, tokens: &mut Tokens) {
-        lalrpop_intern::read(|interner| {
-            // Because we are converting a legal identifier, we don't
-            // have to worry about it having escape characters in it
-            // or anything else:
-            let mut s = String::new();
-            s.push_str("b\"");
-            s.push_str(interner.data(self.0.str));
-            s.push_str("\\0\"");
-            tokens.append(&s);
-        })
+        tokens.append("b\"");
+        tokens.append(self.0.as_ref());
+        tokens.append("\\0\"");
     }
 }
 
@@ -1066,7 +1042,7 @@ impl ToTokens for CodeBlock {
 }
 
 struct SlotTy<'ast> {
-    class_name: Identifier,
+    class_name: Ident,
     sig: &'ast FnSig,
 }
 

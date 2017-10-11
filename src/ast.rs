@@ -1,12 +1,13 @@
-use lalrpop_intern::InternedString;
+//use lalrpop_intern::InternedString;
 use quote::Tokens;
+use syn::Ident;
 
 pub struct Program {
     pub classes: Vec<Class>
 }
 
 pub struct Class {
-    pub name: Identifier,
+    pub name: Ident,
     pub extends: Option<Path>,
     pub members: Vec<Member>
 }
@@ -20,12 +21,12 @@ pub enum Member {
 
 #[derive(Debug)]
 pub struct PrivateStruct {
-    pub name: Identifier,
+    pub name: Ident,
     pub fields: Vec<VarTy>
 }
 
 pub struct Signal {
-    pub name: Identifier,
+    pub name: Ident,
     pub sig: FnSig,
     pub code: Option<CodeBlock>,
     // FIXME: signal flags
@@ -38,7 +39,7 @@ pub struct FnSig {
 }
 
 pub struct Method {
-    pub name: Identifier,
+    pub name: Ident,
     pub fn_def: FnDef,
 }
 
@@ -49,7 +50,7 @@ pub struct FnDef {
 
 #[derive(Debug)]
 pub struct VarTy {
-    pub name: Identifier,
+    pub name: Ident,
     pub ty: Type,
 }
 
@@ -70,10 +71,12 @@ pub struct CodeBlock {
     pub tokens: Tokens,
 }
 
+/*
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct Identifier {
     pub str: InternedString
 }
+*/
 
 #[derive(Debug)]
 pub enum Path {
@@ -87,7 +90,7 @@ pub enum Path {
 
 #[derive(Debug)]
 pub struct PathId {
-    pub name: Identifier,
+    pub name: Ident,
     pub tys: Vec<Type>
 }
 
@@ -95,5 +98,5 @@ pub struct PathId {
 pub struct TraitItemId {
     pub self_ty: Type,
     pub trait_ref: Path,
-    pub item: Identifier,
+    pub item: Ident,
 }
