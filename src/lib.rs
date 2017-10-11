@@ -167,7 +167,7 @@ pub fn gobject_gen(input: TokenStream) -> TokenStream {
             let mut out: Vec<u8> = vec!();
             config.set().write_mode(rustfmt::config::WriteMode::Plain);
             config.set().error_on_line_overflow(false);
-            let stream: String = tokens.as_str().into();
+            let stream: String = tokens.to_string().into();
             match rustfmt::format_input(rustfmt::Input::Text(stream),
                                         & config,
                                         Some(& mut out)) {
