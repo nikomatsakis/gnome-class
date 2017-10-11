@@ -228,3 +228,55 @@ gobject_gen! {
 <nmatsakis> (your tokenizer itself is just something that gives an Iterator)
 <nmatsakis> so essentially it should be compatible with just about *any* scheme,
 <nmatsakis> so long as 'locations' have a type
+
+* Notes on syn
+
+** Augmenting the language
+
+It feels like, out of the box, proc_macro2 and syn provide machinery
+to implement your own attributes or derive-like things.
+
+However, gnome-class more or less wants to augment the language.
+
+I had to write src/parser/mod.rs keyword() by basically copying a bit
+from syn/synom/src/tokens.rs.  Could there be a built-in way to do
+this instead?
+
+    impl Synom for my_ast::Foo {
+        named!(parse -> Self, do_parse!(
+            call!(keyword("foo")) >>
+            other_stuff: ...      >>
+            (my_ast::Foo { ... other_stuff ... })
+        ));
+    }
+
+** Tests for just your parser
+
+It's not obvious how to write your parser bit by bit, with tests along
+the way.  In particular, how to get a valid TokenStream so you can run
+syn on it, without having the whole proc_macro2 machinery in place.
+
+    fn parses_class_name() {
+        let raw = "class Foo {}";
+
+        let token_stream = raw.parse::<TokenStream>().unwrap();
+
+        // We can't use
+        //
+        //   let class: ast::Class = syn::parse(token_stream).unwrap().1;
+        //
+        // because syn::parse() takes a proc_macro::TokenStream, not a
+        // proc_macro2::TokenStream.
+        //
+        // So, we'll do the conversion to a Cursor by hand.
+
+        let buffer = SynomBuffer::new(token_stream);
+        let cursor = buffer.begin();
+        let class: ast::Class = ast::Class::parse(cursor).unwrap().1;
+        assert_eq!(class.name.as_ref(), "Foo");
+    }
+
+** Error messages
+
+I couldn't find a way to create a meaningful ParseError.  The exported
+parse_error() doesn't let one provide a string or anything.
