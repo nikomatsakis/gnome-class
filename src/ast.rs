@@ -1,6 +1,6 @@
 //use lalrpop_intern::InternedString;
 use quote::Tokens;
-use syn::{Ident, Path};
+use syn::{DeriveInput, Ident, Path};
 
 pub struct Program {
     pub classes: Vec<Class>
@@ -20,8 +20,7 @@ pub enum Member {
 }
 
 pub struct PrivateStruct {
-    pub name: Ident,
-    pub fields: Vec<VarTy>
+    pub derive_input: DeriveInput
 }
 
 pub struct Signal {

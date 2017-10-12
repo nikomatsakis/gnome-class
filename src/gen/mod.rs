@@ -389,7 +389,8 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn imp_private_struct(&self) -> Tokens {
-        let PrivateName = self.private_struct.name;
+        // FIXME: self.private_struct now only has a .derive_input
+        let PrivateName = &self.private_struct.derive_input.ident;
         let private_struct_fields = &self.private_struct.fields;
         let private_init_fn_body = &self.private_init_fn_body();
 
@@ -423,10 +424,11 @@ impl<'ast> ClassContext<'ast> {
             quote! { #i }
         } else {
             let PrivateName = self.private_struct.name;
+            // FIXME: self.private_struct.fields is no longer Vec<VarTy>; it is now syn::VariantData.
             let private_struct_field_names =
                 self.private_struct.fields
                                    .iter()
-                                   .map(|f| f.name);
+                                   .map(|f| f.ident.as_ref().unwrap());
             quote! {
                 {
                     #PrivateName {
