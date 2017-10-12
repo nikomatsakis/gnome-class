@@ -1,6 +1,6 @@
 //use lalrpop_intern::InternedString;
 use quote::Tokens;
-use syn::Ident;
+use syn::{Ident, Path};
 
 pub struct Program {
     pub classes: Vec<Class>
@@ -19,7 +19,6 @@ pub enum Member {
     Signal(Signal),
 }
 
-#[derive(Debug)]
 pub struct PrivateStruct {
     pub name: Ident,
     pub fields: Vec<VarTy>
@@ -32,7 +31,6 @@ pub struct Signal {
     // FIXME: signal flags
 }
 
-#[derive(Debug)]
 pub struct FnSig {
     pub args: Vec<VarTy>,
     pub return_ty: Option<Type>,
@@ -48,13 +46,11 @@ pub struct FnDef {
     pub code: CodeBlock,
 }
 
-#[derive(Debug)]
 pub struct VarTy {
     pub name: Ident,
     pub ty: Type,
 }
 
-#[derive(Debug)]
 pub enum Type {
     // N
     Path(Path),
@@ -76,7 +72,6 @@ pub struct CodeBlock {
 pub struct Identifier {
     pub str: InternedString
 }
-*/
 
 #[derive(Debug)]
 pub enum Path {
@@ -100,3 +95,4 @@ pub struct TraitItemId {
     pub trait_ref: Path,
     pub item: Ident,
 }
+*/
