@@ -68,15 +68,15 @@ impl Synom for ast::Class {
 /// ```ignore
 /// call!(keyword("foo"))
 /// ```
-fn keyword<'a>(name: &'static str) -> Box<Fn(Cursor<'a>) -> PResult<()>> {
-    Box::new(move |input: Cursor<'a>| {
+fn keyword<'a>(name: &'static str) -> impl Fn(Cursor<'a>) -> PResult<()> {
+    move |input: Cursor<'a>| {
         if let Some((rest, _, s)) = input.word() {
             if s.as_str() == name {
                 return Ok((rest, ()));
             }
         }
         parse_error() // FIXME: use a meaningful error message when synom allows for it
-    })
+    }
 }
 
 #[cfg(test)]
