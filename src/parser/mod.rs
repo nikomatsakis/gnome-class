@@ -46,20 +46,20 @@ fn parse_var_tys(input: &str,
  */
 
 use synom::{Synom, Cursor, PResult, parse_error, SynomBuffer, tokens};
-use syn;
+use syn::{Ident, Path, Block};
 
 // class Foo [: SuperClass [, ImplementsIface]*] {
 // }
 impl Synom for ast::Class {
     named!(parse -> Self, do_parse!(
         call!(keyword("class"))                 >>
-        name:  syn!(syn::Ident)                 >>
+        name: syn!(Ident)                       >>
         extends: option!(do_parse!(
             syn!(tokens::Colon)                 >>
-            superclass: syn!(syn::Path)         >>
+            superclass: syn!(Path)              >>
             // FIXME: interfaces
             (superclass)))                      >>
-        block: syn!(syn::Block)                 >>
+        block: syn!(Block)                      >>
         (ast::Class {
             name: name,
             extends: extends,
