@@ -1,7 +1,7 @@
 use ast;
 use errors::*;
 //use lalrpop_util::ParseError;
-use proc_macro2::{TokenStream, TokenTree, TokenNode, Term, Delimiter};
+//use proc_macro2::{TokenStream, TokenTree, TokenNode, Term, Delimiter};
 //use tok::{self, Tok};
 
 //mod tokens;
@@ -45,8 +45,8 @@ fn parse_var_tys(input: &str,
 }
  */
 
-use synom::{Synom, Cursor, PResult, parse_error, SynomBuffer, tokens};
-use syn::{Ident, Path, Block};
+use synom::{Synom, Cursor, PResult, parse_error, tokens};
+use syn::{Block, DeriveInput, Ident, Path};
 
 // class Foo [: SuperClass [, ImplementsIface]*] {
 // }
@@ -61,9 +61,28 @@ impl Synom for ast::Class {
             (superclass)))                      >>
         block: syn!(Block)                      >>
         (ast::Class {
-            name: name,
+            name:    name,
             extends: extends,
             members: Vec::new() // FIXME
+        })
+    ));
+}
+
+// struct Foo {
+//     <fields>*
+// }
+//
+// FIXME: we assume that the DeriveInput will have a Body -> Struct ->
+// data: VariantData::Struct i.e. *not* a Tuple.  Would anyone really
+// want to have a private tuple struct for a GObject's data?
+//
+// If the answer is "no", maybe we should peek!() that there is a Brace there.
+impl Synom for ast::PrivateStruct {
+    named!(parse -> Self, do_parse!(
+        peek!(syn!(tokens::Struct))     >>
+        derive_input: syn!(DeriveInput) >>
+        (ast::PrivateStruct {
+            derive_input: derive_input
         })
     ));
 }
@@ -89,8 +108,12 @@ fn keyword<'a>(name: &'static str) -> impl Fn(Cursor<'a>) -> PResult<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use proc_macro2::{TokenStream};
     use quote;
     use quote::ToTokens;
+    use syn::{Body, BodyStruct, Ty, VariantData};
+    use synom::{SynomBuffer};
+    use synom::delimited::Element;
 
     #[test]
     fn parses_class_name() {
@@ -128,5 +151,63 @@ mod tests {
         let mut path_tokens = quote::Tokens::new();
         class.extends.unwrap().to_tokens(&mut path_tokens);
         assert_eq!(path_tokens.to_string(), "Bar");
+    }
+
+    #[test]
+    fn parses_private_struct() {
+        let raw = "struct FooPrivate {
+                       foo: u32,
+                       bar: String
+                   }";
+
+        let token_stream = raw.parse::<TokenStream>().unwrap();
+
+        let buffer = SynomBuffer::new(token_stream);
+        let cursor = buffer.begin();
+
+        let private_struct = ast::PrivateStruct::parse(cursor).unwrap().1;
+
+        assert_eq!(private_struct.derive_input.ident.as_ref(), "FooPrivate");
+
+        match private_struct.derive_input.body {
+            Body::Struct(BodyStruct {
+                data: VariantData::Struct(ref delimited, ..),
+                .. })
+                => {
+                    let mut iter = delimited.iter();
+
+                    let element = iter.next().unwrap();
+                    if let Element::Delimited(ref field, ..) = element {
+                        assert_eq!(field.ident.unwrap(), "foo");
+
+                        if let Ty::Path(ref typath) = field.ty {
+                            let mut path_tokens = quote::Tokens::new();
+                            typath.path.to_tokens(&mut path_tokens);
+                            assert_eq!(path_tokens.to_string(), "u32");
+                        } else {
+                            unreachable!();
+                        }
+                    } else {
+                        unreachable!();
+                    }
+
+                    let element = iter.next().unwrap();
+                    if let Element::End(ref field) = element {
+                        assert_eq!(field.ident.unwrap(), "bar");
+
+                        if let Ty::Path(ref typath) = field.ty {
+                            let mut path_tokens = quote::Tokens::new();
+                            typath.path.to_tokens(&mut path_tokens);
+                            assert_eq!(path_tokens.to_string(), "String");
+                        } else {
+                            unreachable!();
+                        }
+                    } else {
+                        unreachable!();
+                    }
+                },
+
+            _ => unreachable!()
+        }
     }
 }
