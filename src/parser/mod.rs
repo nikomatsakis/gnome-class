@@ -45,17 +45,24 @@ fn parse_var_tys(input: &str,
 }
  */
 
-use synom::{Synom, Cursor, PResult, parse_error, SynomBuffer};
+use synom::{Synom, Cursor, PResult, parse_error, SynomBuffer, tokens};
 use syn;
 
+// class Foo [: SuperClass [, ImplementsIface]*] {
+// }
 impl Synom for ast::Class {
     named!(parse -> Self, do_parse!(
-        call!(keyword("class"))    >>
-        name:  syn!(syn::Ident)    >>
-        block: syn!(syn::Block)    >>
+        call!(keyword("class"))                 >>
+        name:  syn!(syn::Ident)                 >>
+        extends: option!(do_parse!(
+            syn!(tokens::Colon)                 >>
+            superclass: syn!(syn::Path)         >>
+            // FIXME: interfaces
+            (superclass)))                      >>
+        block: syn!(syn::Block)                 >>
         (ast::Class {
             name: name,
-            extends: None, // FIXME
+            extends: extends,
             members: Vec::new() // FIXME
         })
     ));
@@ -82,6 +89,8 @@ fn keyword<'a>(name: &'static str) -> impl Fn(Cursor<'a>) -> PResult<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use quote;
+    use quote::ToTokens;
 
     #[test]
     fn parses_class_name() {
@@ -102,5 +111,22 @@ mod tests {
         let cursor = buffer.begin();
         let class: ast::Class = ast::Class::parse(cursor).unwrap().1;
         assert_eq!(class.name.as_ref(), "Foo");
+        assert!(class.extends.is_none());
+    }
+
+    #[test]
+    fn parses_class_name_and_superclass() {
+        let raw = "class Foo: Bar {}";
+
+        let token_stream = raw.parse::<TokenStream>().unwrap();
+
+        let buffer = SynomBuffer::new(token_stream);
+        let cursor = buffer.begin();
+        let class: ast::Class = ast::Class::parse(cursor).unwrap().1;
+        assert_eq!(class.name.as_ref(), "Foo");
+
+        let mut path_tokens = quote::Tokens::new();
+        class.extends.unwrap().to_tokens(&mut path_tokens);
+        assert_eq!(path_tokens.to_string(), "Bar");
     }
 }
