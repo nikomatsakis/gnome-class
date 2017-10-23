@@ -50,21 +50,28 @@ use synom::{Synom, Cursor, PResult, parse_error, tokens};
 use syn::{Block, DeriveInput, FunctionRetTy, Ident, Path};
 
 // class Foo [: SuperClass [, ImplementsIface]*] {
+//     struct FooPrivate {
+//         ...
+//     }
+//
+//     private_init() -> FooPrivate {
+//         ...
+//     }
 // }
 impl Synom for ast::Class {
     named!(parse -> Self, do_parse!(
-        call!(keyword("class"))                 >>
-        name: syn!(Ident)                       >>
+        call!(keyword("class"))                                  >>
+        name: syn!(Ident)                                        >>
         extends: option!(do_parse!(
-            syn!(tokens::Colon)                 >>
-            superclass: syn!(Path)              >>
+            syn!(tokens::Colon)                                  >>
+            superclass: syn!(Path)                               >>
             // FIXME: interfaces
-            (superclass)))                      >>
-        block: syn!(Block)                      >>
+            (superclass)))                                       >>
+        members_and_braces: braces!(many0!(syn!(ast::Member)))   >>
         (ast::Class {
             name:    name,
             extends: extends,
-            members: Vec::new() // FIXME
+            members: members_and_braces.0
         })
     ));
 }
@@ -310,4 +317,59 @@ mod tests {
         };
     }
 
+    #[test]
+    fn parses_private_struct_members() {
+        let raw = "class Foo {
+                       struct FooPrivate {
+                           foo: u32,
+                           bar: String
+                       }
+
+                       private_init () -> FooPrivate {
+                           FooPrivate {
+                               foo: 42,
+                               bar: \"hello\".to_string()
+                           }
+                       }
+                   }";
+
+        let token_stream = raw.parse::<TokenStream>().unwrap();
+
+        let buffer = SynomBuffer::new(token_stream);
+        let cursor = buffer.begin();
+
+        let class = ast::Class::parse(cursor).unwrap().1;
+
+        let mut iter = class.members.iter();
+
+        let m = iter.next().unwrap();
+        match *m {
+            ast::Member::PrivateStruct(ref s) => {
+                (); // okay
+            },
+
+            _ => unreachable!()
+        };
+
+        let m = iter.next().unwrap();
+        match *m {
+            ast::Member::PrivateInit (ref i) => {
+                assert!(i.inputs.is_empty());
+
+                match i.output {
+                    FunctionRetTy::Ty(Ty::Path(TyPath { ref path, .. }), _) => {
+                        let mut path_tokens = quote::Tokens::new();
+                        path.to_tokens(&mut path_tokens);
+                        assert_eq!(path_tokens.to_string(), "FooPrivate");
+                    },
+
+                    _ => unreachable!()
+                }
+            },
+
+            _ => unreachable!()
+        };
+
+        assert!(iter.next().is_none());
+    }
 }
