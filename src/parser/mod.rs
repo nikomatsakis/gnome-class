@@ -45,8 +45,9 @@ fn parse_var_tys(input: &str,
 }
  */
 
+use synom::delimited::Delimited;
 use synom::{Synom, Cursor, PResult, parse_error, tokens};
-use syn::{Block, DeriveInput, Ident, Path};
+use syn::{Block, DeriveInput, FunctionRetTy, Ident, Path};
 
 // class Foo [: SuperClass [, ImplementsIface]*] {
 // }
@@ -83,6 +84,28 @@ impl Synom for ast::PrivateStruct {
         derive_input: syn!(DeriveInput) >>
         (ast::PrivateStruct {
             derive_input: derive_input
+        })
+    ));
+}
+
+// private_init () -> PrivateStructName {
+//     ...
+// }
+//
+// This is the initialization function for the user's PrivateStruct.
+impl Synom for ast::PrivateInit {
+    named!(parse -> Self, do_parse!(
+        call!(keyword("private_init"))                >>
+        inputs: parens!(Delimited::parse_terminated)  >>
+        output: syn!(FunctionRetTy)                   >>
+        block_and_braces: braces!(call!(Block::parse_within))    >>
+        (ast::PrivateInit {
+            inputs: inputs.0,
+            output: output,
+            block:  Block {
+                brace_token: block_and_braces.1,
+                stmts: block_and_braces.0,
+            },
         })
     ));
 }

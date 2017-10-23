@@ -1,6 +1,8 @@
 //use lalrpop_intern::InternedString;
 use quote::Tokens;
-use syn::{DeriveInput, Ident, Path};
+use syn::{DeriveInput, Ident, Path, FnArg, FunctionRetTy, Block};
+use synom::delimited::Delimited;
+use synom::tokens;
 
 pub struct Program {
     pub classes: Vec<Class>
@@ -14,13 +16,24 @@ pub struct Class {
 
 pub enum Member {
     PrivateStruct(PrivateStruct),
-    PrivateInit(CodeBlock),
+    PrivateInit(PrivateInit),
     Method(Method),
     Signal(Signal),
 }
 
 pub struct PrivateStruct {
     pub derive_input: DeriveInput
+}
+
+pub struct PrivateInit {
+    // FIXME: inputs must be empty; we just don't know how to parse
+    // an empty "()" yet.
+    pub inputs: Delimited<FnArg, tokens::Comma>,
+
+    // checked to be the same as the PrivateStruct type
+    pub output: FunctionRetTy,
+
+    pub block: Block
 }
 
 pub struct Signal {
