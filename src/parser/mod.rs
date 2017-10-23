@@ -49,6 +49,15 @@ use synom::delimited::Delimited;
 use synom::{Synom, Cursor, PResult, parse_error, tokens};
 use syn::{Block, DeriveInput, FunctionRetTy, Ident, Path};
 
+impl Synom for ast::Program {
+    named!(parse -> Self, do_parse!(
+        classes: many0!(syn!(ast::Class)) >>
+        (ast::Program {
+            classes: classes
+        })
+    ));
+}
+
 // class Foo [: SuperClass [, ImplementsIface]*] {
 //     struct FooPrivate {
 //         ...
@@ -371,5 +380,31 @@ mod tests {
         };
 
         assert!(iter.next().is_none());
+    }
+
+    #[test]
+    fn parses_program() {
+        let raw = "class Foo {
+                       struct FooPrivate {
+                           foo: u32,
+                           bar: String
+                       }
+
+                       private_init () -> FooPrivate {
+                           FooPrivate {
+                               foo: 42,
+                               bar: \"hello\".to_string()
+                           }
+                       }
+                   }";
+
+        let token_stream = raw.parse::<TokenStream>().unwrap();
+
+        let buffer = SynomBuffer::new(token_stream);
+        let cursor = buffer.begin();
+
+        let program = ast::Program::parse(cursor).unwrap().1;
+
+        assert!(program.classes.len() == 1);
     }
 }
