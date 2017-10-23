@@ -134,7 +134,7 @@ mod tests {
     use proc_macro2::{TokenStream};
     use quote;
     use quote::ToTokens;
-    use syn::{Body, BodyStruct, Ty, VariantData};
+    use syn::{Body, BodyStruct, Ty, VariantData, TyPath};
     use synom::{SynomBuffer};
     use synom::delimited::Element;
 
@@ -229,6 +229,35 @@ mod tests {
                         unreachable!();
                     }
                 },
+
+            _ => unreachable!()
+        }
+    }
+
+    #[test]
+    fn parses_private_init() {
+        let raw = "private_init () -> FooPrivate {
+                       FooPrivate {
+                           foo: 42,
+                           bar: \"hello\".to_string()
+                       }
+                   }";
+
+        let token_stream = raw.parse::<TokenStream>().unwrap();
+
+        let buffer = SynomBuffer::new(token_stream);
+        let cursor = buffer.begin();
+
+        let private_init = ast::PrivateInit::parse(cursor).unwrap().1;
+
+        assert!(private_init.inputs.is_empty());
+
+        match private_init.output {
+            FunctionRetTy::Ty(Ty::Path(TyPath { ref path, .. }), _) => {
+                let mut path_tokens = quote::Tokens::new();
+                path.to_tokens(&mut path_tokens);
+                assert_eq!(path_tokens.to_string(), "FooPrivate");
+            },
 
             _ => unreachable!()
         }
