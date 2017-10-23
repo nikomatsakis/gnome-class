@@ -69,6 +69,14 @@ impl Synom for ast::Class {
     ));
 }
 
+impl Synom for ast::Member {
+    named!(parse -> Self, alt!(
+        syn!(ast::PrivateStruct) => { |x| ast::Member::PrivateStruct(x) }
+        |
+        syn!(ast::PrivateInit) => { |x| ast::Member::PrivateInit(x) }
+    ));
+}
+
 // struct Foo {
 //     <fields>*
 // }
@@ -262,4 +270,44 @@ mod tests {
             _ => unreachable!()
         }
     }
+
+    #[test]
+    fn parses_members() {
+        let raw = "struct FooPrivate {
+                       foo: u32,
+                       bar: String
+                   }";
+
+        let token_stream = raw.parse::<TokenStream>().unwrap();
+
+        let buffer = SynomBuffer::new(token_stream);
+        let cursor = buffer.begin();
+
+        let member = ast::Member::parse(cursor).unwrap().1;
+
+        match member {
+            ast::Member::PrivateStruct(_) => (),
+            _ => unreachable!()
+        };
+
+        let raw = "private_init () -> FooPrivate {
+                       FooPrivate {
+                           foo: 42,
+                           bar: \"hello\".to_string()
+                       }
+                   }";
+
+        let token_stream = raw.parse::<TokenStream>().unwrap();
+
+        let buffer = SynomBuffer::new(token_stream);
+        let cursor = buffer.begin();
+
+        let member = ast::Member::parse(cursor).unwrap().1;
+
+        match member {
+            ast::Member::PrivateInit(_) => (),
+            _ => unreachable!()
+        };
+    }
+
 }
