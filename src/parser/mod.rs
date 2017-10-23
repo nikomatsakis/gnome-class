@@ -214,7 +214,7 @@ mod tests {
 
         let private_struct = ast::PrivateStruct::parse(cursor).unwrap().1;
 
-        assert_eq!(private_struct.derive_input.ident.as_ref(), "FooPrivate");
+        assert_eq!(private_struct.name_as_ref(), "FooPrivate");
 
         match private_struct.derive_input.body {
             Body::Struct(BodyStruct {

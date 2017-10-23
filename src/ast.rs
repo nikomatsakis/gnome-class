@@ -1,5 +1,5 @@
 //use lalrpop_intern::InternedString;
-use quote::Tokens;
+//use quote::Tokens;
 use syn::{DeriveInput, Ident, Path, FnArg, FunctionRetTy, Block};
 use synom::delimited::Delimited;
 use synom::tokens;
@@ -110,3 +110,13 @@ pub struct TraitItemId {
     pub item: Ident,
 }
 */
+
+impl PrivateStruct {
+    pub fn name(&self) -> &Ident {
+        &self.derive_input.ident
+    }
+
+    pub fn name_as_ref(&self) -> &str {
+        self.derive_input.ident.as_ref()
+    }
+}
