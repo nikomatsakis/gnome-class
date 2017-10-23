@@ -17,8 +17,10 @@ pub struct Class {
 pub enum Member {
     PrivateStruct(PrivateStruct),
     PrivateInit(PrivateInit),
+/*
     Method(Method),
     Signal(Signal),
+*/
 }
 
 pub struct PrivateStruct {
@@ -35,7 +37,7 @@ pub struct PrivateInit {
 
     pub block: Block
 }
-
+/*
 pub struct Signal {
     pub name: Ident,
     pub sig: FnSig,
@@ -78,7 +80,7 @@ pub enum Type {
 pub struct CodeBlock {
     pub tokens: Tokens,
 }
-
+*/
 /*
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct Identifier {
