@@ -76,7 +76,7 @@ impl<'ast> ClassContext<'ast> {
         // These are used for the generated module name, instance/class struct names, etc.
         macro_rules! container_name {
             ($suffix:expr) => {
-                Ident::from(&format!("{}{}", InstanceName.as_ref(), $suffix))
+                Ident::from(format!("{}{}", InstanceName.as_ref(), $suffix))
             };
         }
 
