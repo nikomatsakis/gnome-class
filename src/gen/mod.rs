@@ -23,7 +23,7 @@ pub fn classes(program: &Program) -> Result<Tokens> {
         program.classes
                .iter()
                .map(|class| {
-                   let cx = ClassContext::new(program, class)?;
+                   let cx = ClassContext::new(program, class);
                    cx.gen_class()
                })
                .collect::<Result<Vec<_>>>()?;
@@ -48,7 +48,7 @@ struct ClassContext<'ast> {
 }
 
 impl<'ast> ClassContext<'ast> {
-    pub fn new(program: &'ast Program, class: &'ast Class) -> Result<Self> {
+    pub fn new(program: &'ast Program, class: &'ast Class) -> Self {
         let private_struct =
             class.members
                  .iter()
@@ -60,7 +60,7 @@ impl<'ast> ClassContext<'ast> {
 
         let private_struct = match private_struct {
             Some(p) => p,
-            None => bail!("no private struct found")
+            None => unreachable!() // this was checked already by checking.rs
         };
 
         let InstanceName = &class.name;
@@ -98,7 +98,7 @@ impl<'ast> ClassContext<'ast> {
             <#ParentInstance as glib::wrapper::Wrapper>::GlibClassType
         };
 
-        Ok(ClassContext {
+        ClassContext {
             program,
             class,
             private_struct,
@@ -113,7 +113,7 @@ impl<'ast> ClassContext<'ast> {
             GObjectFfi,
             GObjectClassFfi,
             InstanceExt,
-        })
+        }
     }
 
     pub fn gen_class(&self) -> Result<Tokens> {
