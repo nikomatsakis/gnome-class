@@ -63,24 +63,25 @@ impl<'ast> ClassContext<'ast> {
             None => bail!("no private struct found")
         };
 
-        // If our class name is "Foo" and we have a suffix "Bar", generates a "FooBar" Ident.
+        let InstanceName = &class.name;
+
+        // If our instance name is "Foo" and we have a suffix "Bar", generates a "FooBar" Ident.
         // These are used for the generated module name, instance/class struct names, etc.
         macro_rules! container_name {
-            ($class:expr, $suffix:expr) => {
-                Ident::from(&format!("{}{}", $class.InstanceName.as_ref(), $suffix))
+            ($suffix:expr) => {
+                Ident::from(&format!("{}{}", InstanceName.as_ref(), $suffix))
             };
         }
 
-        let ModuleName       = container_name!(class, "Mod"); // toplevel "InstanceMod" module name
-        let ClassName        = container_name!(class, "Class");
-        let PrivateClassName = container_name!(class, "ClassPrivate");
-        let InstanceExt      = container_name!(class, "Ext"); // public trait with all the class's methods
+        let ModuleName       = container_name!("Mod"); // toplevel "InstanceMod" module name
+        let ClassName        = container_name!("Class");
+        let PrivateClassName = container_name!("ClassPrivate");
+        let InstanceExt      = container_name!("Ext"); // public trait with all the class's methods
 
         let GObject = quote! { glib::Object };
         let GObjectFfi = quote! { gobject_ffi::GObject };
         let GObjectClassFfi = quote! { gobject_ffi::GObjectClass };
 
-        // GObject is hardcoded in various places below
         let ParentInstance =
             class.extends
                  .as_ref()
@@ -102,7 +103,7 @@ impl<'ast> ClassContext<'ast> {
             class,
             private_struct,
             ModuleName,
-            &self.class.name,
+            InstanceName,
             ClassName,
             PrivateClassName,
             ParentInstance,
