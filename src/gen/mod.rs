@@ -3,7 +3,7 @@
 
 use ast::*;
 use errors::*;
-use quote::{Ident, Tokens, ToTokens};
+use quote::{Tokens, ToTokens};
 use std::convert::Into;
 use syn::Ident;
 
