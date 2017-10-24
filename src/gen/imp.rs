@@ -1,4 +1,5 @@
 use super::*;
+use cstringident::*;
 
 impl<'ast> ClassContext<'ast> {
     fn imp_module(&self) -> Tokens {
@@ -489,7 +490,7 @@ impl<'ast> ClassContext<'ast> {
         let ClassName = self.ClassName;
         let InstanceName = self.InstanceName;
         let ParentInstance = &self.ParentInstance;
-        let instance_name_string = ByteString(InstanceName);
+        let instance_name_string = CStringIdent(InstanceName);
 
         quote! {
             #[no_mangle]

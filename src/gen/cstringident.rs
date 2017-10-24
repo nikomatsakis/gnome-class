@@ -1,6 +1,9 @@
-struct ByteString(Ident);
+use quote::{Tokens, ToTokens};
+use syn::Ident;
 
-impl ToTokens for ByteString {
+struct CStringIdent(Ident);
+
+impl ToTokens for CStringIdent {
     fn to_tokens(&self, tokens: &mut Tokens) {
         tokens.append("b\"");
         tokens.append(self.0.as_ref());

@@ -1,4 +1,5 @@
 use super::*;
+use cstringident::*;
 
 impl<'ast> ClassContext<'ast> {
     fn signal_trampolines(&self) -> Tokens {
@@ -36,7 +37,7 @@ impl<'ast> ClassContext<'ast> {
                 // FIXME: We are not passing a class_closure, marshaller, etc.
 
                 let signal_id_name = signal_id_name(&signal);
-                let signal_name = ByteString(signal.name);
+                let signal_name = CStringIdent(signal.name);
                 quote! {
                     klass.#signal_id_name =
                         gobject_sys::g_signal_newv (#signal_name as *const u8 as *const i8,
