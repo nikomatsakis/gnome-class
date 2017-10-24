@@ -7,6 +7,7 @@ use quote::{Tokens, ToTokens};
 use std::convert::Into;
 use syn::Ident;
 
+mod glib_utils;
 mod toplevel_imports;
 
 macro_rules! quote_in {
@@ -156,21 +157,6 @@ impl<'ast> ClassContext<'ast> {
 
     fn get_type_fn_name(&self) -> Ident {
         self.exported_fn_name("get_type")
-    }
-
-    fn glib_wrapper(&self) -> Tokens {
-        let InstanceName = self.InstanceName;
-        let get_type_fn_name = self.get_type_fn_name();
-
-        quote! {
-            glib_wrapper! {
-                pub struct #InstanceName(Object<imp::#InstanceName>); // FIXME: parent classes/interfaces
-
-                match fn {
-                    get_type => || imp::#get_type_fn_name(),
-                }
-            }
-        }
     }
 
     fn imp_module(&self) -> Tokens {
