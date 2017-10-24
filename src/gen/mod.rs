@@ -91,10 +91,7 @@ impl<'ast> ClassContext<'ast> {
 
         let ParentInstance    = Self::tokens_ParentInstance(class);
         let ParentInstanceFfi = Self::tokens_ParentInstanceFfi(class);
-
-        let ParentClassFfi    = quote! {
-            <#ParentInstance as glib::wrapper::Wrapper>::GlibClassType
-        };
+        let ParentClassFfi    = Self::tokens_ParentClassFfi(class);
 
         ClassContext {
             program,

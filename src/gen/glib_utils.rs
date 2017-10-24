@@ -51,6 +51,14 @@ impl<'ast> ClassContext<'ast> {
             .unwrap_or_else(|| Self::tokens_GObjectFfi())
     }
 
+    pub fn tokens_ParentClassFfi(class: &Class) -> Tokens {
+        let ParentInstance = Self::tokens_ParentInstance(class);
+
+        quote! {
+            <#ParentInstance as glib::wrapper::Wrapper>::GlibClassType
+        }
+    }
+
     fn glib_callback_guard(&self) -> Tokens {
         quote! {
             let _guard = glib::CallbackGuard::new();
