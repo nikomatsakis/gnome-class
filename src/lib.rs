@@ -23,6 +23,7 @@ use errors::*;
 use std::str::FromStr;
 
 mod ast;
+mod checking;
 mod errors;
 //mod gen;
 mod param;
@@ -157,6 +158,7 @@ pub fn gobject_gen(input: TokenStream) -> TokenStream {
 
     let result: Result<quote::Tokens> = do catch {
         let program = parser::parse_program(&input)?;
+        let program = checking::check_program(program)?;
         //gen::classes(&program)
         Ok(quote!{})
     };

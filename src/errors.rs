@@ -17,5 +17,13 @@ error_chain! {
             description("invalid token in the input")
             display("invalid token at offset {}: {}", offset, msg)
         }
+        OnePrivateStructError(msg: String) {
+            description("single private struct expected")
+            display("one and only one private struct expected: {}", msg)
+        }
+        OnePrivateInitError(msg: String) {
+            description("single private_init expected")
+            display("one and only one private_init expected: {}", msg)
+        }
     }
 }
