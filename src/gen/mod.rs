@@ -67,7 +67,7 @@ impl<'ast> ClassContext<'ast> {
         // These are used for the generated module name, instance/class struct names, etc.
         macro_rules! container_name {
             ($class:expr, $suffix:expr) => {
-                Ident::from(&format!("{}{}", $class.name.str, $suffix))
+                Ident::from(&format!("{}{}", $class.InstanceName.as_ref(), $suffix))
             };
         }
 
@@ -870,7 +870,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn slot_impl_name(slot_name: &Ident) -> Ident {
-        Ident::from(&format!("{}_impl", slot_name.str))
+        Ident::from(&format!("{}_impl", slot_name.as_ref()))
     }
 
     fn slot_assignments(&self) -> Vec<Tokens> {
@@ -894,7 +894,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn signal_id_name(signal: &Signal) -> Ident {
-        Ident::from(&format!("{}_signal_id", signal.name.str))
+        Ident::from(&format!("{}_signal_id", signal.name.as_ref()))
     }
 
     /// From a signal called `foo`, generate `foo_signal_id`.  This is used to
@@ -994,7 +994,7 @@ impl<'ast> ClassContext<'ast> {
 
     fn lower_case_class_name(&self) -> String {
         lalrpop_intern::read(|interner| {
-            let name_str = interner.data(self.InstanceName.str);
+            let name_str = interner.data(self.InstanceName.as_ref());
             let mut name_chars = name_str.chars();
             let first_char: char = name_chars.next().unwrap();
             first_char.to_lowercase().chain(name_chars).collect()
