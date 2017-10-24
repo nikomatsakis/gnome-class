@@ -353,7 +353,7 @@ mod tests {
 
         let m = iter.next().unwrap();
         match *m {
-            ast::Member::PrivateStruct(ref s) => {
+            ast::Member::PrivateStruct(_) => {
                 (); // okay
             },
 
