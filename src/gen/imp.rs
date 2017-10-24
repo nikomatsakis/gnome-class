@@ -404,7 +404,7 @@ impl<'ast> ClassContext<'ast> {
 
                 // Signals
                 {
-                    // FIXME
+                    // FIXME self.signal_declarations();
                 }
 
                 PRIV.parent_class = gobject_ffi::g_type_class_peek_parent(klass) as *const #ParentClassFfi;
