@@ -1,3 +1,4 @@
+use quote::ToTokens;
 use super::*;
 
 impl<'ast> ClassContext<'ast> {
@@ -37,6 +38,17 @@ impl<'ast> ClassContext<'ast> {
                 tokens
             })
             .unwrap_or_else(|| Self::tokens_GObject())
+    }
+
+    pub fn tokens_ParentInstanceFfi(class: &Class) -> Tokens {
+        class.extends
+            .as_ref()
+            .map(|path| {
+                let mut tokens = Tokens::new();
+                path.to_tokens(&mut tokens);
+                tokens
+            })
+            .unwrap_or_else(|| Self::tokens_GObjectFfi())
     }
 
     fn glib_callback_guard(&self) -> Tokens {

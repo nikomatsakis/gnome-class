@@ -85,18 +85,14 @@ impl<'ast> ClassContext<'ast> {
         let PrivateClassName = container_name!("ClassPrivate");
         let InstanceExt      = container_name!("Ext"); // public trait with all the class's methods
 
-        let GObject         = Self::tokens_GObject();
-        let GObjectFfi      = Self::tokens_GObjectFfi();
-        let GObjectClassFfi = Self::tokens_GObjectClassFfi();
+        let GObject          = Self::tokens_GObject();
+        let GObjectFfi       = Self::tokens_GObjectFfi();
+        let GObjectClassFfi  = Self::tokens_GObjectClassFfi();
 
-        let ParentInstance  = Self::tokens_ParentInstance(class);
-        let ParentInstanceFfi =
-            class.extends
-                 .as_ref()
-                 .map(|c| c.ty())
-                 .map(|c| quote! { #c })
-                 .unwrap_or_else(|| GObjectFfi.clone());
-        let ParentClassFfi = quote! {
+        let ParentInstance    = Self::tokens_ParentInstance(class);
+        let ParentInstanceFfi = Self::tokens_ParentInstanceFfi(class);
+
+        let ParentClassFfi    = quote! {
             <#ParentInstance as glib::wrapper::Wrapper>::GlibClassType
         };
 
