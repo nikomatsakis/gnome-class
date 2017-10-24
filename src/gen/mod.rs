@@ -155,7 +155,7 @@ impl<'ast> ClassContext<'ast> {
         Ident::from(&format!("{}_{}", self.lower_case_class_name(), method_name))
     }
 
-    fn get_type_fn_name(&self) -> Ident {
+    fn instance_get_type_fn_name(&self) -> Ident {
         self.exported_fn_name("get_type")
     }
 

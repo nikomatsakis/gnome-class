@@ -3,7 +3,7 @@ use super::*;
 impl<'ast> ClassContext<'ast> {
     pub fn glib_wrapper(&self) -> Tokens {
         let InstanceName = self.InstanceName;
-        let get_type_fn_name = self.get_type_fn_name();
+        let get_type_fn_name = self.instance_get_type_fn_name();
 
         quote! {
             glib_wrapper! {

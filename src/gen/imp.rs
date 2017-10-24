@@ -189,7 +189,7 @@ impl<'ast> ClassContext<'ast> {
     fn imp_get_priv_fn(&self) -> Tokens {
         let InstanceName = self.InstanceName;
         let PrivateName = self.private_struct.name;
-        let get_type_fn_name = self.get_type_fn_name();
+        let get_type_fn_name = self.instance_get_type_fn_name();
 
         quote! {
             fn get_priv(&self) -> &#PrivateName {
@@ -254,7 +254,7 @@ impl<'ast> ClassContext<'ast> {
 
     fn instance_init_fn(&self) -> Tokens {
         let callback_guard = self.glib_callback_guard();
-        let get_type_fn_name = self.get_type_fn_name();
+        let get_type_fn_name = self.instance_get_type_fn_name();
         let PrivateName = self.private_struct.name;
 
         quote! {
@@ -277,7 +277,7 @@ impl<'ast> ClassContext<'ast> {
 
     fn instance_finalize_fn(&self) -> Tokens {
         let callback_guard = self.glib_callback_guard();
-        let get_type_fn_name = self.get_type_fn_name();
+        let get_type_fn_name = self.instance_get_type_fn_name();
         let PrivateName = self.private_struct.name;
 
         quote! {
@@ -417,7 +417,7 @@ impl<'ast> ClassContext<'ast> {
         let imp_new_fn_name = self.imp_new_fn_name();
         let InstanceName = self.InstanceName;
         let callback_guard = self.glib_callback_guard();
-        let get_type_fn_name = self.get_type_fn_name();
+        let get_type_fn_name = self.instance_get_type_fn_name();
 
         quote! {
             #[no_mangle]
@@ -486,7 +486,7 @@ impl<'ast> ClassContext<'ast> {
 
     fn imp_get_type_fn(&self) -> Tokens {
         let callback_guard = self.glib_callback_guard();
-        let get_type_fn_name = self.get_type_fn_name();
+        let get_type_fn_name = self.instance_get_type_fn_name();
         let ClassName = self.ClassName;
         let InstanceName = self.InstanceName;
         let ParentInstance = &self.ParentInstance;
