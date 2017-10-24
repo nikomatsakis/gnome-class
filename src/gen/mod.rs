@@ -30,10 +30,6 @@ pub fn classes(program: &Program) -> Result<Tokens> {
     Ok(quote! { #(#class_tokens)* })
 }
 
-fn signal_id_name(signal: &Signal) -> Ident {
-    Ident::from(&format!("{}_signal_id", signal.name.str))
-}
-
 struct ClassContext<'ast> {
     program: &'ast Program,
     class: &'ast Class,
@@ -893,6 +889,10 @@ impl<'ast> ClassContext<'ast> {
                 }
             })
             .collect()
+    }
+
+    fn signal_id_name(signal: &Signal) -> Ident {
+        Ident::from(&format!("{}_signal_id", signal.name.str))
     }
 
     /// From a signal called `foo`, generate `foo_signal_id`.  This is used to
