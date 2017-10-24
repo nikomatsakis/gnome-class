@@ -2,9 +2,6 @@ use ast;
 use errors::*;
 //use lalrpop_util::ParseError;
 //use proc_macro2::{TokenStream, TokenTree, TokenNode, Term, Delimiter};
-//use tok::{self, Tok};
-
-//mod tokens;
 
 //mod grammar;
 
