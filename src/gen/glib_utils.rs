@@ -27,4 +27,10 @@ impl<'ast> ClassContext<'ast> {
     pub fn tokens_GObjectClassFfi() -> Tokens {
         quote! { gobject_ffi::GObjectClass }
     }
+
+    fn glib_callback_guard(&self) -> Tokens {
+        quote! {
+            let _guard = glib::CallbackGuard::new();
+        }
+    }
 }

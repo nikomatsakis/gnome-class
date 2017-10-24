@@ -151,12 +151,6 @@ impl<'ast> ClassContext<'ast> {
         })
     }
 
-    fn callback_guard(&self) -> Tokens {
-        quote! {
-            let _guard = glib::CallbackGuard::new();
-        }
-    }
-
     fn exported_fn_name(&self, method_name: &str) -> Ident {
         Ident::from(&format!("{}_{}", self.lower_case_class_name(), method_name))
     }

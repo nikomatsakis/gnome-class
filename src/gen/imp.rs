@@ -252,7 +252,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn instance_init_fn(&self) -> Tokens {
-        let callback_guard = self.callback_guard();
+        let callback_guard = self.glib_callback_guard();
         let get_type_fn_name = self.get_type_fn_name();
         let PrivateName = self.private_struct.name;
 
@@ -275,7 +275,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn instance_finalize_fn(&self) -> Tokens {
-        let callback_guard = self.callback_guard();
+        let callback_guard = self.glib_callback_guard();
         let get_type_fn_name = self.get_type_fn_name();
         let PrivateName = self.private_struct.name;
 
@@ -298,7 +298,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn instance_method_trampolines(&self) -> Tokens {
-        let callback_guard = self.callback_guard();
+        let callback_guard = self.glib_callback_guard();
         let InstanceName = self.InstanceName;
 
         let impls: Vec<Tokens> = self.methods()
@@ -367,7 +367,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn class_init_fn(&self) -> Tokens {
-        let callback_guard = self.callback_guard();
+        let callback_guard = self.glib_callback_guard();
         let InstanceName = self.InstanceName;
         let ClassName = &self.ClassName;
         let ParentClassFfi = &self.ParentClassFfi;
@@ -415,7 +415,7 @@ impl<'ast> ClassContext<'ast> {
     fn imp_new_fn(&self) -> Tokens {
         let imp_new_fn_name = self.imp_new_fn_name();
         let InstanceName = self.InstanceName;
-        let callback_guard = self.callback_guard();
+        let callback_guard = self.glib_callback_guard();
         let get_type_fn_name = self.get_type_fn_name();
 
         quote! {
@@ -436,7 +436,7 @@ impl<'ast> ClassContext<'ast> {
 
     fn imp_extern_methods(&self) -> Vec<Tokens> {
         let InstanceName = self.InstanceName;
-        let callback_guard = self.callback_guard();
+        let callback_guard = self.glib_callback_guard();
 
         self.methods()
             .map(|method| {
@@ -484,7 +484,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn imp_get_type_fn(&self) -> Tokens {
-        let callback_guard = self.callback_guard();
+        let callback_guard = self.glib_callback_guard();
         let get_type_fn_name = self.get_type_fn_name();
         let ClassName = self.ClassName;
         let InstanceName = self.InstanceName;
