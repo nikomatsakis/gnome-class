@@ -2,18 +2,21 @@
 
 extern crate gobject_gen;
 
-// #[macro_use]
-// extern crate glib;
+#[macro_use]
+extern crate glib;
 use gobject_gen::gobject_gen;
 
 use std::cell::Cell;
-/*
+
 gobject_gen! {
     class Counter {
         struct CounterPrivate {
             f: Cell<u32>
         }
 
+        private_init() -> Foo {
+        }
+/*
         fn add(&self, x: u32) -> u32 {
             let private = self.get_priv();
             let v = private.f.get() + x;
@@ -24,9 +27,10 @@ gobject_gen! {
         fn get(&self) -> u32 {
             self.get_priv().f.get()
         }
+*/
     }
 }
-*/
+
 #[test]
 #[cfg(None)]
 fn test() {
