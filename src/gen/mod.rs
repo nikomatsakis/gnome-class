@@ -8,6 +8,8 @@ use std::convert::Into;
 use syn::Ident;
 
 mod glib_utils;
+use self::glib_utils::lower_case_instance_name;
+
 mod toplevel_imports;
 // mod imp;
 // mod pub;
@@ -146,22 +148,17 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn exported_fn_name(&self, method_name: &str) -> Ident {
-        Ident::from(&format!("{}_{}", self.lower_case_class_name(), method_name))
+        Ident::from(format!("{}_{}", lower_case_instance_name(self.InstanceName.as_ref()), method_name))
     }
 
     fn instance_get_type_fn_name(&self) -> Ident {
         self.exported_fn_name("get_type")
     }
+}
 
-    fn lower_case_class_name(&self) -> String {
-        lalrpop_intern::read(|interner| {
-            let name_str = interner.data(self.InstanceName.as_ref());
-            let mut name_chars = name_str.chars();
-            let first_char: char = name_chars.next().unwrap();
-            first_char.to_lowercase().chain(name_chars).collect()
-        })
 /*
 use quote::{ToTokens};
+
 
 macro_rules! quote_in {
     ($tokens:expr, $($t:tt)*) => {

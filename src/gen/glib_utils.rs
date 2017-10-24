@@ -34,3 +34,19 @@ impl<'ast> ClassContext<'ast> {
         }
     }
 }
+
+pub fn lower_case_instance_name(instance_name: &str) -> String {
+    let mut name_chars = instance_name.chars();
+    let first_char: char = name_chars.next().unwrap();
+    first_char.to_lowercase().chain(name_chars).collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn lower_cases_simple_names() {
+        assert_eq!("foo", lower_case_instance_name("Foo"));
+    }
+}
