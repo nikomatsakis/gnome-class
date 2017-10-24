@@ -28,7 +28,6 @@ mod errors;
 //mod gen;
 mod param;
 mod parser;
-//mod tok;
 
 /// Generates the code to create a derived glib::Object
 ///
