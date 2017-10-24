@@ -159,10 +159,6 @@ impl<'ast> ClassContext<'ast> {
         self.exported_fn_name("get_type")
     }
 
-    fn imp_new_fn_name(&self) -> Ident {
-        self.exported_fn_name("new")
-    }
-
     fn lower_case_class_name(&self) -> String {
         lalrpop_intern::read(|interner| {
             let name_str = interner.data(self.InstanceName.as_ref());

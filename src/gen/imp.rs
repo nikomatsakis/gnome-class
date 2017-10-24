@@ -566,4 +566,8 @@ impl<'ast> ClassContext<'ast> {
             })
             .collect()
     }
+
+    fn imp_new_fn_name(&self) -> Ident {
+        self.exported_fn_name("new")
+    }
 }
