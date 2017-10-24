@@ -40,7 +40,6 @@ struct ClassContext<'ast> {
     class: &'ast Class,
     private_struct: &'ast PrivateStruct,
     ModuleName: Ident,
-    FieldsName: Ident,
     GClassName: Ident,
     PrivateClassName: Ident,
     ParentInstance: Tokens,
@@ -77,7 +76,6 @@ impl<'ast> ClassContext<'ast> {
         }
 
         let ModuleName       = container_name!(class, "Mod"); // toplevel "InstanceMod" module name
-        let FieldsName       = container_name!(class, "Fields");
         let GClassName       = container_name!(class, "Class");
         let PrivateClassName = container_name!(class, "ClassPrivate");
         let InstanceExt      = container_name!(class, "Ext"); // public trait with all the class's methods
@@ -108,7 +106,6 @@ impl<'ast> ClassContext<'ast> {
             class,
             private_struct,
             ModuleName,
-            FieldsName,
             GClassName,
             PrivateClassName,
             ParentInstance,
