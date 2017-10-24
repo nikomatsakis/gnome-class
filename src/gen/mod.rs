@@ -3,7 +3,6 @@
 
 use ast::*;
 use errors::*;
-use lalrpop_intern::{self, intern};
 use quote::{Ident, Tokens, ToTokens};
 use std::convert::Into;
 use syn::Ident;
