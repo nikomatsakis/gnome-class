@@ -7,6 +7,8 @@ use quote::{Tokens, ToTokens};
 use std::convert::Into;
 use syn::Ident;
 
+mod toplevel_imports;
+
 macro_rules! quote_in {
     ($tokens:expr, $($t:tt)*) => {
         $tokens.append_all(Some(quote!{$($t)*}));
@@ -122,7 +124,7 @@ impl<'ast> ClassContext<'ast> {
 
     pub fn gen_class(&self) -> Result<Tokens> {
         let all = vec![
-            self.imports(),
+            self.toplevel_imports(),
             self.glib_wrapper(),
             self.imp_module(),
             self.pub_impl(),
@@ -145,39 +147,6 @@ impl<'ast> ClassContext<'ast> {
     fn callback_guard(&self) -> Tokens {
         quote! {
             let _guard = glib::CallbackGuard::new();
-        }
-    }
-
-    fn imports(&self) -> Tokens {
-        quote! {
-            extern crate glib_sys as glib_ffi;
-            extern crate gobject_sys as gobject_ffi;
-
-            // #[macro_use]
-            extern crate glib;
-
-            extern crate libc;
-
-            use glib::{IsA, Value};
-            use glib::object::Downcast;
-            use glib::signal::connect;
-            use glib::translate::*;
-
-            use std::ptr;
-            use std::mem;
-            use std::mem::transmute;
-
-            // Bring in our parent's stuff so the user's implementation
-            // can use what they had already defined there.
-            use super::*;
-
-            // #[cfg(feature = "bindings")]
-            // mod ffi;
-
-            // #[cfg(feature = "bindings")]
-            // pub mod imp {
-            //     pub use ffi::*;
-            // }
         }
     }
 
