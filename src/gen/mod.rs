@@ -169,16 +169,6 @@ impl<'ast> ClassContext<'ast> {
         self.exported_fn_name("new")
     }
 
-    pub fn methods(&self) -> impl Iterator<Item = &'ast Method> {
-        self.class
-            .members
-            .iter()
-            .filter_map(|member| match *member {
-                Member::Method(ref m) => Some(m),
-                _ => None,
-            })
-    }
-
     fn lower_case_class_name(&self) -> String {
         lalrpop_intern::read(|interner| {
             let name_str = interner.data(self.InstanceName.as_ref());

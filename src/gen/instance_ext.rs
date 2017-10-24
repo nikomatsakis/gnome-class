@@ -97,4 +97,14 @@ impl<'ast> ClassContext<'ast> {
     fn method_ffi_name(&self, method: &Method) -> Ident {
         self.exported_fn_name(method.name.as_ref())
     }
+
+    pub fn methods(&self) -> impl Iterator<Item = &'ast Method> {
+        self.class
+            .members
+            .iter()
+            .filter_map(|member| match *member {
+                Member::Method(ref m) => Some(m),
+                _ => None,
+            })
+    }
 }
