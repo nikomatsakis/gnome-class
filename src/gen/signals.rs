@@ -66,4 +66,14 @@ impl<'ast> ClassContext<'ast> {
             .map(|signal| signal_id_name (signal))
             .collect()
     }
+
+    pub fn signals(&self) -> impl Iterator<Item = &'ast Signal> {
+        self.class
+            .members
+            .iter()
+            .filter_map(|member| match *member {
+                Member::Signal(ref s) => Some(s),
+                _ => None,
+            })
+    }
 }

@@ -179,16 +179,6 @@ impl<'ast> ClassContext<'ast> {
             })
     }
 
-    pub fn signals(&self) -> impl Iterator<Item = &'ast Signal> {
-        self.class
-            .members
-            .iter()
-            .filter_map(|member| match *member {
-                Member::Signal(ref s) => Some(s),
-                _ => None,
-            })
-    }
-
     fn lower_case_class_name(&self) -> String {
         lalrpop_intern::read(|interner| {
             let name_str = interner.data(self.InstanceName.as_ref());
