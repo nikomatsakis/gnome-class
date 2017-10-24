@@ -49,6 +49,10 @@ struct ClassContext<'ast> {
 
 impl<'ast> ClassContext<'ast> {
     pub fn new(program: &'ast Program, class: &'ast Class) -> Self {
+        // This function creates a ClassContext by generating the
+        // commonly-used symbol names for the class in question, for
+        // example, "FooClass" out of "Foo".
+
         let private_struct =
             class.members
                  .iter()
