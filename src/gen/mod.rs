@@ -3,7 +3,7 @@
 
 use ast::*;
 use errors::*;
-use quote::{Tokens, ToTokens};
+use quote::{Tokens};
 use std::convert::Into;
 use syn::Ident;
 
@@ -13,12 +13,6 @@ mod toplevel_imports;
 // mod pub;
 // mod instance_ext;
 // mod signals;
-
-macro_rules! quote_in {
-    ($tokens:expr, $($t:tt)*) => {
-        $tokens.append_all(Some(quote!{$($t)*}));
-    }
-}
 
 // HYGIENE NOTE:
 //
@@ -166,6 +160,12 @@ impl<'ast> ClassContext<'ast> {
             let first_char: char = name_chars.next().unwrap();
             first_char.to_lowercase().chain(name_chars).collect()
         })
+/*
+use quote::{ToTokens};
+
+macro_rules! quote_in {
+    ($tokens:expr, $($t:tt)*) => {
+        $tokens.append_all(Some(quote!{$($t)*}));
     }
 }
 
@@ -347,3 +347,4 @@ impl ToTokens for TraitItemId {
         quote_in!(tokens, < #self_ty as #trait_ref > :: #item);
     }
 }
+*/
