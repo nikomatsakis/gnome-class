@@ -152,11 +152,8 @@ mod parser;
 ///
 #[proc_macro]
 pub fn gobject_gen(input: TokenStream) -> TokenStream {
-    let input: proc_macro2::TokenStream = input.into();
-    let input = input.to_string();
-
     let result: Result<quote::Tokens> = do catch {
-        let program = parser::parse_program(&input)?;
+        let program = parser::parse_program(input)?;
         let program = checking::check_program(program)?;
         gen::classes(&program)
     };

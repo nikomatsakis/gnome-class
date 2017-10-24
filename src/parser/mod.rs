@@ -1,3 +1,6 @@
+use proc_macro::TokenStream;
+use syn;
+
 use ast;
 use errors::*;
 //use lalrpop_util::ParseError;
@@ -5,15 +8,8 @@ use errors::*;
 
 //mod grammar;
 
-pub fn parse_program(input: &str) -> Result<ast::Program> {
-    unimplemented!()
-    /*
-    let tokenizer = tok::Tokenizer::new(input, 0);
-    match grammar::parse_Program(tokenizer) {
-        Ok(p) => Ok(p),
-        Err(e) => bail!("parse error: {:?}", e),
-    }
-     */
+pub fn parse_program(token_stream: TokenStream) -> Result<ast::Program> {
+    syn::parse(token_stream).map_err(|e| e.into())
 }
 
 /*
