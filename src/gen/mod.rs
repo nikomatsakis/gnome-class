@@ -189,12 +189,6 @@ impl<'ast> ClassContext<'ast> {
             })
     }
 
-    pub fn method_names(&self) -> Vec<Ident> {
-        self.methods()
-            .map(|method| method.name)
-            .collect()
-    }
-
     fn lower_case_class_name(&self) -> String {
         lalrpop_intern::read(|interner| {
             let name_str = interner.data(self.InstanceName.as_ref());
