@@ -35,7 +35,8 @@ struct ClassContext<'ast> {
     class: &'ast Class,
     private_struct: &'ast PrivateStruct,
     ModuleName: Ident,
-    GClassName: Ident,
+    InstanceName: &'ast Ident,
+    ClassName: Ident,
     PrivateClassName: Ident,
     ParentInstance: Tokens,
     ParentInstanceFfi: Tokens,
@@ -71,7 +72,7 @@ impl<'ast> ClassContext<'ast> {
         }
 
         let ModuleName       = container_name!(class, "Mod"); // toplevel "InstanceMod" module name
-        let GClassName       = container_name!(class, "Class");
+        let ClassName        = container_name!(class, "Class");
         let PrivateClassName = container_name!(class, "ClassPrivate");
         let InstanceExt      = container_name!(class, "Ext"); // public trait with all the class's methods
 
@@ -101,7 +102,8 @@ impl<'ast> ClassContext<'ast> {
             class,
             private_struct,
             ModuleName,
-            GClassName,
+            &self.class.name,
+            ClassName,
             PrivateClassName,
             ParentInstance,
             ParentInstanceFfi,
@@ -183,7 +185,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn glib_wrapper(&self) -> Tokens {
-        let InstanceName = self.class.name;
+        let InstanceName = self.InstanceName;
         let get_type_fn_name = self.get_type_fn_name();
 
         quote! {
@@ -234,7 +236,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn imp_instance_struct(&self) -> Tokens {
-        let InstanceName = self.class.name;
+        let InstanceName = self.InstanceName;
         let ParentInstanceFfi = &self.ParentInstanceFfi;
 
         quote! {
@@ -246,7 +248,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn imp_class_struct(&self) -> Tokens {
-        let ClassName = self.GClassName;
+        let ClassName = self.ClassName;
         let ParentClassFfi = &self.ParentClassFfi;
 
         // ABI: we are generating the imp::FooClass with the parent_class, and the slots to signals/methods.
@@ -259,13 +261,13 @@ impl<'ast> ClassContext<'ast> {
                 let (slot_name, slot_fn_ty) = match *member {
                     Member::Method(ref method) => (method.name,
                                                    SlotTy {
-                                                       class_name: self.class.name,
+                                                       class_name: self.InstanceName,
                                                        sig: &method.fn_def.sig
                                                    }),
 
                     Member::Signal(ref signal) => (signal.name,
                                                    SlotTy {
-                                                       class_name: self.class.name,
+                                                       class_name: self.InstanceName,
                                                        sig: &signal.sig
                                                    }),
 
@@ -312,8 +314,8 @@ impl<'ast> ClassContext<'ast> {
     fn imp_get_type_fn(&self) -> Tokens {
         let callback_guard = self.callback_guard();
         let get_type_fn_name = self.get_type_fn_name();
-        let GClassName = self.GClassName;
-        let InstanceName = self.class.name;
+        let ClassName = self.ClassName;
+        let InstanceName = self.InstanceName;
         let ParentInstance = &self.ParentInstance;
         let instance_name_string = ByteString(InstanceName);
 
@@ -329,7 +331,7 @@ impl<'ast> ClassContext<'ast> {
                 static ONCE: Once = ONCE_INIT;
 
                 ONCE.call_once(|| {
-                    let class_size = mem::size_of::<#GClassName>();
+                    let class_size = mem::size_of::<#ClassName>();
                     assert!(class_size <= u16::MAX as usize);
 
                     let instance_size = mem::size_of::<#InstanceName>();
@@ -339,7 +341,7 @@ impl<'ast> ClassContext<'ast> {
                         <#ParentInstance as glib::StaticType>::static_type().to_glib(),
                         #instance_name_string as *const u8 as *const i8,
                         class_size as u32,
-                        Some(#GClassName::init),
+                        Some(#ClassName::init),
                         instance_size as u32,
                         Some(#InstanceName::init),
                         gobject_ffi::GTypeFlags::empty()
@@ -354,7 +356,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn pub_impl(&self) -> Tokens {
-        let InstanceName = self.class.name;
+        let InstanceName = self.InstanceName;
         let pub_new_method = self.pub_new_method();
 
         quote! {
@@ -365,7 +367,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn pub_new_method(&self) -> Tokens {
-        let InstanceName = self.class.name;
+        let InstanceName = self.InstanceName;
         let imp_new_fn_name = self.imp_new_fn_name();
 
         // FIXME: we should take construct-only arguments and other convenient args to new()
@@ -459,7 +461,7 @@ impl<'ast> ClassContext<'ast> {
         // those functions will refer to the Rust wrapper object that
         // corresponds to the GObject-ABI structs within "mod imp".
 
-        let InstanceName = self.class.name;
+        let InstanceName = self.InstanceName;
         let get_priv = self.imp_get_priv_fn();
         let impls = self.imp_slot_default_handlers();
 
@@ -500,7 +502,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn imp_instance(&self) -> Tokens {
-        let InstanceName = self.class.name;
+        let InstanceName = self.InstanceName;
 
         let all = vec![
             self.instance_get_class_fn(),
@@ -522,20 +524,20 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn instance_get_class_fn(&self) -> Tokens {
-        let GClassName = &self.GClassName;
+        let ClassName = &self.ClassName;
 
         quote! {
-            fn get_class(&self) -> &#GClassName {
+            fn get_class(&self) -> &#ClassName {
                 unsafe {
                     let klass = (*(self as *const _ as *const gobject_ffi::GTypeInstance)).g_class;
-                    &*(klass as *const #GClassName)
+                    &*(klass as *const #ClassName)
                 }
             }
         }
     }
 
     fn imp_get_priv_fn(&self) -> Tokens {
-        let InstanceName = self.class.name;
+        let InstanceName = self.InstanceName;
         let PrivateName = self.private_struct.name;
         let get_type_fn_name = self.get_type_fn_name();
 
@@ -601,7 +603,7 @@ impl<'ast> ClassContext<'ast> {
 
     fn instance_method_trampolines(&self) -> Tokens {
         let callback_guard = self.callback_guard();
-        let InstanceName = self.class.name;
+        let InstanceName = self.InstanceName;
 
         let impls: Vec<Tokens> = self.methods()
             .map(|method| {
@@ -609,7 +611,7 @@ impl<'ast> ClassContext<'ast> {
                 let method_impl_name = Self::slot_impl_name(&method.name);
 
                 let slot_ty = SlotTy {
-                    class_name: self.class.name,
+                    class_name: self.InstanceName,
                     sig: &method.fn_def.sig
                 };
 
@@ -635,11 +637,11 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn imp_class(&self) -> Tokens {
-        let GClassName = &self.GClassName;
+        let ClassName = &self.ClassName;
         let class_init_fn = self.class_init_fn();
 
         quote! {
-            impl #GClassName {
+            impl #ClassName {
                 #class_init_fn
                 // FIXME
             }
@@ -648,8 +650,8 @@ impl<'ast> ClassContext<'ast> {
 
     fn class_init_fn(&self) -> Tokens {
         let callback_guard = self.callback_guard();
-        let InstanceName = self.class.name;
-        let GClassName = &self.GClassName;
+        let InstanceName = self.InstanceName;
+        let ClassName = &self.ClassName;
         let ParentClassFfi = &self.ParentClassFfi;
         let PrivateName = self.private_struct.name;
         let slot_assignments = self.slot_assignments();
@@ -678,7 +680,7 @@ impl<'ast> ClassContext<'ast> {
 
                 // Slots
                 {
-                    let klass = &mut *(klass as *mut #GClassName);
+                    let klass = &mut *(klass as *mut #ClassName);
                     #(#slot_assignments)*
                 }
 
@@ -704,7 +706,7 @@ impl<'ast> ClassContext<'ast> {
 
     fn imp_new_fn(&self) -> Tokens {
         let imp_new_fn_name = self.imp_new_fn_name();
-        let InstanceName = self.class.name;
+        let InstanceName = self.InstanceName;
         let callback_guard = self.callback_guard();
         let get_type_fn_name = self.get_type_fn_name();
 
@@ -725,7 +727,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn imp_extern_methods(&self) -> Vec<Tokens> {
-        let InstanceName = self.class.name;
+        let InstanceName = self.InstanceName;
         let callback_guard = self.callback_guard();
 
         self.methods()
@@ -772,7 +774,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn instance_ext_impl(&self) -> Tokens {
-        let InstanceName = self.class.name;
+        let InstanceName = self.InstanceName;
         let InstanceExt = self.InstanceExt;
         let method_redirects = self.method_redirects();
         quote! {
@@ -809,7 +811,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn signal_trampolines(&self) -> Tokens {
-        let InstanceName = self.class.name;
+        let InstanceName = self.InstanceName;
         let InstanceExt = self.InstanceExt;
 
         quote! {
@@ -872,7 +874,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn slot_assignments(&self) -> Vec<Tokens> {
-        let InstanceName = self.class.name;
+        let InstanceName = self.InstanceName;
 
         self.members_with_slots()
             .map(|member| {
@@ -943,7 +945,7 @@ impl<'ast> ClassContext<'ast> {
         self.methods()
             .map(|method| {
                 let method_fn_ty = SlotTy {
-                    class_name: self.class.name,
+                    class_name: self.InstanceName,
                     sig: &method.fn_def.sig
                 };
                 quote! { #method_fn_ty }
@@ -992,7 +994,7 @@ impl<'ast> ClassContext<'ast> {
 
     fn lower_case_class_name(&self) -> String {
         lalrpop_intern::read(|interner| {
-            let name_str = interner.data(self.class.name.str);
+            let name_str = interner.data(self.InstanceName.str);
             let mut name_chars = name_str.chars();
             let first_char: char = name_chars.next().unwrap();
             first_char.to_lowercase().chain(name_chars).collect()
