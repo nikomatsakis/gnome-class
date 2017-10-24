@@ -189,45 +189,6 @@ impl<'ast> ClassContext<'ast> {
             })
     }
 
-    pub fn members_with_slots(&self) -> impl Iterator<Item = &'ast Member> {
-        self.class
-            .members
-            .iter()
-            .filter_map(|member| match *member {
-                Member::Method(_) => Some(member),
-                Member::Signal(_) => Some(member),
-                _ => None,
-            })
-    }
-
-    fn slot_trampoline_name(slot_name: &Ident) -> Ident {
-        Ident::from(&format!("{}_trampoline", slot_name.as_ref()))
-    }
-
-    fn slot_impl_name(slot_name: &Ident) -> Ident {
-        Ident::from(&format!("{}_impl", slot_name.as_ref()))
-    }
-
-    fn slot_assignments(&self) -> Vec<Tokens> {
-        let InstanceName = self.InstanceName;
-
-        self.members_with_slots()
-            .map(|member| {
-                let slot_name = match *member {
-                    Member::Method(ref method) => method.name,
-                    Member::Signal(ref signal) => signal.name,
-                    _ => unreachable!()
-                };
-
-                let trampoline_name = Self::slot_trampoline_name(&slot_name);
-
-                quote! {
-                    klass.#slot_name = Some(#InstanceName::#trampoline_name);
-                }
-            })
-            .collect()
-    }
-
     pub fn method_names(&self) -> Vec<Ident> {
         self.methods()
             .map(|method| method.name)
