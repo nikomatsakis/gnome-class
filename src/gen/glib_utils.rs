@@ -15,4 +15,16 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
+
+    pub fn tokens_GObject() -> Tokens {
+        quote! { glib::Object }
+    }
+
+    pub fn tokens_GObjectFfi() -> Tokens {
+        quote! { gobject_ffi::GObject }
+    }
+
+    pub fn tokens_GObjectClassFfi() -> Tokens {
+        quote! { gobject_ffi::GObjectClass }
+    }
 }

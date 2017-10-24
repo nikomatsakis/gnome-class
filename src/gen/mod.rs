@@ -85,9 +85,9 @@ impl<'ast> ClassContext<'ast> {
         let PrivateClassName = container_name!("ClassPrivate");
         let InstanceExt      = container_name!("Ext"); // public trait with all the class's methods
 
-        let GObject = quote! { glib::Object };
-        let GObjectFfi = quote! { gobject_ffi::GObject };
-        let GObjectClassFfi = quote! { gobject_ffi::GObjectClass };
+        let GObject         = Self::tokens_GObject();
+        let GObjectFfi      = Self::tokens_GObjectFfi();
+        let GObjectClassFfi = Self::tokens_GObjectClassFfi();
 
         let ParentInstance =
             class.extends
