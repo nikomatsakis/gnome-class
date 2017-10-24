@@ -299,18 +299,6 @@ impl<'ast> ClassContext<'ast> {
             .collect()
     }
 
-    pub fn method_fn_tys(&self) -> Vec<Tokens> {
-        self.methods()
-            .map(|method| {
-                let method_fn_ty = SlotTy {
-                    class_name: self.InstanceName,
-                    sig: &method.fn_def.sig
-                };
-                quote! { #method_fn_ty }
-            })
-            .collect()
-    }
-
     fn lower_case_class_name(&self) -> String {
         lalrpop_intern::read(|interner| {
             let name_str = interner.data(self.InstanceName.as_ref());
