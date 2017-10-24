@@ -28,6 +28,17 @@ impl<'ast> ClassContext<'ast> {
         quote! { gobject_ffi::GObjectClass }
     }
 
+    pub fn tokens_ParentInstance(class: &Class) -> Tokens {
+        class.extends
+            .as_ref()
+            .map(|path| {
+                let mut tokens = Tokens::new();
+                path.to_tokens(&mut tokens);
+                tokens
+            })
+            .unwrap_or_else(|| Self::tokens_GObject())
+    }
+
     fn glib_callback_guard(&self) -> Tokens {
         quote! {
             let _guard = glib::CallbackGuard::new();

@@ -89,12 +89,7 @@ impl<'ast> ClassContext<'ast> {
         let GObjectFfi      = Self::tokens_GObjectFfi();
         let GObjectClassFfi = Self::tokens_GObjectClassFfi();
 
-        let ParentInstance =
-            class.extends
-                 .as_ref()
-                 .map(|c| c.ty())
-                 .map(|c| quote! { #c })
-                 .unwrap_or_else(|| GObject.clone());
+        let ParentInstance  = Self::tokens_ParentInstance(class);
         let ParentInstanceFfi =
             class.extends
                  .as_ref()
