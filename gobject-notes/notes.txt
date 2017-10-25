@@ -1,4 +1,4 @@
--*- org -*- 
+-*- org -*-
 
 * TODO include a floating ref guard:
 
@@ -31,7 +31,7 @@ pub struct GtkBoxClass {
     pub _gtk_reserved4: Option<unsafe extern "C" fn()>,
 }
 
-Maybe have something like 
+Maybe have something like
 
 gobject_gen! {
     class Foo: glib::Object {
@@ -295,7 +295,7 @@ public interface HelloMixin {
 
 public interface ByeMixin {
     public void say_bye () {
-        print ("Bye, world!");    
+        print ("Bye, world!");
     }
 }
 
@@ -303,7 +303,7 @@ public class Foo : Object, HelloMixin, ByeMixin {
     public Foo () {
         this.say_hello ();
     }
-    
+
     ~Foo () {
         this.say_bye ();
     }
@@ -337,4 +337,129 @@ public class MyWidget : Box {
         private void button_clicked (Button button) {
                 print ("The button was clicked with entry text: %s\n", entry.text);
         }
+}
+
+* New syntax
+
+gnome_class! {
+    class Foo: Superclass {
+        private = FooPrivate; // similar to associated types, "type Foo = Bar;"
+        class_private = FooClassPrivate;
+
+        // should we put the init/constructor/etc here?  See also the comment
+        // below on "impl GObject"
+        fn init(&self) {
+            ...
+        }
+
+        fn constructor(&self, ... construct properties ...) {
+            // how do we pass in the construct properties comfortably?
+        }
+    }
+
+    struct FooPrivate {
+        ...
+    }
+
+    struct FooClassPrivate {
+        ...
+    }
+
+    // or #[derive(Default)] above if it works for you
+    impl Default for FooPrivate {
+        fn default() -> FooPrivate {
+            ...
+        }
+    }
+
+    impl Drop for FooPrivate {
+        fn drop(&mut self) {
+            // this is called during finalization
+        }
+    }
+
+    // this defines the class ABI, basically
+    impl Foo {
+        pub fn static_method(&self, ...) {
+            ...
+        }
+
+        virtual fn virtual_method(&self, ...) {
+            ...
+        }
+
+        fn this_private_method_is_an_implementation_detail(&self) {
+            // and is not exported or put in the class slots
+        }
+
+        signal some_signal(&self, ...);
+
+        signal with_default_handler(&self, ...) -> Bar {
+            // default handler code goes here
+        }
+
+        #[accumulator(my_accumulator_function)]
+        signal sig_with_accumulator(&self, ...);
+
+        reserve_slots(5); // decrement this when you add a method/signal, for ABI compatibility
+    }
+
+    // from sig_with_accumulator above
+    fn my_accumulator(/* FIXME: arguments */) -> bool {
+        ...
+    }
+
+    // Properties.  These could go in the "impl Foo" above?
+    // See https://wiki.gnome.org/Projects/Vala/Manual/Classes#Properties for ideas
+    impl Foo {
+        #[attributes...]
+        property some_property: u32 {
+            get(&self) -> u32 {
+                self.something
+            }
+            set(&self, value: u32) {
+                self.something = value;
+            }
+        }
+    }
+
+    impl Superclass for Foo {
+        fn overriden_method(&self, ...) {
+            ...
+        }
+
+        signal overriden_signal_handler(&self, ...) {
+            ...
+        }
+    }
+
+    impl AnotherSuperclass for Foo {
+        // same as above
+    }
+
+    // See https://wiki.gnome.org/Projects/Vala/Manual/Classes#Construction for syntax ideas
+
+    // This "impl GObject" is an alternative to putting
+    // initialization/destruction functions inside the "class" block.
+    impl GObject for Foo {
+        fn init(&self) {
+            // set up initial things
+        }
+
+        #[construct_prop(name="foo-bar", arg="foobar")]
+        #[construct_prop(name="eek", arg="eek")]
+        fn constructor(&self, foobar: i32, eek: Eek) {
+        }
+
+        fn dispose(&self) {
+        }
+    }
+
+    // should we list SomeInterface in the "class" line above?
+    // Pros: makes it obvious at a glance what interfaces are implemented
+    // Cons: a little duplication
+    impl SomeInterface for Foo {
+        fn blah(&self, ...) {
+        }
+    }
 }
