@@ -280,3 +280,44 @@ syn on it, without having the whole proc_macro2 machinery in place.
 
 I couldn't find a way to create a meaningful ParseError.  The exported
 parse_error() doesn't let one provide a string or anything.
+
+* Vala mixins
+
+Vala allows interfaces to have non-virtual method implementations,
+much like Rust's traits with default methods.  Look at the generated C
+code!
+
+public interface HelloMixin {
+    public virtual void say_hello () {
+        print ("Hello, world!");
+    }
+}
+
+public interface ByeMixin {
+    public void say_bye () {
+        print ("Bye, world!");    
+    }
+}
+
+public class Foo : Object, HelloMixin, ByeMixin {
+    public Foo () {
+        this.say_hello ();
+    }
+    
+    ~Foo () {
+        this.say_bye ();
+    }
+
+    void say_hello () {
+        print ("Hello specific to Foo");
+    }
+/*
+    void hello_there (string s) {
+        print ("hello, %s", s);
+    }
+    */
+}
+
+void main () {
+    new Foo ();
+}
