@@ -321,3 +321,20 @@ public class Foo : Object, HelloMixin, ByeMixin {
 void main () {
     new Foo ();
 }
+
+* Vala and GtkBuilder templates
+
+https://blogs.gnome.org/tvb/2013/05/29/composite-templates-lands-in-vala/
+
+
+[GtkTemplate (ui = "/org/foo/my/mywidget.ui")]
+public class MyWidget : Box {
+
+        [GtkChild]
+        private Entry entry;
+
+        [GtkCallback]
+        private void button_clicked (Button button) {
+                print ("The button was clicked with entry text: %s\n", entry.text);
+        }
+}
