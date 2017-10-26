@@ -413,12 +413,31 @@ gnome_class! {
     // See https://wiki.gnome.org/Projects/Vala/Manual/Classes#Properties for ideas
     impl Foo {
         #[attributes...]
-        property some_property: u32 {
-            get(&self) -> u32 {
-                self.something
+        property some_property: T where T: u32 {
+            get(&self) -> T {
+                ...
             }
-            set(&self, value: u32) {
-                self.something = value;
+
+            set(&self, value: T) {
+                ...
+            }
+        }
+
+        #[construct]
+        // #[construct_only]
+        property foo: T where T: u32 {
+            default() -> T {
+                // warn if a non-construct property has a default() as it won't be used?
+                // require construct or construct-only properties to have a default()?
+                ... 
+            }
+
+            get(&self) -> T {
+                ...
+            }
+
+            set(&self, value: T) {
+                ...
             }
         }
     }
