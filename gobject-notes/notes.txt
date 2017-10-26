@@ -482,3 +482,26 @@ gnome_class! {
         }
     }
 }
+
+* Antoyo on proc-macro2:
+
+<antoyo> I didn't know about parse_error(), but you might get better
+errors by using std::compile_error
+(https://doc.rust-lang.org/stable/std/macro.compile_error.html). Let
+me know if you have issues to set the right Span on this, since it's
+tricky.
+
+fn error(msg: &str, span: proc_macro2::Span) -> Tokens {
+    let result = quote! {
+        compile_error!(#msg)
+    };
+    let mut expr: Expr = parse(result.clone().into()).unwrap();
+    if let Mac(ref mut mac) = expr.node {
+        mac.tokens[0].0.span = span;
+    }
+    quote! {
+        #expr
+    }
+}
+
+<antoyo> Instead of returning the generated code, you return that.
