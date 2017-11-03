@@ -343,18 +343,8 @@ public class MyWidget : Box {
 
 gnome_class! {
     class Foo: Superclass {
-        private = FooPrivate; // similar to associated types, "type Foo = Bar;"
-        class_private = FooClassPrivate;
-
-        // should we put the init/constructor/etc here?  See also the comment
-        // below on "impl GObject"
-        fn init(&self) {
-            ...
-        }
-
-        fn constructor(&self, ... construct properties ...) {
-            // how do we pass in the construct properties comfortably?
-        }
+        type Private = FooPrivate; // similar to associated types, "type Foo = Bar;"
+        type ClassPrivate = FooClassPrivate;
     }
 
     struct FooPrivate {
