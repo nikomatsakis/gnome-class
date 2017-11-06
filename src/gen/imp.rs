@@ -5,8 +5,8 @@ impl<'ast> ClassContext<'ast> {
     pub fn imp_module(&self) -> Tokens {
         let all = vec![
             self.imp_instance_struct(),
-/*
             self.imp_class_struct(),
+/*
             self.imp_properties_enum(),
             self.imp_signals_enum(),
             self.imp_private_struct(),
@@ -51,7 +51,7 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
-/*
+
     fn imp_class_struct(&self) -> Tokens {
         let ClassName = self.ClassName;
         let ParentClassFfi = &self.ParentClassFfi;
@@ -61,6 +61,7 @@ impl<'ast> ClassContext<'ast> {
         //
         // FIXME: we should check that the extern "C" signatures only have types representable by C.
 
+        /*
         let slots: Vec<Tokens> = self.members_with_slots()
             .map(|member| {
                 let (slot_name, slot_fn_ty) = match *member {
@@ -84,16 +85,17 @@ impl<'ast> ClassContext<'ast> {
                 }
             })
             .collect();
-
+        */
         quote! {
             #[repr(C)]
             pub struct #ClassName {
                 pub parent_class: #ParentClassFfi,
-                #(#slots)*
+                // #(#slots)*
             }
         }
     }
 
+/*
     fn imp_properties_enum(&self) -> Tokens {
         quote! {
             #[repr(u32)]
