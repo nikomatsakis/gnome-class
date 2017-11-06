@@ -14,7 +14,10 @@ gobject_gen! {
             f: Cell<u32>
         }
 
-        private_init() -> Foo {
+        private_init() -> CounterPrivate {
+            CounterPrivate {
+                f: Cell::new(0)
+            }
         }
 /*
         fn add(&self, x: u32) -> u32 {

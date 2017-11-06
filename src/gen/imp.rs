@@ -119,7 +119,6 @@ impl<'ast> ClassContext<'ast> {
     }
 */
 
-/*
     fn private_init_fn_body(&self) -> Tokens {
         // If the user had a "private_init()" method, we want to use it as an initializer
         // for the private struct.
@@ -136,8 +135,13 @@ impl<'ast> ClassContext<'ast> {
             .next();
 
         if let Some(i) = private_init_member {
-            quote! { #i }
+            // FIXME: check that i.inputs is empty
+            // FIXME: check that i.output is the same as PrivateStruct
+            let block = &i.block;
+            quote! { #block }
         } else {
+            panic!("Class must have a private_init() member");
+            /*
             let PrivateName = self.private_struct.name;
             // FIXME: self.private_struct.fields is no longer Vec<VarTy>; it is now syn::VariantData.
             let private_struct_field_names =
@@ -151,20 +155,20 @@ impl<'ast> ClassContext<'ast> {
                     }
                 }
             }
+            */
         }
     }
-*/
 
     fn imp_private_struct(&self) -> Tokens {
         let PrivateName = &self.private_struct.derive_input.ident;
         let derive_input = &self.private_struct.derive_input;
-        // let private_init_fn_body = &self.private_init_fn_body();
+        let private_init_fn_body = &self.private_init_fn_body();
 
         quote! {
             #derive_input
 
             impl #PrivateName {
-//                pub fn new() -> Self #private_init_fn_body
+                pub fn new() -> Self #private_init_fn_body
             }
         }
     }
