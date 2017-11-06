@@ -8,7 +8,7 @@ impl<'ast> ClassContext<'ast> {
             self.imp_class_struct(),
             // self.imp_properties_enum(),
             // self.imp_signals_enum(),
-            // self.imp_private_struct(),
+            self.imp_private_struct(),
             // self.imp_class_private_struct(),
             // self.imp_slot_impls(),
             // self.imp_instance(),
@@ -155,24 +155,19 @@ impl<'ast> ClassContext<'ast> {
     }
 */
 
-/*
     fn imp_private_struct(&self) -> Tokens {
-        // FIXME: self.private_struct now only has a .derive_input
         let PrivateName = &self.private_struct.derive_input.ident;
-        let private_struct_fields = &self.private_struct.fields;
-        let private_init_fn_body = &self.private_init_fn_body();
+        let derive_input = &self.private_struct.derive_input;
+        // let private_init_fn_body = &self.private_init_fn_body();
 
         quote! {
-            struct #PrivateName {
-                #(#private_struct_fields),*
-            }
+            #derive_input
 
             impl #PrivateName {
-                pub fn new() -> Self #private_init_fn_body
+//                pub fn new() -> Self #private_init_fn_body
             }
         }
     }
-*/
 
 /*
     fn imp_class_private_struct(&self) -> Tokens {
