@@ -6,17 +6,15 @@ impl<'ast> ClassContext<'ast> {
         let all = vec![
             self.imp_instance_struct(),
             self.imp_class_struct(),
-/*
-            self.imp_properties_enum(),
-            self.imp_signals_enum(),
-            self.imp_private_struct(),
-            self.imp_class_private_struct(),
-            self.imp_slot_impls(),
-            self.imp_instance(),
-            self.imp_class(),
-            self.imp_extern_funcs(),
-            self.imp_get_type_fn(),
-*/
+            // self.imp_properties_enum(),
+            // self.imp_signals_enum(),
+            // self.imp_private_struct(),
+            // self.imp_class_private_struct(),
+            // self.imp_slot_impls(),
+            // self.imp_instance(),
+            // self.imp_class(),
+            // self.imp_extern_funcs(),
+            // self.imp_get_type_fn(),
         ];
 
         quote! {
@@ -106,7 +104,9 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
+*/
 
+/*
     fn imp_signals_enum(&self) -> Tokens {
         quote! {
             #[repr(u32)]
@@ -117,7 +117,9 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
+*/
 
+/*
     fn private_init_fn_body(&self) -> Tokens {
         // If the user had a "private_init()" method, we want to use it as an initializer
         // for the private struct.
@@ -151,7 +153,9 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
+*/
 
+/*
     fn imp_private_struct(&self) -> Tokens {
         // FIXME: self.private_struct now only has a .derive_input
         let PrivateName = &self.private_struct.derive_input.ident;
@@ -168,7 +172,9 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
+*/
 
+/*
     fn imp_class_private_struct(&self) -> Tokens {
         let PrivateClassName = &self.PrivateClassName;
         let ParentClassFfi = &self.ParentClassFfi;
@@ -189,7 +195,9 @@ impl<'ast> ClassContext<'ast> {
             };
         }
     }
+*/
 
+/*
     fn imp_get_priv_fn(&self) -> Tokens {
         let InstanceName = self.InstanceName;
         let PrivateName = self.private_struct.name;
@@ -208,7 +216,9 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
+*/
 
+/*
     fn imp_slot_impls(&self) -> Tokens {
         // We are inside the "mod imp".  We will create function
         // implementations for the default handlers for methods and
@@ -228,7 +238,9 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
+*/
 
+/*
     fn imp_slot_default_handlers(&self) -> Vec<Tokens> {
         self.members_with_slots()
             .map(|member| {
@@ -255,7 +267,9 @@ impl<'ast> ClassContext<'ast> {
             })
             .collect()
     }
+*/
 
+/*
     fn instance_init_fn(&self) -> Tokens {
         let callback_guard = self.glib_callback_guard();
         let get_type_fn_name = self.instance_get_type_fn_name();
@@ -278,7 +292,9 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
+*/
 
+/*
     fn instance_finalize_fn(&self) -> Tokens {
         let callback_guard = self.glib_callback_guard();
         let get_type_fn_name = self.instance_get_type_fn_name();
@@ -301,7 +317,9 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
+*/
 
+/*
     fn instance_method_trampolines(&self) -> Tokens {
         let callback_guard = self.glib_callback_guard();
         let InstanceName = self.InstanceName;
@@ -336,7 +354,9 @@ impl<'ast> ClassContext<'ast> {
             #(#impls)*
         }
     }
+*/
 
+/*
     fn imp_instance(&self) -> Tokens {
         let InstanceName = self.InstanceName;
 
@@ -358,7 +378,9 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
+*/
 
+/*
     fn imp_class(&self) -> Tokens {
         let ClassName = &self.ClassName;
         let class_init_fn = self.class_init_fn();
@@ -370,7 +392,9 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
+*/
 
+/*
     fn class_init_fn(&self) -> Tokens {
         let callback_guard = self.glib_callback_guard();
         let InstanceName = self.InstanceName;
@@ -416,7 +440,9 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
+*/
 
+/*
     fn imp_new_fn(&self) -> Tokens {
         let imp_new_fn_name = self.imp_new_fn_name();
         let InstanceName = self.InstanceName;
@@ -438,7 +464,9 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
+*/
 
+/*
     fn imp_extern_methods(&self) -> Vec<Tokens> {
         let InstanceName = self.InstanceName;
         let callback_guard = self.glib_callback_guard();
@@ -464,7 +492,9 @@ impl<'ast> ClassContext<'ast> {
             })
             .collect()
     }
+*/
 
+/*
     fn imp_extern_funcs(&self) -> Tokens {
         let imp_new_fn = self.imp_new_fn();
         let imp_extern_methods = self.imp_extern_methods();
@@ -474,7 +504,9 @@ impl<'ast> ClassContext<'ast> {
             #(#imp_extern_methods)*
         }
     }
+*/
 
+/*
     fn instance_get_class_fn(&self) -> Tokens {
         let ClassName = &self.ClassName;
 
@@ -487,7 +519,9 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
+*/
 
+/*
     fn imp_get_type_fn(&self) -> Tokens {
         let callback_guard = self.glib_callback_guard();
         let get_type_fn_name = self.instance_get_type_fn_name();
@@ -531,7 +565,9 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
+*/
 
+/*
     pub fn members_with_slots(&self) -> impl Iterator<Item = &'ast Member> {
         self.class
             .members
@@ -542,15 +578,21 @@ impl<'ast> ClassContext<'ast> {
                 _ => None,
             })
     }
+*/
 
+/*
     fn slot_trampoline_name(slot_name: &Ident) -> Ident {
         Ident::from(&format!("{}_trampoline", slot_name.as_ref()))
     }
+*/
 
+/*
     fn slot_impl_name(slot_name: &Ident) -> Ident {
         Ident::from(&format!("{}_impl", slot_name.as_ref()))
     }
+*/
 
+/*
     fn slot_assignments(&self) -> Vec<Tokens> {
         let InstanceName = self.InstanceName;
 
@@ -570,7 +612,9 @@ impl<'ast> ClassContext<'ast> {
             })
             .collect()
     }
+*/
 
+/*
     fn imp_new_fn_name(&self) -> Ident {
         self.exported_fn_name("new")
     }
