@@ -1,5 +1,5 @@
 use super::*;
-use cstringident::*;
+use self::cstringident::*;
 
 impl<'ast> ClassContext<'ast> {
     fn signal_trampolines(&self) -> Tokens {

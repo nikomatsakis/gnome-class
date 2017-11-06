@@ -1,10 +1,11 @@
 use super::*;
-use cstringident::*;
+use self::cstringident::*;
 
 impl<'ast> ClassContext<'ast> {
-    fn imp_module(&self) -> Tokens {
+    pub fn imp_module(&self) -> Tokens {
         let all = vec![
             self.imp_instance_struct(),
+/*
             self.imp_class_struct(),
             self.imp_properties_enum(),
             self.imp_signals_enum(),
@@ -15,6 +16,7 @@ impl<'ast> ClassContext<'ast> {
             self.imp_class(),
             self.imp_extern_funcs(),
             self.imp_get_type_fn(),
+*/
         ];
 
         quote! {
@@ -49,7 +51,7 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
-
+/*
     fn imp_class_struct(&self) -> Tokens {
         let ClassName = self.ClassName;
         let ParentClassFfi = &self.ParentClassFfi;
@@ -570,4 +572,5 @@ impl<'ast> ClassContext<'ast> {
     fn imp_new_fn_name(&self) -> Ident {
         self.exported_fn_name("new")
     }
+*/
 }

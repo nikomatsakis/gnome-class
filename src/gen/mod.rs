@@ -7,11 +7,14 @@ use quote::{Tokens};
 use std::convert::Into;
 use syn::Ident;
 
+mod cstringident;
+
+mod toplevel_imports;
+
 mod glib_utils;
 use self::glib_utils::lower_case_instance_name;
 
-mod toplevel_imports;
-// mod imp;
+mod imp;
 // mod pub;
 // mod instance_ext;
 // mod signals;
@@ -115,8 +118,8 @@ impl<'ast> ClassContext<'ast> {
         let all = vec![
             self.toplevel_imports(),
             self.glib_wrapper(),
-/*
             self.imp_module(),
+/*
             self.pub_impl(),
             self.instance_ext(),
             self.instance_ext_impl(),
