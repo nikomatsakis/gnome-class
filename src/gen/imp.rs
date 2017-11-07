@@ -10,7 +10,7 @@ impl<'ast> ClassContext<'ast> {
             // self.imp_signals_enum(),
             self.imp_private_struct(),
             self.imp_class_private_struct(),
-            // self.imp_slot_impls(),
+            self.imp_slot_impls(),
             // self.imp_instance(),
             // self.imp_class(),
             // self.imp_extern_funcs(),
@@ -194,10 +194,9 @@ impl<'ast> ClassContext<'ast> {
         }
     }
 
-/*
     fn imp_get_priv_fn(&self) -> Tokens {
         let InstanceName = self.InstanceName;
-        let PrivateName = self.private_struct.name;
+        let PrivateName = &self.private_struct.derive_input.ident;
         let get_type_fn_name = self.instance_get_type_fn_name();
 
         quote! {
@@ -213,9 +212,7 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
-*/
 
-/*
     fn imp_slot_impls(&self) -> Tokens {
         // We are inside the "mod imp".  We will create function
         // implementations for the default handlers for methods and
@@ -225,17 +222,16 @@ impl<'ast> ClassContext<'ast> {
 
         let InstanceName = self.InstanceName;
         let get_priv = self.imp_get_priv_fn();
-        let impls = self.imp_slot_default_handlers();
+        // let impls = self.imp_slot_default_handlers();
 
         quote! {
             impl super::#InstanceName {
                 #get_priv
 
-                #(#impls)*
+                // #(#impls)*
             }
         }
     }
-*/
 
 /*
     fn imp_slot_default_handlers(&self) -> Vec<Tokens> {
