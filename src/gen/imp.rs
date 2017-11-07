@@ -9,7 +9,7 @@ impl<'ast> ClassContext<'ast> {
             // self.imp_properties_enum(),
             // self.imp_signals_enum(),
             self.imp_private_struct(),
-            // self.imp_class_private_struct(),
+            self.imp_class_private_struct(),
             // self.imp_slot_impls(),
             // self.imp_instance(),
             // self.imp_class(),
@@ -173,7 +173,6 @@ impl<'ast> ClassContext<'ast> {
         }
     }
 
-/*
     fn imp_class_private_struct(&self) -> Tokens {
         let PrivateClassName = &self.PrivateClassName;
         let ParentClassFfi = &self.ParentClassFfi;
@@ -194,7 +193,6 @@ impl<'ast> ClassContext<'ast> {
             };
         }
     }
-*/
 
 /*
     fn imp_get_priv_fn(&self) -> Tokens {
