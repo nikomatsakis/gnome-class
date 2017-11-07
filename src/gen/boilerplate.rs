@@ -2,9 +2,6 @@ use quote::{Tokens};
 
 use super::*;
 use self::cstringident::*;
-use self::imp::*;
-use self::instance_ext::*;
-use self::signals::*;
 
 // This has all the one-time boilerplate for a GObject implementation:
 // the instance and class structs, the get_type(), instance_init(),

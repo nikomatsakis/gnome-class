@@ -2,7 +2,6 @@
 #![allow(non_snake_case)]
 
 use quote::{Tokens};
-use std::convert::Into;
 use syn::Ident;
 
 use ast::*;

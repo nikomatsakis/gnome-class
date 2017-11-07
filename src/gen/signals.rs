@@ -1,5 +1,4 @@
 use super::*;
-use self::cstringident::*;
 
 impl<'ast> ClassContext<'ast> {
     pub fn signal_trampolines(&self) -> Vec<Tokens> {
