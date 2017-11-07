@@ -35,10 +35,10 @@ gobject_gen! {
 }
 
 #[test]
-#[cfg(None)]
 fn test() {
     let c: Counter = Counter::new();
 
+    /*
     println!("Counter has value: {}", c.get());
 
     c.add(2);
@@ -46,4 +46,5 @@ fn test() {
     assert_eq!(c.get(), 22);
 
     println!("Counter has value: {}", c.get());
+    */
 }

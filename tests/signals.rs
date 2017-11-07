@@ -3,8 +3,8 @@
 extern crate gobject_gen;
 // extern crate gobject_sys;
 
-// #[macro_use]
-// extern crate glib;
+#[macro_use]
+extern crate glib;
 
 extern crate libc;
 
@@ -13,7 +13,7 @@ use std::cell::Cell;
 use std::ffi::CStr;
 use std::mem;
 use std::slice;
-/*
+
 use glib::object::*;
 use glib::translate::*;
 
@@ -23,8 +23,15 @@ gobject_gen! {
             val: Cell<u32>
         }
 
-//        signal value_changed(&self);
+        private_init() -> SignalerPrivate {
+            SignalerPrivate {
+                val: Cell::new(0)
+            }
+        }
 
+        // signal value_changed(&self);
+
+        /*
         fn set_value(&self, v: u32) {
             let private = self.get_priv();
             private.val.set(v);
@@ -35,16 +42,17 @@ gobject_gen! {
             let private = self.get_priv();
             private.val.get()
         }
+        */
     }
 }
-*/
+
 #[test]
 #[ignore] // We don't create signals yet
-#[cfg(None)]
 fn has_value_changed_signal() {
     let obj: Signaler = Signaler::new();
     let obj_type = obj.get_type().to_glib();
 
+    /*
     unsafe {
         let mut n_ids: libc::c_uint = mem::zeroed();
 
@@ -63,5 +71,6 @@ fn has_value_changed_signal() {
 
         let signal_name = CStr::from_ptr(query.signal_name);
         assert_eq!(signal_name.to_str().unwrap(), "value-changed");
-    }
+  }
+  */
 }

@@ -2,8 +2,8 @@
 
 extern crate gobject_gen;
 
-// #[macro_use]
-// extern crate glib;
+#[macro_use]
+extern crate glib;
 use gobject_gen::gobject_gen;
 
 use std::cell::RefCell;
@@ -30,7 +30,7 @@ impl Drop for DropCounter {
         self.counter.fetch_add(1, Ordering::SeqCst);
     }
 }
-/*
+
 gobject_gen! {
     class Dummy {
         struct DummyPrivate {
@@ -42,19 +42,20 @@ gobject_gen! {
                 dc: RefCell::new(DropCounter::new())
             }
         }
-
+/*
         fn set_dc(&self, dc: DropCounter) {
             let mut self_dc = self.get_priv().dc.borrow_mut();
             *self_dc = dc;
         }
+*/
     }
 }
-*/
+
 #[test]
-#[cfg(None)]
 fn check() {
     let dc = DropCounter::new();
 
+    /*
     {
         let c: Dummy = Dummy::new();
         c.set_dc(dc.clone());
@@ -64,4 +65,5 @@ fn check() {
 
     println!("Drop counter has value: {}", dc.get());
     assert_eq!(dc.get(), 1);
+    */
 }
