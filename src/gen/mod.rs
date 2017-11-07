@@ -1,23 +1,21 @@
 // We give `ClassName` variables an identifier that uses upper-case.
 #![allow(non_snake_case)]
 
-use ast::*;
-use errors::*;
 use quote::{Tokens};
 use std::convert::Into;
 use syn::Ident;
 
+use ast::*;
+use errors::*;
+
+mod boilerplate;
 mod cstringident;
-
-mod toplevel_imports;
-
 mod glib_utils;
-use self::glib_utils::lower_case_instance_name;
-
 mod imp;
-mod public;
-// mod instance_ext;
-// mod signals;
+mod instance_ext;
+mod signals;
+
+use self::glib_utils::lower_case_instance_name;
 
 // HYGIENE NOTE:
 //
@@ -115,25 +113,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     pub fn gen_class(&self) -> Result<Tokens> {
-        let all = vec![
-            self.toplevel_imports(),
-            self.glib_wrapper(),
-            self.imp_module(),
-            self.pub_impl(),
-            // self.instance_ext(),
-            // self.instance_ext_impl(),
-            // self.signal_trampolines(),
-        ];
-
-        let ModuleName = &self.ModuleName;
-
-        Ok(quote! {
-            pub mod #ModuleName {
-                #(#all)*
-            }
-
-            pub use #ModuleName::*;
-        })
+        Ok(self.gen_boilerplate())
     }
 
     fn exported_fn_name(&self, method_name: &str) -> Ident {

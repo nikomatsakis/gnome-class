@@ -2,10 +2,7 @@ use super::*;
 use self::cstringident::*;
 
 impl<'ast> ClassContext<'ast> {
-    fn signal_trampolines(&self) -> Tokens {
-        let InstanceName = self.InstanceName;
-        let InstanceExt = self.InstanceExt;
-
+    pub fn signal_trampolines(&self) -> Tokens {
         quote! {
             // FIXME: signal handler trampolines like in glib-rs
             //
@@ -26,7 +23,8 @@ impl<'ast> ClassContext<'ast> {
         }
     }
 
-    fn signal_declarations(&self) -> Vec<Tokens> {
+    pub fn signal_declarations(&self) -> Vec<Tokens> {
+        /*
         self.signals()
             .map(|signal| {
                 // FIXME: we are not specifying the proper signature (return, args) for the signal
@@ -39,7 +37,7 @@ impl<'ast> ClassContext<'ast> {
                 let signal_id_name = signal_id_name(&signal);
                 let signal_name = CStringIdent(signal.name);
                 quote! {
-                    klass.#signal_id_name =
+                    PRIV.signals[signal_id_name] =
                         gobject_sys::g_signal_newv (#signal_name as *const u8 as *const i8,
                                                     (*g_object_class).g_type_class.g_type,
                                                     gobject_sys::G_SIGNAL_RUN_FIRST, // flags
@@ -54,20 +52,28 @@ impl<'ast> ClassContext<'ast> {
                 }
             })
             .collect()
+         */
+        Vec::new()
     }
 
+    /*
+    /// From a signal called `foo`, generate `foo_signal_id`.  This is used to
+    /// store the signal ids from g_signal_newv() in the Class structure.
     fn signal_id_name(signal: &Signal) -> Ident {
         Ident::from(&format!("{}_signal_id", signal.name.as_ref()))
     }
+    */
 
-    /// From a signal called `foo`, generate `foo_signal_id`.  This is used to
-    /// store the signal ids from g_signal_newv() in the Class structure.
     pub fn signal_id_names(&self) -> Vec<Ident> {
+        /*
         self.signals()
             .map(|signal| signal_id_name (signal))
             .collect()
+         */
+        Vec::new()
     }
 
+    /*
     pub fn signals(&self) -> impl Iterator<Item = &'ast Signal> {
         self.class
             .members
@@ -77,4 +83,5 @@ impl<'ast> ClassContext<'ast> {
                 _ => None,
             })
     }
+    */
 }

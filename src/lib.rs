@@ -1,7 +1,7 @@
 #![feature(catch_expr)]
 #![feature(conservative_impl_trait)]
 #![feature(proc_macro)]
-#![recursion_limit="256"]
+#![recursion_limit="512"]
 
 // While under active devel, these warnings are kind of annoying.
 #![allow(dead_code)]
