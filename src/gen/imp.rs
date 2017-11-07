@@ -14,7 +14,7 @@ impl<'ast> ClassContext<'ast> {
             self.imp_instance(),
             self.imp_class(),
             // self.imp_extern_funcs(),
-            // self.imp_get_type_fn(),
+            self.imp_get_type_fn(),
         ];
 
         quote! {
@@ -500,14 +500,13 @@ impl<'ast> ClassContext<'ast> {
         }
     }
 
-/*
     fn imp_get_type_fn(&self) -> Tokens {
         let callback_guard = self.glib_callback_guard();
         let get_type_fn_name = self.instance_get_type_fn_name();
         let ClassName = self.ClassName;
         let InstanceName = self.InstanceName;
         let ParentInstance = &self.ParentInstance;
-        let instance_name_string = CStringIdent(InstanceName);
+        let instance_name_string = CStringIdent(*InstanceName);
 
         quote! {
             #[no_mangle]
@@ -544,7 +543,6 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
-*/
 
 /*
     pub fn members_with_slots(&self) -> impl Iterator<Item = &'ast Member> {

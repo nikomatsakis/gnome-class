@@ -5,8 +5,7 @@ use proc_macro2::{Literal, TokenNode};
 /// Wraps an `Ident` so it can be tokenized as a C-friendly string literal.
 ///
 /// For example, if the ident holds the name Foo, then this will
-/// generate "`b"Foo\0" as *const u8 as *const i8`", which is suitable
-/// for calling C APIs.
+/// generate "`b"Foo\0"`", which is suitable for calling C APIs.
 pub struct CStringIdent(pub Ident);
 
 impl ToTokens for CStringIdent {
@@ -17,9 +16,5 @@ impl ToTokens for CStringIdent {
         let mut v = Vec::from (s.as_bytes());
         v.push (0u8);
         tokens.append (TokenNode::Literal(Literal::byte_string(&v)));
-
-        // Cast it to what glib expects
-
-        tokens.append_tokens (quote! { as *const u8 as *const i8 });
     }
 }
