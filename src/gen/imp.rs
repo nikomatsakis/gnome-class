@@ -11,7 +11,7 @@ impl<'ast> ClassContext<'ast> {
             self.imp_private_struct(),
             self.imp_class_private_struct(),
             self.imp_slot_impls(),
-            // self.imp_instance(),
+            self.imp_instance(),
             // self.imp_class(),
             // self.imp_extern_funcs(),
             // self.imp_get_type_fn(),
@@ -262,11 +262,10 @@ impl<'ast> ClassContext<'ast> {
     }
 */
 
-/*
     fn instance_init_fn(&self) -> Tokens {
         let callback_guard = self.glib_callback_guard();
         let get_type_fn_name = self.instance_get_type_fn_name();
-        let PrivateName = self.private_struct.name;
+        let PrivateName = &self.private_struct.derive_input.ident;
 
         quote! {
             // Instance struct and private data initialization, called from GObject
@@ -285,13 +284,11 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
-*/
 
-/*
     fn instance_finalize_fn(&self) -> Tokens {
         let callback_guard = self.glib_callback_guard();
         let get_type_fn_name = self.instance_get_type_fn_name();
-        let PrivateName = self.private_struct.name;
+        let PrivateName = &self.private_struct.derive_input.ident;
 
         quote! {
             unsafe extern "C" fn finalize(obj: *mut gobject_ffi::GObject) {
@@ -310,13 +307,11 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
-*/
 
-/*
     fn instance_method_trampolines(&self) -> Tokens {
         let callback_guard = self.glib_callback_guard();
         let InstanceName = self.InstanceName;
-
+        /*
         let impls: Vec<Tokens> = self.methods()
             .map(|method| {
                 let trampoline_name = Self::slot_trampoline_name(&method.name);
@@ -342,14 +337,12 @@ impl<'ast> ClassContext<'ast> {
                 }
             })
             .collect();
-
+        */
         quote! {
-            #(#impls)*
+            // #(#impls)*
         }
     }
-*/
 
-/*
     fn imp_instance(&self) -> Tokens {
         let InstanceName = self.InstanceName;
 
@@ -371,7 +364,6 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
-*/
 
 /*
     fn imp_class(&self) -> Tokens {
@@ -499,7 +491,6 @@ impl<'ast> ClassContext<'ast> {
     }
 */
 
-/*
     fn instance_get_class_fn(&self) -> Tokens {
         let ClassName = &self.ClassName;
 
@@ -512,7 +503,6 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
-*/
 
 /*
     fn imp_get_type_fn(&self) -> Tokens {

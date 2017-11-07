@@ -59,7 +59,7 @@ impl<'ast> ClassContext<'ast> {
         }
     }
 
-    fn glib_callback_guard(&self) -> Tokens {
+    pub fn glib_callback_guard(&self) -> Tokens {
         quote! {
             let _guard = glib::CallbackGuard::new();
         }
