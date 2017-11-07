@@ -69,20 +69,20 @@ impl Synom for ast::Class {
             superclass: syn!(Path)                               >>
             // FIXME: interfaces
             (superclass)))                                       >>
-        members_and_braces: braces!(many0!(syn!(ast::Member)))   >>
+        items_and_braces: braces!(many0!(syn!(ast::ClassItem)))  >>
         (ast::Class {
             name:    name,
             extends: extends,
-            members: members_and_braces.0
+            items:   items_and_braces.0
         })
     ));
 }
 
-impl Synom for ast::Member {
+impl Synom for ast::ClassItem {
     named!(parse -> Self, alt!(
-        syn!(ast::PrivateStruct) => { |x| ast::Member::PrivateStruct(x) }
+        syn!(ast::PrivateStruct) => { |x| ast::ClassItem::PrivateStruct(x) }
         |
-        syn!(ast::PrivateInit) => { |x| ast::Member::PrivateInit(x) }
+        syn!(ast::PrivateInit) => { |x| ast::ClassItem::PrivateInit(x) }
     ));
 }
 
@@ -281,7 +281,7 @@ mod tests {
     }
 
     #[test]
-    fn parses_members() {
+    fn parses_class_items() {
         let raw = "struct FooPrivate {
                        foo: u32,
                        bar: String
@@ -292,10 +292,10 @@ mod tests {
         let buffer = SynomBuffer::new(token_stream);
         let cursor = buffer.begin();
 
-        let member = ast::Member::parse(cursor).unwrap().1;
+        let item = ast::ClassItem::parse(cursor).unwrap().1;
 
-        match member {
-            ast::Member::PrivateStruct(_) => (),
+        match item {
+            ast::ClassItem::PrivateStruct(_) => (),
             _ => unreachable!()
         };
 
@@ -311,16 +311,16 @@ mod tests {
         let buffer = SynomBuffer::new(token_stream);
         let cursor = buffer.begin();
 
-        let member = ast::Member::parse(cursor).unwrap().1;
+        let item = ast::ClassItem::parse(cursor).unwrap().1;
 
-        match member {
-            ast::Member::PrivateInit(_) => (),
+        match item {
+            ast::ClassItem::PrivateInit(_) => (),
             _ => unreachable!()
         };
     }
 
     #[test]
-    fn parses_private_struct_members() {
+    fn parses_private_struct_class_items() {
         let raw = "class Foo {
                        struct FooPrivate {
                            foo: u32,
@@ -342,11 +342,11 @@ mod tests {
 
         let class = ast::Class::parse(cursor).unwrap().1;
 
-        let mut iter = class.members.iter();
+        let mut iter = class.items.iter();
 
         let m = iter.next().unwrap();
         match *m {
-            ast::Member::PrivateStruct(_) => {
+            ast::ClassItem::PrivateStruct(_) => {
                 (); // okay
             },
 
@@ -355,7 +355,7 @@ mod tests {
 
         let m = iter.next().unwrap();
         match *m {
-            ast::Member::PrivateInit (ref i) => {
+            ast::ClassItem::PrivateInit (ref i) => {
                 assert!(i.inputs.is_empty());
 
                 match i.output {

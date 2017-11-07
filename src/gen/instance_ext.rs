@@ -50,10 +50,10 @@ impl<'ast> ClassContext<'ast> {
     /*
     pub fn methods(&self) -> impl Iterator<Item = &'ast Method> {
         self.class
-            .members
+            .items
             .iter()
-            .filter_map(|member| match *member {
-                Member::Method(ref m) => Some(m),
+            .filter_map(|item| match *item {
+                ClassItem::Method(ref m) => Some(m),
                 _ => None,
             })
     }

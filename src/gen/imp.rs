@@ -42,22 +42,22 @@ impl<'ast> ClassContext<'ast> {
         //
         // Otherwise, just initialize all of the struct's fields to Default::default().
 
-        let private_init_member =
-            self.class.members
+        let private_init_item =
+            self.class.items
             .iter()
-            .filter_map(|m| match *m {
-                Member::PrivateInit(ref f) => Some(f),
+            .filter_map(|i| match *i {
+                ClassItem::PrivateInit(ref f) => Some(f),
                 _ => None,
             })
             .next();
 
-        if let Some(i) = private_init_member {
+        if let Some(i) = private_init_item {
             // FIXME: check that i.inputs is empty
             // FIXME: check that i.output is the same as PrivateStruct
             let block = &i.block;
             quote! { #block }
         } else {
-            panic!("Class must have a private_init() member");
+            panic!("Class must have a private_init() item");
             /*
             let PrivateName = self.private_struct.name();
             // FIXME: self.private_struct.fields is no longer Vec<VarTy>; it is now syn::VariantData.

@@ -75,10 +75,10 @@ impl<'ast> ClassContext<'ast> {
     /*
     pub fn signals(&self) -> impl Iterator<Item = &'ast Signal> {
         self.class
-            .members
+            .items
             .iter()
-            .filter_map(|member| match *member {
-                Member::Signal(ref s) => Some(s),
+            .filter_map(|item| match *item {
+                ClassItem::Signal(ref s) => Some(s),
                 _ => None,
             })
     }

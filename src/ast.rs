@@ -11,10 +11,10 @@ pub struct Program {
 pub struct Class {
     pub name: Ident,
     pub extends: Option<Path>,
-    pub members: Vec<Member>
+    pub items: Vec<ClassItem>
 }
 
-pub enum Member {
+pub enum ClassItem {
     PrivateStruct(PrivateStruct),
     PrivateInit(PrivateInit),
 /*

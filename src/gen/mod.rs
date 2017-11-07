@@ -58,10 +58,10 @@ impl<'ast> ClassContext<'ast> {
         // example, "FooClass" out of "Foo".
 
         let private_struct =
-            class.members
+            class.items
                  .iter()
-                 .filter_map(|member| match *member {
-                     Member::PrivateStruct(ref ps) => Some(ps),
+                 .filter_map(|item| match *item {
+                     ClassItem::PrivateStruct(ref ps) => Some(ps),
                      _ => None,
                  })
                  .next();

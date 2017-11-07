@@ -10,35 +10,35 @@ pub fn check_program(program: Program) -> Result<Program> {
 }
 
 fn check_class(class: &Class) -> Result<()> {
-    Ok(check_members(class)?)
+    Ok(check_class_items(class)?)
 }
 
-fn check_members(class: &Class) -> Result<()> {
+fn check_class_items(class: &Class) -> Result<()> {
     Ok(check_private_struct(class)?)
 }
 
 fn check_private_struct(class: &Class) -> Result<()> {
     let (num_private_structs, num_private_inits) =
         class
-        .members
+        .items
         .iter()
         .fold((0, 0),
-              |(s, i), member| {
-                  match *member {
-                      Member::PrivateStruct(_) => (s + 1, i),
-                      Member::PrivateInit(_)   => (s, i + 1),
+              |(s, i), item| {
+                  match *item {
+                      ClassItem::PrivateStruct(_) => (s + 1, i),
+                      ClassItem::PrivateInit(_)   => (s, i + 1),
 //                      _                        => (s, i)
                   }
               });
 
     // FIXME: use the spans to provide exact locations of the errors
     if num_private_structs != 1 {
-        bail!(ErrorKind::OnePrivateStructError(format!("found {} structs", num_private_structs)));
+        bail!(ErrorKind::OnePrivateStructError(format!("found {} private structs", num_private_structs)));
     }
 
     // FIXME: zero private_init functions are allowed if we provide a Default initializer
     if num_private_inits != 1 {
-        bail!(ErrorKind::OnePrivateInitError(format!("found {} private_init members", num_private_inits)));
+        bail!(ErrorKind::OnePrivateInitError(format!("found {} private_init items", num_private_inits)));
     }
 
     Ok(())
