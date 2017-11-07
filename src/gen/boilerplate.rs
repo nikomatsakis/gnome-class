@@ -211,13 +211,13 @@ impl<'ast> ClassContext<'ast> {
 
                         // FIXME: get_property() handler
 
-                        #instance_method_trampolines
+                        #(#instance_method_trampolines)*
 
-                        #instance_signal_trampolines
+                        #(#instance_signal_trampolines)*
 
-                        #instance_method_impls
+                        #(#instance_method_impls)*
 
-                        #instance_default_signal_handlers
+                        #(#instance_default_signal_handlers)*
                     }
 
                     impl #ClassName {

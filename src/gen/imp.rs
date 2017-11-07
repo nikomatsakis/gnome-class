@@ -106,11 +106,11 @@ impl<'ast> ClassContext<'ast> {
         Vec::new()
     }
 
-    pub fn instance_method_trampolines(&self) -> Tokens {
+    pub fn instance_method_trampolines(&self) -> Vec<Tokens> {
         let callback_guard = self.glib_callback_guard();
         let InstanceName = self.InstanceName;
         /*
-        let impls: Vec<Tokens> = self.methods()
+        self.methods()
             .map(|method| {
                 let trampoline_name = Self::slot_trampoline_name(&method.name);
                 let method_impl_name = Self::slot_impl_name(&method.name);
@@ -134,29 +134,24 @@ impl<'ast> ClassContext<'ast> {
                     }
                 }
             })
-            .collect();
-        */
-        quote! {
-            // #(#impls)*
-        }
+            .collect()
+         */
+        Vec::new()
     }
 
-    pub fn instance_signal_trampolines(&self) -> Tokens {
-        quote! {
-            // FIXME
-        }
+    pub fn instance_signal_trampolines(&self) -> Vec<Tokens> {
+        // FIXME
+        Vec::new()
     }
 
-    pub fn instance_method_impls(&self) -> Tokens {
-        quote! {
-            // FIXME
-        }
+    pub fn instance_method_impls(&self) -> Vec<Tokens> {
+        // FIXME
+        Vec::new()
     }
 
-    pub fn instance_default_signal_handlers(&self) -> Tokens {
-        quote! {
-            // FIXME
-        }
+    pub fn instance_default_signal_handlers(&self) -> Vec<Tokens> {
+        // FIXME
+        Vec::new()
     }
 
     pub fn imp_extern_methods(&self) -> Vec<Tokens> {
