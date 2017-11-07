@@ -106,9 +106,9 @@ impl<'ast> ClassContext<'ast> {
     }
 
     pub fn instance_method_trampolines(&self) -> Vec<Tokens> {
+        /*
         let callback_guard = self.glib_callback_guard();
         let InstanceName = self.InstanceName;
-        /*
         self.methods()
             .map(|method| {
                 let trampoline_name = Self::slot_trampoline_name(&method.name);
