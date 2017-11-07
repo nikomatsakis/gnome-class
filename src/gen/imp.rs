@@ -6,7 +6,7 @@ impl<'ast> ClassContext<'ast> {
         let all = vec![
             self.imp_instance_struct(),
             self.imp_class_struct(),
-            // self.imp_properties_enum(),
+            self.imp_properties_enum(),
             self.imp_signals_enum(),
             self.imp_private_struct(),
             self.imp_class_private_struct(),
@@ -93,7 +93,6 @@ impl<'ast> ClassContext<'ast> {
         }
     }
 
-/*
     fn imp_properties_enum(&self) -> Tokens {
         quote! {
             #[repr(u32)]
@@ -104,7 +103,6 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
-*/
 
     fn imp_signals_enum(&self) -> Tokens {
         quote! {
