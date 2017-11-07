@@ -12,7 +12,7 @@ impl<'ast> ClassContext<'ast> {
             self.imp_class_private_struct(),
             self.imp_slot_impls(),
             self.imp_instance(),
-            // self.imp_class(),
+            self.imp_class(),
             // self.imp_extern_funcs(),
             // self.imp_get_type_fn(),
         ];
@@ -365,7 +365,6 @@ impl<'ast> ClassContext<'ast> {
         }
     }
 
-/*
     fn imp_class(&self) -> Tokens {
         let ClassName = &self.ClassName;
         let class_init_fn = self.class_init_fn();
@@ -377,16 +376,14 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
-*/
 
-/*
     fn class_init_fn(&self) -> Tokens {
         let callback_guard = self.glib_callback_guard();
         let InstanceName = self.InstanceName;
         let ClassName = &self.ClassName;
         let ParentClassFfi = &self.ParentClassFfi;
-        let PrivateName = self.private_struct.name;
-        let slot_assignments = self.slot_assignments();
+        let PrivateName = &self.private_struct.derive_input.ident;
+        // let slot_assignments = self.slot_assignments();
 
         quote! {
             unsafe extern "C" fn init(klass: glib_ffi::gpointer, _klass_data: glib_ffi::gpointer) {
@@ -413,7 +410,7 @@ impl<'ast> ClassContext<'ast> {
                 // Slots
                 {
                     let klass = &mut *(klass as *mut #ClassName);
-                    #(#slot_assignments)*
+                    // #(#slot_assignments)*
                 }
 
                 // Signals
@@ -425,7 +422,6 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
-*/
 
 /*
     fn imp_new_fn(&self) -> Tokens {
