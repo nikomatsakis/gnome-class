@@ -15,7 +15,7 @@ mod glib_utils;
 use self::glib_utils::lower_case_instance_name;
 
 mod imp;
-// mod pub;
+mod public;
 // mod instance_ext;
 // mod signals;
 
@@ -119,12 +119,10 @@ impl<'ast> ClassContext<'ast> {
             self.toplevel_imports(),
             self.glib_wrapper(),
             self.imp_module(),
-/*
             self.pub_impl(),
-            self.instance_ext(),
-            self.instance_ext_impl(),
-            self.signal_trampolines(),
-*/
+            // self.instance_ext(),
+            // self.instance_ext_impl(),
+            // self.signal_trampolines(),
         ];
 
         let ModuleName = &self.ModuleName;

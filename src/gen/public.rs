@@ -1,7 +1,7 @@
 use super::*;
 
 impl<'ast> ClassContext<'ast> {
-    fn pub_impl(&self) -> Tokens {
+    pub fn pub_impl(&self) -> Tokens {
         let InstanceName = self.InstanceName;
         let pub_new_method = self.pub_new_method();
 
