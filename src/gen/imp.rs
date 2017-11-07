@@ -13,7 +13,7 @@ impl<'ast> ClassContext<'ast> {
             self.imp_slot_impls(),
             self.imp_instance(),
             self.imp_class(),
-            // self.imp_extern_funcs(),
+            self.imp_extern_funcs(),
             self.imp_get_type_fn(),
         ];
 
@@ -423,7 +423,6 @@ impl<'ast> ClassContext<'ast> {
         }
     }
 
-/*
     fn imp_new_fn(&self) -> Tokens {
         let imp_new_fn_name = self.imp_new_fn_name();
         let InstanceName = self.InstanceName;
@@ -437,15 +436,14 @@ impl<'ast> ClassContext<'ast> {
 
                 let this = gobject_ffi::g_object_newv(
                     #get_type_fn_name(),
-                    0,
-                    ptr::null_mut()
+                    0,              // FIXME: num_arguments
+                    ptr::null_mut() // FIXME: args
                 );
 
                 this as *mut #InstanceName
             }
         }
     }
-*/
 
 /*
     fn imp_extern_methods(&self) -> Vec<Tokens> {
@@ -475,17 +473,15 @@ impl<'ast> ClassContext<'ast> {
     }
 */
 
-/*
     fn imp_extern_funcs(&self) -> Tokens {
         let imp_new_fn = self.imp_new_fn();
-        let imp_extern_methods = self.imp_extern_methods();
+        // let imp_extern_methods = self.imp_extern_methods();
 
         quote! {
             #imp_new_fn
-            #(#imp_extern_methods)*
+            // #(#imp_extern_methods)*
         }
     }
-*/
 
     fn instance_get_class_fn(&self) -> Tokens {
         let ClassName = &self.ClassName;
@@ -591,9 +587,7 @@ impl<'ast> ClassContext<'ast> {
     }
 */
 
-/*
     fn imp_new_fn_name(&self) -> Ident {
         self.exported_fn_name("new")
     }
-*/
 }
