@@ -7,7 +7,7 @@ impl<'ast> ClassContext<'ast> {
             self.imp_instance_struct(),
             self.imp_class_struct(),
             // self.imp_properties_enum(),
-            // self.imp_signals_enum(),
+            self.imp_signals_enum(),
             self.imp_private_struct(),
             self.imp_class_private_struct(),
             self.imp_slot_impls(),
@@ -106,7 +106,6 @@ impl<'ast> ClassContext<'ast> {
     }
 */
 
-/*
     fn imp_signals_enum(&self) -> Tokens {
         quote! {
             #[repr(u32)]
@@ -117,7 +116,6 @@ impl<'ast> ClassContext<'ast> {
             }
         }
     }
-*/
 
     fn private_init_fn_body(&self) -> Tokens {
         // If the user had a "private_init()" method, we want to use it as an initializer
