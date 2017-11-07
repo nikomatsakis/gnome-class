@@ -142,7 +142,7 @@ impl<'ast> ClassContext<'ast> {
         } else {
             panic!("Class must have a private_init() member");
             /*
-            let PrivateName = self.private_struct.name;
+            let PrivateName = self.private_struct.name();
             // FIXME: self.private_struct.fields is no longer Vec<VarTy>; it is now syn::VariantData.
             let private_struct_field_names =
                 self.private_struct.fields
@@ -160,7 +160,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn imp_private_struct(&self) -> Tokens {
-        let PrivateName = &self.private_struct.derive_input.ident;
+        let PrivateName = &self.private_struct.name();
         let derive_input = &self.private_struct.derive_input;
         let private_init_fn_body = &self.private_init_fn_body();
 
@@ -196,7 +196,7 @@ impl<'ast> ClassContext<'ast> {
 
     fn imp_get_priv_fn(&self) -> Tokens {
         let InstanceName = self.InstanceName;
-        let PrivateName = &self.private_struct.derive_input.ident;
+        let PrivateName = &self.private_struct.name();
         let get_type_fn_name = self.instance_get_type_fn_name();
 
         quote! {
@@ -265,7 +265,7 @@ impl<'ast> ClassContext<'ast> {
     fn instance_init_fn(&self) -> Tokens {
         let callback_guard = self.glib_callback_guard();
         let get_type_fn_name = self.instance_get_type_fn_name();
-        let PrivateName = &self.private_struct.derive_input.ident;
+        let PrivateName = &self.private_struct.name();
 
         quote! {
             // Instance struct and private data initialization, called from GObject
@@ -288,7 +288,7 @@ impl<'ast> ClassContext<'ast> {
     fn instance_finalize_fn(&self) -> Tokens {
         let callback_guard = self.glib_callback_guard();
         let get_type_fn_name = self.instance_get_type_fn_name();
-        let PrivateName = &self.private_struct.derive_input.ident;
+        let PrivateName = &self.private_struct.name();
 
         quote! {
             unsafe extern "C" fn finalize(obj: *mut gobject_ffi::GObject) {
@@ -382,7 +382,7 @@ impl<'ast> ClassContext<'ast> {
         let InstanceName = self.InstanceName;
         let ClassName = &self.ClassName;
         let ParentClassFfi = &self.ParentClassFfi;
-        let PrivateName = &self.private_struct.derive_input.ident;
+        let PrivateName = &self.private_struct.name();
         // let slot_assignments = self.slot_assignments();
 
         quote! {
