@@ -80,9 +80,27 @@ impl Synom for ast::Class {
 
 impl Synom for ast::ClassItem {
     named!(parse -> Self, alt!(
+        syn!(ast::InstancePrivateItem) => { |x| ast::ClassItem::InstancePrivate(x) }
+        |
         syn!(ast::PrivateStruct) => { |x| ast::ClassItem::PrivateStruct(x) }
         |
         syn!(ast::PrivateInit) => { |x| ast::ClassItem::PrivateInit(x) }
+    ));
+}
+
+impl Synom for ast::InstancePrivateItem {
+    named!(parse -> Self, do_parse!(
+        type_: syn!(tokens::Type)         >>
+        call!(keyword("InstancePrivate")) >>
+        eq: syn!(tokens::Eq)              >>
+        path: syn!(Path)                  >>
+        semi: syn!(tokens::Semi)          >>
+        (ast::InstancePrivateItem {
+            type_token: type_,
+            eq_token:   eq,
+            path:       path,
+            semi_token: semi
+        })
     ));
 }
 
@@ -191,6 +209,25 @@ mod tests {
         let mut path_tokens = quote::Tokens::new();
         class.extends.unwrap().to_tokens(&mut path_tokens);
         assert_eq!(path_tokens.to_string(), "Bar");
+    }
+
+    #[test]
+    fn parses_instance_private_item() {
+        let raw = "type InstancePrivate = FooPrivate;";
+
+        let token_stream = raw.parse::<TokenStream>().unwrap();
+
+        let buffer = SynomBuffer::new(token_stream);
+        let cursor = buffer.begin();
+        let item: ast::ClassItem = ast::ClassItem::parse(cursor).unwrap().1;
+
+        if let ast::ClassItem::InstancePrivate(item) = item {
+            let mut path_tokens = quote::Tokens::new();
+            item.path.to_tokens(&mut path_tokens);
+            assert_eq!(path_tokens.to_string(), "FooPrivate");
+        } else {
+            unreachable!();
+        }
     }
 
     #[test]

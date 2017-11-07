@@ -18,18 +18,24 @@ fn check_class_items(class: &Class) -> Result<()> {
 }
 
 fn check_private_struct(class: &Class) -> Result<()> {
-    let (num_private_structs, num_private_inits) =
+    let (num_instance_private_items, num_private_structs, num_private_inits) =
         class
         .items
         .iter()
-        .fold((0, 0),
-              |(s, i), item| {
+        .fold((0, 0, 0),
+              |(p, s, i), item| {
                   match *item {
-                      ClassItem::PrivateStruct(_) => (s + 1, i),
-                      ClassItem::PrivateInit(_)   => (s, i + 1),
+                      ClassItem::InstancePrivate(_) => (p + 1, s, i),
+                      ClassItem::PrivateStruct(_)   => (p, s + 1, i),
+                      ClassItem::PrivateInit(_)     => (p, s, i + 1),
 //                      _                        => (s, i)
                   }
               });
+
+    if num_instance_private_items > 1 {
+        bail!(ErrorKind::InstancePrivateError(format!("found {} InstancePrivate type declarations",
+                                                      num_instance_private_items)));
+    }
 
     // FIXME: use the spans to provide exact locations of the errors
     if num_private_structs != 1 {
@@ -76,6 +82,38 @@ mod tests {
         let program = ast::Program::parse(cursor).unwrap().1;
 
         assert!(check_program(program).is_ok());
+    }
+
+    #[test]
+    fn catches_several_instance_private_items() {
+        let raw = "class Foo {
+                       type InstancePrivate = FooPriv;
+                       type InstancePrivate = BarPriv;
+
+                       struct FooPrivate {
+                           foo: u32,
+                           bar: String
+                       }
+
+                       private_init () -> FooPrivate {
+                           FooPrivate {
+                               foo: 42,
+                               bar: \"hello\".to_string()
+                           }
+                       }
+                   }";
+
+        let token_stream = raw.parse::<TokenStream>().unwrap();
+
+        let buffer = SynomBuffer::new(token_stream);
+        let cursor = buffer.begin();
+
+        let program = ast::Program::parse(cursor).unwrap().1;
+
+        match check_program(program) {
+            Err(Error(ErrorKind::InstancePrivateError(_), _ )) => (),
+            _ => unreachable!()
+        }
     }
 
     #[test]

@@ -15,12 +15,21 @@ pub struct Class {
 }
 
 pub enum ClassItem {
+    InstancePrivate(InstancePrivateItem),
     PrivateStruct(PrivateStruct),
     PrivateInit(PrivateInit),
 /*
     Method(Method),
     Signal(Signal),
 */
+}
+
+// Mostly copied from syn's ImplItemType
+pub struct InstancePrivateItem {
+    pub type_token: tokens::Type,
+    pub eq_token: tokens::Eq,
+    pub path: Path,
+    pub semi_token: tokens::Semi,
 }
 
 pub struct PrivateStruct {

@@ -20,6 +20,10 @@ error_chain! {
             description("invalid token in the input")
             display("invalid token at offset {}: {}", offset, msg)
         }
+        InstancePrivateError(msg: String) {
+            description("zero or one InstancePrivate types expected")
+            display("at most one InstancePrivate type definitions expected: {}", msg)
+        }
         OnePrivateStructError(msg: String) {
             description("single private struct expected")
             display("one and only one private struct expected: {}", msg)
