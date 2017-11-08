@@ -212,7 +212,7 @@ mod tests {
         let class: ast::Class = ast::Class::parse(cursor).unwrap().1;
         assert_eq!(class.name.as_ref(), "Foo");
 
-        assert_tokens_equal(&class.extends.unwrap(), "Bar");
+        assert_tokens_equal(&class.extends, "Bar");
     }
 
     #[test]
