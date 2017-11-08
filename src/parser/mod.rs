@@ -173,6 +173,12 @@ mod tests {
     use synom::{SynomBuffer};
     use synom::delimited::Element;
 
+    fn assert_tokens_equal<T: ToTokens>(x: &T, s: &str) {
+        let mut tokens = quote::Tokens::new();
+        x.to_tokens(&mut tokens);
+        assert_eq!(tokens.to_string(), s);
+    }
+
     #[test]
     fn parses_class_name() {
         let raw = "class Foo {}";
@@ -206,9 +212,7 @@ mod tests {
         let class: ast::Class = ast::Class::parse(cursor).unwrap().1;
         assert_eq!(class.name.as_ref(), "Foo");
 
-        let mut path_tokens = quote::Tokens::new();
-        class.extends.unwrap().to_tokens(&mut path_tokens);
-        assert_eq!(path_tokens.to_string(), "Bar");
+        assert_tokens_equal(&class.extends.unwrap(), "Bar");
     }
 
     #[test]
@@ -222,9 +226,7 @@ mod tests {
         let item: ast::ClassItem = ast::ClassItem::parse(cursor).unwrap().1;
 
         if let ast::ClassItem::InstancePrivate(item) = item {
-            let mut path_tokens = quote::Tokens::new();
-            item.path.to_tokens(&mut path_tokens);
-            assert_eq!(path_tokens.to_string(), "FooPrivate");
+            assert_tokens_equal(&item.path, "FooPrivate");
         } else {
             unreachable!();
         }
@@ -258,9 +260,7 @@ mod tests {
                         assert_eq!(field.ident.unwrap(), "foo");
 
                         if let Ty::Path(ref typath) = field.ty {
-                            let mut path_tokens = quote::Tokens::new();
-                            typath.path.to_tokens(&mut path_tokens);
-                            assert_eq!(path_tokens.to_string(), "u32");
+                            assert_tokens_equal(typath, "u32");
                         } else {
                             unreachable!();
                         }
@@ -273,9 +273,7 @@ mod tests {
                         assert_eq!(field.ident.unwrap(), "bar");
 
                         if let Ty::Path(ref typath) = field.ty {
-                            let mut path_tokens = quote::Tokens::new();
-                            typath.path.to_tokens(&mut path_tokens);
-                            assert_eq!(path_tokens.to_string(), "String");
+                            assert_tokens_equal(typath, "String");
                         } else {
                             unreachable!();
                         }
@@ -308,9 +306,7 @@ mod tests {
 
         match private_init.output {
             FunctionRetTy::Ty(Ty::Path(TyPath { ref path, .. }), _) => {
-                let mut path_tokens = quote::Tokens::new();
-                path.to_tokens(&mut path_tokens);
-                assert_eq!(path_tokens.to_string(), "FooPrivate");
+                assert_tokens_equal(path, "FooPrivate");
             },
 
             _ => unreachable!()
@@ -397,9 +393,7 @@ mod tests {
 
                 match i.output {
                     FunctionRetTy::Ty(Ty::Path(TyPath { ref path, .. }), _) => {
-                        let mut path_tokens = quote::Tokens::new();
-                        path.to_tokens(&mut path_tokens);
-                        assert_eq!(path_tokens.to_string(), "FooPrivate");
+                        assert_tokens_equal(path, "FooPrivate");
                     },
 
                     _ => unreachable!()
