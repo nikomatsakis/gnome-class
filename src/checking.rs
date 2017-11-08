@@ -28,7 +28,7 @@ fn check_private_struct(class: &Class) -> Result<()> {
                       ClassItem::InstancePrivate(_) => (p + 1, s, i),
                       ClassItem::PrivateStruct(_)   => (p, s + 1, i),
                       ClassItem::PrivateInit(_)     => (p, s, i + 1),
-//                      _                        => (s, i)
+                      ClassItem::Method(_)          => (p, s, i),
                   }
               });
 

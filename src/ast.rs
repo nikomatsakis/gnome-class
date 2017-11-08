@@ -18,8 +18,8 @@ pub enum ClassItem {
     InstancePrivate(InstancePrivateItem),
     PrivateStruct(PrivateStruct),
     PrivateInit(PrivateInit),
-/*
     Method(Method),
+/*
     Signal(Signal),
 */
 }
@@ -46,6 +46,14 @@ pub struct PrivateInit {
 
     pub block: Block
 }
+
+pub struct Method {
+    pub name: Ident,
+    pub inputs: Delimited<FnArg, tokens::Comma>,
+    pub output: FunctionRetTy,
+    pub block: Block
+}
+
 /*
 pub struct Signal {
     pub name: Ident,
@@ -57,11 +65,6 @@ pub struct Signal {
 pub struct FnSig {
     pub args: Vec<VarTy>,
     pub return_ty: Option<Type>,
-}
-
-pub struct Method {
-    pub name: Ident,
-    pub fn_def: FnDef,
 }
 
 pub struct FnDef {

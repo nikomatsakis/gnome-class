@@ -85,6 +85,8 @@ impl Synom for ast::ClassItem {
         syn!(ast::PrivateStruct) => { |x| ast::ClassItem::PrivateStruct(x) }
         |
         syn!(ast::PrivateInit) => { |x| ast::ClassItem::PrivateInit(x) }
+        |
+        syn!(ast::Method) => { |x| ast::ClassItem::Method(x) }
     ));
 }
 
@@ -141,6 +143,28 @@ impl Synom for ast::PrivateInit {
                 brace_token: block_and_braces.1,
                 stmts: block_and_braces.0,
             },
+        })
+    ));
+}
+
+// fn foo(x: T) -> U {
+//     ...
+// }
+impl Synom for ast::Method {
+    named!(parse -> Self, do_parse!(
+        call!(keyword("fn")) >>
+        name: syn!(Ident) >>
+        inputs: parens!(Delimited::parse_terminated) >>
+        output: syn!(FunctionRetTy) >>
+        block_and_braces: braces!(call!(Block::parse_within))    >>
+        (ast::Method {
+            name,
+            inputs: inputs.0,
+            output,
+            block: Block {
+                brace_token: block_and_braces.1,
+                stmts: block_and_braces.0,
+            }
         })
     ));
 }
@@ -286,6 +310,23 @@ mod tests {
 
             _ => unreachable!()
         }
+    }
+
+    #[test]
+    fn parses_method() {
+        let raw = r#"fn hello_world(x: u32, y: u32) -> String {
+                       println!("Hello, world!");
+                   }"#;
+
+        let token_stream = raw.parse::<TokenStream>().unwrap();
+
+        let buffer = SynomBuffer::new(token_stream);
+        let cursor = buffer.begin();
+
+        let method = ast::Method::parse(cursor).unwrap().1;
+
+        assert_eq!(method.name.as_ref(), "hello_world");
+        assert_eq!(method.inputs.len(), 2);
     }
 
     #[test]
