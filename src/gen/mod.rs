@@ -23,13 +23,13 @@ use self::glib_utils::lower_case_instance_name;
 
 pub fn classes(program: &Program) -> Result<Tokens> {
     let class_tokens =
-        program.classes
-               .iter()
-               .map(|class| {
-                   let cx = ClassContext::new(program, class);
-                   cx.gen_class()
-               })
-               .collect::<Result<Vec<_>>>()?;
+        get_program_classes(program)
+        .iter()
+        .map(|class| {
+            let cx = ClassContext::new(program, class);
+            cx.gen_class()
+        })
+        .collect::<Result<Vec<_>>>()?;
     Ok(quote! { #(#class_tokens)* })
 }
 

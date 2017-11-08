@@ -2,7 +2,7 @@ use ast::*;
 use errors::*;
 
 pub fn check_program(program: Program) -> Result<Program> {
-    for class in &program.classes {
+    for class in get_program_classes (&program) {
         check_class(class)?;
     }
 

@@ -5,12 +5,25 @@ use synom::delimited::Delimited;
 use synom::tokens;
 
 pub struct Program {
-    pub classes: Vec<Class>
+    pub items: Vec<Item>
 }
 
 pub enum Item {
     Class(Class),
     Impl
+}
+
+pub fn get_program_classes<'a>(program: &'a Program) -> Vec<&'a Class> {
+    program.items
+        .iter()
+        .filter_map(|item| {
+            if let Item::Class(ref c) = *item {
+                Some(c)
+            } else {
+                None
+            }
+        })
+        .collect()
 }
 
 pub struct Class {

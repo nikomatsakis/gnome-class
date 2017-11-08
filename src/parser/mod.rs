@@ -44,9 +44,9 @@ use syn::{Block, DeriveInput, FunctionRetTy, Ident, Path};
 
 impl Synom for ast::Program {
     named!(parse -> Self, do_parse!(
-        classes: many0!(syn!(ast::Class)) >>
+        items: many0!(syn!(ast::Item)) >>
         (ast::Program {
-            classes: classes
+            items: items
         })
     ));
 }
@@ -453,6 +453,7 @@ mod tests {
 
         let program = ast::Program::parse(cursor).unwrap().1;
 
-        assert!(program.classes.len() == 1);
+        assert!(program.items.len() == 1);
+        assert!(ast::get_program_classes(&program).len() == 1);
     }
 }
