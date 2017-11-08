@@ -92,6 +92,21 @@ mod tests {
     use super::*;
     use quote::{ToTokens};
 
+    fn test_class_and_superclass (raw: &str, class_name: &str, superclass_name: &str) {
+        let token_stream = raw.parse::<TokenStream>().unwrap();
+        let buffer = SynomBuffer::new(token_stream);
+        let cursor = buffer.begin();
+        let ast_program = ast::Program::parse(cursor).unwrap().1;
+
+        let program = Program::from_ast_program(ast_program).unwrap();
+
+        assert!(program.classes.len() == 1);
+
+        let class = &program.classes[0];
+        assert_eq!(class.name.as_ref(), class_name);
+        assert_eq!(class.superclass.clone().into_tokens().to_string(), superclass_name);
+    }
+
     #[test]
     fn creates_trivial_class() {
         let raw = "class Foo {
@@ -106,17 +121,23 @@ mod tests {
                        }
                    }";
 
-        let token_stream = raw.parse::<TokenStream>().unwrap();
-        let buffer = SynomBuffer::new(token_stream);
-        let cursor = buffer.begin();
-        let ast_program = ast::Program::parse(cursor).unwrap().1;
+        test_class_and_superclass(raw, "Foo", "glib :: Object");
+    }
 
-        let program = Program::from_ast_program(ast_program).unwrap();
+    #[test]
+    fn creates_class_with_superclass() {
+        let raw = "class Foo: Bar {
+                       struct FooPrivate {
+                           foo: u32,
+                       }
 
-        assert!(program.classes.len() == 1);
+                       private_init () -> FooPrivate {
+                           FooPrivate {
+                               foo: 42,
+                           }
+                       }
+                   }";
 
-        let class = &program.classes[0];
-        assert_eq!(class.name.as_ref(), "Foo");
-        assert_eq!(class.superclass.clone().into_tokens().to_string(), "glib :: Object");
+        test_class_and_superclass(raw, "Foo", "Bar");
     }
 }
