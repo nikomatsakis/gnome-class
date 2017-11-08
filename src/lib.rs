@@ -26,6 +26,7 @@ mod ast;
 mod checking;
 mod errors;
 mod gen;
+mod hir;
 mod param;
 mod parser;
 
