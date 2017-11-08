@@ -1,6 +1,6 @@
 //use lalrpop_intern::InternedString;
 //use quote::Tokens;
-use syn::{DeriveInput, Ident, Path, FnArg, FunctionRetTy, Block};
+use syn::{DeriveInput, Ident, ImplItem, Path, FnArg, FunctionRetTy, Block};
 use synom::delimited::Delimited;
 use synom::tokens;
 
@@ -10,7 +10,7 @@ pub struct Program {
 
 pub enum Item {
     Class(Class),
-    Impl
+    Impl(Impl)
 }
 
 pub fn get_program_classes<'a>(program: &'a Program) -> Vec<&'a Class> {
@@ -30,6 +30,15 @@ pub struct Class {
     pub name: Ident,
     pub extends: Option<Path>,
     pub items: Vec<ClassItem>
+}
+
+// similar to syn::ItemImpl
+pub struct Impl {
+    pub impl_token: tokens::Impl,
+    pub trait_: Option<(Path, tokens::For)>,
+    pub self_path: Path,
+    pub brace_token: tokens::Brace,
+    pub items: Vec<ImplItem>
 }
 
 pub enum ClassItem {

@@ -40,7 +40,7 @@ fn parse_var_tys(input: &str,
 
 use synom::delimited::Delimited;
 use synom::{Synom, Cursor, PResult, parse_error, tokens};
-use syn::{Block, DeriveInput, FunctionRetTy, Ident, Path};
+use syn::{Block, DeriveInput, FunctionRetTy, Ident, ImplItem, Path};
 
 impl Synom for ast::Program {
     named!(parse -> Self, do_parse!(
@@ -54,6 +54,8 @@ impl Synom for ast::Program {
 impl Synom for ast::Item {
     named!(parse -> Self, alt!(
         syn!(ast::Class) => { |x| ast::Item::Class(x) }
+        |
+        syn!(ast::Impl) => { |x| ast::Item::Impl(x) }
     ));
 }
 
@@ -147,6 +149,30 @@ impl Synom for ast::PrivateInit {
                 brace_token: block_and_braces.1,
                 stmts: block_and_braces.0,
             },
+        })
+    ));
+}
+
+impl Synom for ast::Impl {
+    named!(parse -> Self, do_parse!(
+        impl_: syn!(tokens::Impl) >>
+        trait_: alt!(
+            do_parse!(
+                path: syn!(Path) >>
+                for_: syn!(tokens::For) >>
+                (Some((path, for_)))
+            )
+            |
+            epsilon!() => { |_| None }
+        ) >>
+        self_path: syn!(Path) >>
+        body: braces!(many0!(syn!(ImplItem))) >>
+        (ast::Impl {
+            impl_token: impl_,
+            trait_: trait_,
+            self_path: self_path,
+            brace_token: body.1,
+            items: body.0
         })
     ));
 }
@@ -455,5 +481,36 @@ mod tests {
 
         assert!(program.items.len() == 1);
         assert!(ast::get_program_classes(&program).len() == 1);
+    }
+
+    fn test_parsing_impl_item(raw: &str, trait_name: Option<&str>, self_name: &str) {
+        let token_stream = raw.parse::<TokenStream>().unwrap();
+
+        let buffer = SynomBuffer::new(token_stream);
+        let cursor = buffer.begin();
+
+        let item = ast::Item::parse(cursor).unwrap().1;
+
+        if let ast::Item::Impl(ref impl_) = item {
+            if let Some((ref trait_path, _)) = impl_.trait_ {
+                assert_tokens_equal(trait_path, trait_name.as_ref().unwrap());
+            } else {
+                assert!(trait_name.is_none());
+            }
+
+            assert_tokens_equal(&impl_.self_path, self_name);
+        } else {
+            unreachable!();
+        }
+    }
+
+    #[test]
+    fn parses_plain_impl_item() {
+        test_parsing_impl_item("impl Foo {}", None, "Foo");
+    }
+
+    #[test]
+    fn parses_impl_item_with_trait() {
+        test_parsing_impl_item("impl Foo for Bar {}", Some("Foo"), "Bar");
     }
 }
