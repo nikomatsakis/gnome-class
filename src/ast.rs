@@ -8,6 +8,11 @@ pub struct Program {
     pub classes: Vec<Class>
 }
 
+pub enum Item {
+    Class(Class),
+    Impl
+}
+
 pub struct Class {
     pub name: Ident,
     pub extends: Option<Path>,

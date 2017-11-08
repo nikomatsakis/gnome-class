@@ -51,6 +51,12 @@ impl Synom for ast::Program {
     ));
 }
 
+impl Synom for ast::Item {
+    named!(parse -> Self, alt!(
+        syn!(ast::Class) => { |x| ast::Item::Class(x) }
+    ));
+}
+
 // class Foo [: SuperClass [, ImplementsIface]*] {
 //     struct FooPrivate {
 //         ...
@@ -227,6 +233,24 @@ mod tests {
 
         if let ast::ClassItem::InstancePrivate(item) = item {
             assert_tokens_equal(&item.path, "FooPrivate");
+        } else {
+            unreachable!();
+        }
+    }
+
+    #[test]
+    fn parses_class_item() {
+        let raw = "class Foo {}";
+
+        let token_stream = raw.parse::<TokenStream>().unwrap();
+
+        let buffer = SynomBuffer::new(token_stream);
+        let cursor = buffer.begin();
+        let item: ast::Item = ast::Item::parse(cursor).unwrap().1;
+
+        if let ast::Item::Class(class) = item {
+            assert_eq!(class.name.as_ref(), "Foo");
+            assert!(class.extends.is_none());
         } else {
             unreachable!();
         }
