@@ -198,11 +198,9 @@ fn keyword<'a>(name: &'static str) -> impl Fn(Cursor<'a>) -> PResult<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use proc_macro2::{TokenStream};
     use quote;
     use quote::ToTokens;
-    use syn::{Body, BodyStruct, Ty, VariantData, TyPath};
-    use synom::{SynomBuffer};
+    use syn::{Body, BodyStruct, Ty, VariantData, TyPath, parse_str};
     use synom::delimited::Element;
 
     fn assert_tokens_equal<T: ToTokens>(x: &T, s: &str) {
@@ -212,50 +210,27 @@ mod tests {
     }
 
     #[test]
-    fn parses_class_name() {
+    fn parses_class_with_no_superclass() {
         let raw = "class Foo {}";
+        let class = parse_str::<ast::Class>(raw).unwrap();
 
-        let token_stream = raw.parse::<TokenStream>().unwrap();
-
-        // We can't use
-        //
-        //   let class: ast::Class = syn::parse(token_stream).unwrap().1;
-        //
-        // because syn::parse() takes a proc_macro::TokenStream, not a
-        // proc_macro2::TokenStream.
-        //
-        // So, we'll do the conversion to a Cursor by hand.
-
-        let buffer = SynomBuffer::new(token_stream);
-        let cursor = buffer.begin();
-        let class: ast::Class = ast::Class::parse(cursor).unwrap().1;
         assert_eq!(class.name.as_ref(), "Foo");
         assert!(class.extends.is_none());
     }
 
     #[test]
-    fn parses_class_name_and_superclass() {
+    fn parses_class_with_superclass() {
         let raw = "class Foo: Bar {}";
+        let class = parse_str::<ast::Class>(raw).unwrap();
 
-        let token_stream = raw.parse::<TokenStream>().unwrap();
-
-        let buffer = SynomBuffer::new(token_stream);
-        let cursor = buffer.begin();
-        let class: ast::Class = ast::Class::parse(cursor).unwrap().1;
         assert_eq!(class.name.as_ref(), "Foo");
-
         assert_tokens_equal(&class.extends, "Bar");
     }
 
     #[test]
     fn parses_instance_private_item() {
         let raw = "type InstancePrivate = FooPrivate;";
-
-        let token_stream = raw.parse::<TokenStream>().unwrap();
-
-        let buffer = SynomBuffer::new(token_stream);
-        let cursor = buffer.begin();
-        let item: ast::ClassItem = ast::ClassItem::parse(cursor).unwrap().1;
+        let item = parse_str::<ast::ClassItem>(raw).unwrap();
 
         if let ast::ClassItem::InstancePrivate(item) = item {
             assert_tokens_equal(&item.path, "FooPrivate");
@@ -267,12 +242,7 @@ mod tests {
     #[test]
     fn parses_class_item() {
         let raw = "class Foo {}";
-
-        let token_stream = raw.parse::<TokenStream>().unwrap();
-
-        let buffer = SynomBuffer::new(token_stream);
-        let cursor = buffer.begin();
-        let item: ast::Item = ast::Item::parse(cursor).unwrap().1;
+        let item = parse_str::<ast::Item>(raw).unwrap();
 
         if let ast::Item::Class(class) = item {
             assert_eq!(class.name.as_ref(), "Foo");
@@ -288,13 +258,7 @@ mod tests {
                        foo: u32,
                        bar: String
                    }";
-
-        let token_stream = raw.parse::<TokenStream>().unwrap();
-
-        let buffer = SynomBuffer::new(token_stream);
-        let cursor = buffer.begin();
-
-        let private_struct = ast::PrivateStruct::parse(cursor).unwrap().1;
+        let private_struct = parse_str::<ast::PrivateStruct>(raw).unwrap();
 
         assert_eq!(private_struct.name_as_ref(), "FooPrivate");
 
@@ -344,13 +308,7 @@ mod tests {
                            bar: \"hello\".to_string()
                        }
                    }";
-
-        let token_stream = raw.parse::<TokenStream>().unwrap();
-
-        let buffer = SynomBuffer::new(token_stream);
-        let cursor = buffer.begin();
-
-        let private_init = ast::PrivateInit::parse(cursor).unwrap().1;
+        let private_init = parse_str::<ast::PrivateInit>(raw).unwrap();
 
         assert!(private_init.inputs.is_empty());
 
@@ -369,13 +327,7 @@ mod tests {
                        foo: u32,
                        bar: String
                    }";
-
-        let token_stream = raw.parse::<TokenStream>().unwrap();
-
-        let buffer = SynomBuffer::new(token_stream);
-        let cursor = buffer.begin();
-
-        let item = ast::ClassItem::parse(cursor).unwrap().1;
+        let item = parse_str::<ast::ClassItem>(raw).unwrap();
 
         match item {
             ast::ClassItem::PrivateStruct(_) => (),
@@ -388,13 +340,7 @@ mod tests {
                            bar: \"hello\".to_string()
                        }
                    }";
-
-        let token_stream = raw.parse::<TokenStream>().unwrap();
-
-        let buffer = SynomBuffer::new(token_stream);
-        let cursor = buffer.begin();
-
-        let item = ast::ClassItem::parse(cursor).unwrap().1;
+        let item = parse_str::<ast::ClassItem>(raw).unwrap();
 
         match item {
             ast::ClassItem::PrivateInit(_) => (),
@@ -417,13 +363,7 @@ mod tests {
                            }
                        }
                    }";
-
-        let token_stream = raw.parse::<TokenStream>().unwrap();
-
-        let buffer = SynomBuffer::new(token_stream);
-        let cursor = buffer.begin();
-
-        let class = ast::Class::parse(cursor).unwrap().1;
+        let class = parse_str::<ast::Class>(raw).unwrap();
 
         let mut iter = class.items.iter();
 
@@ -471,25 +411,14 @@ mod tests {
                            }
                        }
                    }";
-
-        let token_stream = raw.parse::<TokenStream>().unwrap();
-
-        let buffer = SynomBuffer::new(token_stream);
-        let cursor = buffer.begin();
-
-        let program = ast::Program::parse(cursor).unwrap().1;
+        let program = parse_str::<ast::Program>(raw).unwrap();
 
         assert!(program.items.len() == 1);
         assert!(ast::get_program_classes(&program).len() == 1);
     }
 
     fn test_parsing_impl_item(raw: &str, trait_name: Option<&str>, self_name: &str) {
-        let token_stream = raw.parse::<TokenStream>().unwrap();
-
-        let buffer = SynomBuffer::new(token_stream);
-        let cursor = buffer.begin();
-
-        let item = ast::Item::parse(cursor).unwrap().1;
+        let item = parse_str::<ast::Item>(raw).unwrap();
 
         if let ast::Item::Impl(ref impl_) = item {
             if let Some((ref trait_path, _)) = impl_.trait_ {
