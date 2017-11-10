@@ -10,7 +10,8 @@ pub struct Program {
 
 pub enum Item {
     Class(Class),
-    Impl(Impl)
+    Impl(Impl),
+    PrivateStruct(PrivateStruct),
 }
 
 pub fn get_program_classes<'a>(program: &'a Program) -> Vec<&'a Class> {

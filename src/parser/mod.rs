@@ -56,6 +56,8 @@ impl Synom for ast::Item {
         syn!(ast::Class) => { |x| ast::Item::Class(x) }
         |
         syn!(ast::Impl) => { |x| ast::Item::Impl(x) }
+        |
+        syn!(ast::PrivateStruct) => { |x| ast::Item::PrivateStruct(x) }
     ));
 }
 
@@ -253,50 +255,54 @@ mod tests {
     }
 
     #[test]
-    fn parses_private_struct() {
+    fn parses_private_struct_item() {
         let raw = "struct FooPrivate {
                        foo: u32,
                        bar: String
                    }";
-        let private_struct = parse_str::<ast::PrivateStruct>(raw).unwrap();
+        let item = parse_str::<ast::Item>(raw).unwrap();
 
-        assert_eq!(private_struct.name_as_ref(), "FooPrivate");
+        if let ast::Item::PrivateStruct(private_struct) = item {
+            assert_eq!(private_struct.name_as_ref(), "FooPrivate");
 
-        match private_struct.derive_input.body {
-            Body::Struct(BodyStruct {
-                data: VariantData::Struct(ref delimited, ..),
-                .. })
-                => {
-                    let mut iter = delimited.iter();
+            match private_struct.derive_input.body {
+                Body::Struct(BodyStruct {
+                    data: VariantData::Struct(ref delimited, ..),
+                    .. })
+                    => {
+                        let mut iter = delimited.iter();
 
-                    let element = iter.next().unwrap();
-                    if let Element::Delimited(ref field, ..) = element {
-                        assert_eq!(field.ident.unwrap(), "foo");
+                        let element = iter.next().unwrap();
+                        if let Element::Delimited(ref field, ..) = element {
+                            assert_eq!(field.ident.unwrap(), "foo");
 
-                        if let Ty::Path(ref typath) = field.ty {
-                            assert_tokens_equal(typath, "u32");
+                            if let Ty::Path(ref typath) = field.ty {
+                                assert_tokens_equal(typath, "u32");
+                            } else {
+                                unreachable!();
+                            }
                         } else {
                             unreachable!();
                         }
-                    } else {
-                        unreachable!();
-                    }
 
-                    let element = iter.next().unwrap();
-                    if let Element::End(ref field) = element {
-                        assert_eq!(field.ident.unwrap(), "bar");
+                        let element = iter.next().unwrap();
+                        if let Element::End(ref field) = element {
+                            assert_eq!(field.ident.unwrap(), "bar");
 
-                        if let Ty::Path(ref typath) = field.ty {
-                            assert_tokens_equal(typath, "String");
+                            if let Ty::Path(ref typath) = field.ty {
+                                assert_tokens_equal(typath, "String");
+                            } else {
+                                unreachable!();
+                            }
                         } else {
                             unreachable!();
                         }
-                    } else {
-                        unreachable!();
-                    }
-                },
+                    },
 
-            _ => unreachable!()
+                _ => unreachable!()
+            }
+        } else {
+            unreachable!();
         }
     }
 
