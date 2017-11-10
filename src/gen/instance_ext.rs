@@ -35,10 +35,14 @@ impl<'ast> ClassContext<'ast> {
             .iter()
             .map(|slot| {
                 match *slot {
-                    Slot::Method(Method { public, name, inputs, output, body: _ }) => {
+                    Slot::Method(Method { public: false, .. }) => {
+                        unimplemented!();
+                    },
+
+                    Slot::Method(Method { public: true, name, inputs, output, .. }) |
+                    Slot::VirtualMethod(VirtualMethod { name, inputs, output, .. }) => {
                         let ffi_name = self.method_ffi_name(name.sym.as_str());
                         let arg_names = ArgNames(&inputs[1..]);
-                        drop(public); // TODO: use this?
                         quote! {
                             fn #name(#(#inputs),*) #output {
                                 unsafe {
@@ -48,7 +52,7 @@ impl<'ast> ClassContext<'ast> {
                             }
                         }
                     }
-                    Slot::VirtualMethod(_) => panic!("virtual methods not implemented"),
+
                     Slot::Signal(_) => panic!("signals not implemented"),
                 }
             })

@@ -41,6 +41,8 @@ pub struct Class<'ast> {
     // pub n_reserved_slots: usize,
 
     // pub properties: Vec<Property>,
+
+    // pub overrides: HashMap<Ident, Vec<Method<'ast>>>
 }
 
 pub enum Slot<'ast> {

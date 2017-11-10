@@ -21,9 +21,12 @@ impl<'ast> ClassContext<'ast> {
         let ParentInstance                   = self.ParentInstance;
         let ParentInstanceFfi                = self.ParentInstanceFfi;
         let PrivateClassName                 = &self.PrivateClassName;
-        let PrivateName                      = &self.instance_private;
 
         let callback_guard                   = glib_callback_guard();
+        let register_instance_private        = self.register_instance_private();
+        let get_priv_fn                      = self.get_priv_fn();
+        let init_priv_with_default           = self.init_priv_with_default();
+        let free_instance_private            = self.free_instance_private();
         let get_type_fn_name                 = self.instance_get_type_fn_name();
         let imp_new_fn_name                  = self.imp_new_fn_name();
 
@@ -145,16 +148,7 @@ impl<'ast> ClassContext<'ast> {
                     // those functions will refer to the Rust wrapper object that
                     // corresponds to the GObject-ABI structs within "mod imp".
                     impl super::#InstanceName {
-                        fn get_priv(&self) -> &#PrivateName {
-                            unsafe {
-                                let private = gobject_ffi::g_type_instance_get_private(
-                                    <Self as ToGlibPtr<*mut #InstanceName>>::to_glib_none(self).0 as *mut gobject_ffi::GTypeInstance,
-                                    #get_type_fn_name(),
-                                ) as *const Option<#PrivateName>;
-
-                                (&*private).as_ref().unwrap()
-                            }
-                        }
+                        #get_priv_fn
 
                         #(#slot_default_handlers)*
                     }
@@ -171,28 +165,13 @@ impl<'ast> ClassContext<'ast> {
                         unsafe extern "C" fn init(obj: *mut gobject_ffi::GTypeInstance, _klass: glib_ffi::gpointer) {
                             #callback_guard
 
-                            let private = gobject_ffi::g_type_instance_get_private(
-                                obj,
-                                #get_type_fn_name()
-                            ) as *mut Option<#PrivateName>;
-
-                            // Here we initialize the private data.  GObject gives it to us all zero-initialized
-                            // but we don't really want to have any Drop impls run here so just overwrite the
-                            // data.
-                            ptr::write(private, Some(<#PrivateName as Default>::default()));
+                            #init_priv_with_default
                         }
 
                         unsafe extern "C" fn finalize(obj: *mut gobject_ffi::GObject) {
                             #callback_guard
 
-                            let private = gobject_ffi::g_type_instance_get_private(
-                                obj as *mut gobject_ffi::GTypeInstance,
-                                #get_type_fn_name(),
-                            ) as *mut Option<#PrivateName>;
-
-                            // Drop contents of private data by replacing its
-                            // Option container with None
-                            let _ = (*private).take();
+                            #free_instance_private
 
                             (*PRIV.parent_class).finalize.map(|f| f(obj));
                         }
@@ -214,9 +193,7 @@ impl<'ast> ClassContext<'ast> {
                         unsafe extern "C" fn init(klass: glib_ffi::gpointer, _klass_data: glib_ffi::gpointer) {
                             #callback_guard
 
-                            // This is an Option<_> so that we can replace its value with None on finalize() to
-                            // release all memory it holds
-                            gobject_ffi::g_type_class_add_private(klass, mem::size_of::<Option<#PrivateName>>());
+                            #register_instance_private
 
                             // GObjectClass methods; properties
                             {
