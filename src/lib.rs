@@ -174,7 +174,7 @@ pub fn gobject_gen(input: TokenStream) -> TokenStream {
                 Ok(_) => {
                     let output = String::from_utf8(out).unwrap();
                     println!("/********************************************************************************/\n{}", output);
-                    TokenStream::from_str(& output).unwrap()
+                    tokens.into()
                 },
                 Err(e) => {
                     println!("{}", e.0);
