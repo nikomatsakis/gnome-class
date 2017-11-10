@@ -49,12 +49,10 @@ gobject_gen! {
     }
 
     impl Dummy {
-        /*
         fn set_dc(&self, dc: DropCounter) {
             let mut self_dc = self.get_priv().dc.borrow_mut();
             *self_dc = dc;
         }
-        */
     }
 }
 
@@ -62,7 +60,6 @@ gobject_gen! {
 fn check() {
     let dc = DropCounter::new();
 
-    /*
     {
         let c: Dummy = Dummy::new();
         c.set_dc(dc.clone());
@@ -72,5 +69,4 @@ fn check() {
 
     println!("Drop counter has value: {}", dc.get());
     assert_eq!(dc.get(), 1);
-    */
 }
