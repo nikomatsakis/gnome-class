@@ -21,7 +21,7 @@ impl<'ast> ClassContext<'ast> {
         let ParentInstance                   = self.ParentInstance;
         let ParentInstanceFfi                = self.ParentInstanceFfi;
         let PrivateClassName                 = &self.PrivateClassName;
-        let PrivateName                      = &self.instance_private.name();
+        let PrivateName                      = &self.instance_private;
 
         let callback_guard                   = glib_callback_guard();
         let get_type_fn_name                 = self.instance_get_type_fn_name();
@@ -29,8 +29,6 @@ impl<'ast> ClassContext<'ast> {
 
         let slots                            = self.slots();
         // let signal_id_names                  = self.signal_id_names();
-        let instance_private                 = &self.instance_private.derive_input;
-        let private_init_fn_body             = &self.private_init_fn_body();
         let slot_default_handlers            = self.imp_slot_default_handlers();
         let slot_assignments                 = self.slot_assignments();
         let signal_declarations              = self.signal_declarations();
@@ -127,12 +125,6 @@ impl<'ast> ClassContext<'ast> {
                         // #(#signal_id_names),*
                     }
 
-                    #instance_private
-
-                    impl #PrivateName {
-                        pub fn new() -> Self #private_init_fn_body
-                    }
-
                     struct #PrivateClassName {
                         parent_class: *const #ParentClassFfi,
                         properties:   *const Vec<*const gobject_ffi::GParamSpec>,
@@ -187,7 +179,7 @@ impl<'ast> ClassContext<'ast> {
                             // Here we initialize the private data.  GObject gives it to us all zero-initialized
                             // but we don't really want to have any Drop impls run here so just overwrite the
                             // data.
-                            ptr::write(private, Some(#PrivateName::new()));
+                            ptr::write(private, Some(<#PrivateName as Default>::default()));
                         }
 
                         unsafe extern "C" fn finalize(obj: *mut gobject_ffi::GObject) {

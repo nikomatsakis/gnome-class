@@ -24,13 +24,5 @@ error_chain! {
             description("zero or one InstancePrivate types expected")
             display("at most one InstancePrivate type definitions expected: {}", msg)
         }
-        OnePrivateStructError(msg: String) {
-            description("single private struct expected")
-            display("one and only one private struct expected: {}", msg)
-        }
-        OnePrivateInitError(msg: String) {
-            description("single private_init expected")
-            display("one and only one private_init expected: {}", msg)
-        }
     }
 }

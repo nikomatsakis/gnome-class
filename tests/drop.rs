@@ -31,23 +31,30 @@ impl Drop for DropCounter {
     }
 }
 
+struct DummyPrivate {
+    dc: RefCell<DropCounter>
+}
+
+impl Default for DummyPrivate {
+    fn default() -> Self {
+        DummyPrivate {
+            dc: RefCell::new(DropCounter::new())
+        }
+    }
+}
+
 gobject_gen! {
     class Dummy {
-        struct DummyPrivate {
-            dc: RefCell<DropCounter>
-        }
+        type InstancePrivate = DummyPrivate;
+    }
 
-        private_init() -> DummyPrivate {
-            DummyPrivate {
-                dc: RefCell::new(DropCounter::new())
-            }
-        }
-/*
+    impl Dummy {
+        /*
         fn set_dc(&self, dc: DropCounter) {
             let mut self_dc = self.get_priv().dc.borrow_mut();
             *self_dc = dc;
         }
-*/
+        */
     }
 }
 

@@ -1,8 +1,7 @@
 //use lalrpop_intern::InternedString;
 //use quote::Tokens;
-use syn::{DeriveInput, Ident, Path, FnArg, FunctionRetTy, Block};
+use syn::{Ident, Path, FnArg, FunctionRetTy, Block};
 use syn::{Attribute, Lit};
-use synom::delimited::Delimited;
 use synom::tokens;
 
 pub struct Program {
@@ -32,7 +31,6 @@ impl Program {
 pub enum Item {
     Class(Class),
     Impl(Impl),
-    PrivateStruct(PrivateStruct),
 }
 
 pub fn get_program_classes<'a>(program: &'a Program) -> Vec<&'a Class> {
@@ -63,11 +61,6 @@ pub struct Impl {
 
 pub enum ClassItem {
     InstancePrivate(InstancePrivateItem),
-    PrivateInit(PrivateInit),
-/*
-    Method(Method),
-    Signal(Signal),
-*/
 }
 
 pub struct ImplItem {
@@ -98,20 +91,6 @@ pub struct InstancePrivateItem {
     pub semi_token: tokens::Semi,
 }
 
-pub struct PrivateStruct {
-    pub derive_input: DeriveInput
-}
-
-pub struct PrivateInit {
-    // FIXME: inputs must be empty; we just don't know how to parse
-    // an empty "()" yet.
-    pub inputs: Delimited<FnArg, tokens::Comma>,
-
-    // checked to be the same as the PrivateStruct type
-    pub output: FunctionRetTy,
-
-    pub block: Block
-}
 /*
 pub struct Signal {
     pub name: Ident,
@@ -185,13 +164,3 @@ pub struct TraitItemId {
     pub item: Ident,
 }
 */
-
-impl PrivateStruct {
-    pub fn name(&self) -> &Ident {
-        &self.derive_input.ident
-    }
-
-    pub fn name_as_ref(&self) -> &str {
-        self.derive_input.ident.as_ref()
-    }
-}

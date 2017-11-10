@@ -40,7 +40,7 @@ fn parse_var_tys(input: &str,
 
 use synom::delimited::Delimited;
 use synom::{Synom, Cursor, PResult, parse_error, tokens};
-use syn::{Block, DeriveInput, FunctionRetTy, Ident, Path};
+use syn::{Ident, Path};
 
 impl Synom for ast::Program {
     named!(parse -> Self, do_parse!(
@@ -56,8 +56,6 @@ impl Synom for ast::Item {
         syn!(ast::Class) => { |x| ast::Item::Class(x) }
         |
         syn!(ast::Impl) => { |x| ast::Item::Impl(x) }
-        |
-        syn!(ast::PrivateStruct) => { |x| ast::Item::PrivateStruct(x) }
     ));
 }
 
@@ -91,8 +89,6 @@ impl Synom for ast::Class {
 impl Synom for ast::ClassItem {
     named!(parse -> Self, alt!(
         syn!(ast::InstancePrivateItem) => { |x| ast::ClassItem::InstancePrivate(x) }
-        |
-        syn!(ast::PrivateInit) => { |x| ast::ClassItem::PrivateInit(x) }
     ));
 }
 
@@ -108,47 +104,6 @@ impl Synom for ast::InstancePrivateItem {
             eq_token:   eq,
             path:       path,
             semi_token: semi
-        })
-    ));
-}
-
-// struct Foo {
-//     <fields>*
-// }
-//
-// FIXME: we assume that the DeriveInput will have a Body -> Struct ->
-// data: VariantData::Struct i.e. *not* a Tuple.  Would anyone really
-// want to have a private tuple struct for a GObject's data?
-//
-// If the answer is "no", maybe we should peek!() that there is a Brace there.
-impl Synom for ast::PrivateStruct {
-    named!(parse -> Self, do_parse!(
-        peek!(syn!(tokens::Struct))     >>
-        derive_input: syn!(DeriveInput) >>
-        (ast::PrivateStruct {
-            derive_input: derive_input
-        })
-    ));
-}
-
-// private_init () -> PrivateStructName {
-//     ...
-// }
-//
-// This is the initialization function for the user's PrivateStruct.
-impl Synom for ast::PrivateInit {
-    named!(parse -> Self, do_parse!(
-        call!(keyword("private_init"))                >>
-        inputs: parens!(Delimited::parse_terminated)  >>
-        output: syn!(FunctionRetTy)                   >>
-        block_and_braces: braces!(call!(Block::parse_within))    >>
-        (ast::PrivateInit {
-            inputs: inputs.0,
-            output: output,
-            block:  Block {
-                brace_token: block_and_braces.1,
-                stmts: block_and_braces.0,
-            },
         })
     ));
 }
@@ -240,8 +195,7 @@ mod tests {
     use super::*;
     use quote;
     use quote::ToTokens;
-    use syn::{Body, BodyStruct, Ty, VariantData, TyPath, parse_str};
-    use synom::delimited::Element;
+    use syn::{parse_str};
 
     fn assert_tokens_equal<T: ToTokens>(x: &T, s: &str) {
         let mut tokens = quote::Tokens::new();
@@ -272,10 +226,10 @@ mod tests {
         let raw = "type InstancePrivate = FooPrivate;";
         let item = parse_str::<ast::ClassItem>(raw).unwrap();
 
-        if let ast::ClassItem::InstancePrivate(item) = item {
-            assert_tokens_equal(&item.path, "FooPrivate");
-        } else {
-            unreachable!();
+        match item {
+            ast::ClassItem::InstancePrivate(item) => {
+                assert_tokens_equal(&item.path, "FooPrivate");
+            }
         }
     }
 
@@ -293,142 +247,9 @@ mod tests {
     }
 
     #[test]
-    fn parses_private_struct_item() {
-        let raw = "struct FooPrivate {
-                       foo: u32,
-                       bar: String
-                   }";
-        let item = parse_str::<ast::Item>(raw).unwrap();
-
-        if let ast::Item::PrivateStruct(private_struct) = item {
-            assert_eq!(private_struct.name_as_ref(), "FooPrivate");
-
-            match private_struct.derive_input.body {
-                Body::Struct(BodyStruct {
-                    data: VariantData::Struct(ref delimited, ..),
-                    .. })
-                    => {
-                        let mut iter = delimited.iter();
-
-                        let element = iter.next().unwrap();
-                        if let Element::Delimited(ref field, ..) = element {
-                            assert_eq!(field.ident.unwrap(), "foo");
-
-                            if let Ty::Path(ref typath) = field.ty {
-                                assert_tokens_equal(typath, "u32");
-                            } else {
-                                unreachable!();
-                            }
-                        } else {
-                            unreachable!();
-                        }
-
-                        let element = iter.next().unwrap();
-                        if let Element::End(ref field) = element {
-                            assert_eq!(field.ident.unwrap(), "bar");
-
-                            if let Ty::Path(ref typath) = field.ty {
-                                assert_tokens_equal(typath, "String");
-                            } else {
-                                unreachable!();
-                            }
-                        } else {
-                            unreachable!();
-                        }
-                    },
-
-                _ => unreachable!()
-            }
-        } else {
-            unreachable!();
-        }
-    }
-
-    #[test]
-    fn parses_private_init() {
-        let raw = "private_init () -> FooPrivate {
-                       FooPrivate {
-                           foo: 42,
-                           bar: \"hello\".to_string()
-                       }
-                   }";
-        let private_init = parse_str::<ast::PrivateInit>(raw).unwrap();
-
-        assert!(private_init.inputs.is_empty());
-
-        match private_init.output {
-            FunctionRetTy::Ty(Ty::Path(TyPath { ref path, .. }), _) => {
-                assert_tokens_equal(path, "FooPrivate");
-            },
-
-            _ => unreachable!()
-        }
-    }
-
-    #[test]
-    fn parses_class_items() {
-        let raw = "private_init () -> FooPrivate {
-                       FooPrivate {
-                           foo: 42,
-                           bar: \"hello\".to_string()
-                       }
-                   }";
-        let item = parse_str::<ast::ClassItem>(raw).unwrap();
-
-        match item {
-            ast::ClassItem::PrivateInit(_) => (),
-            _ => unreachable!()
-        };
-    }
-
-    #[test]
-    fn parses_private_struct_class_items() {
-        let raw = "class Foo {
-                       private_init () -> FooPrivate {
-                           FooPrivate {
-                               foo: 42,
-                               bar: \"hello\".to_string()
-                           }
-                       }
-                   }";
-        let class = parse_str::<ast::Class>(raw).unwrap();
-
-        let mut iter = class.items.iter();
-
-        let m = iter.next().unwrap();
-        match *m {
-            ast::ClassItem::PrivateInit (ref i) => {
-                assert!(i.inputs.is_empty());
-
-                match i.output {
-                    FunctionRetTy::Ty(Ty::Path(TyPath { ref path, .. }), _) => {
-                        assert_tokens_equal(path, "FooPrivate");
-                    },
-
-                    _ => unreachable!()
-                }
-            },
-
-            _ => unreachable!()
-        };
-
-        assert!(iter.next().is_none());
-    }
-
-    #[test]
     fn parses_program() {
         let raw = "class Foo {
-                       struct FooPrivate {
-                           foo: u32,
-                           bar: String
-                       }
-
-                       private_init () -> FooPrivate {
-                           FooPrivate {
-                               foo: 42,
-                               bar: \"hello\".to_string()
-                           }
-                       }
+                       type InstancePrivate = FooPrivate;
                    }";
         let program = parse_str::<ast::Program>(raw).unwrap();
 

@@ -2,9 +2,8 @@
 #![allow(non_snake_case)]
 
 use quote::{Tokens, ToTokens};
-use syn::Ident;
+use syn::{Ident, Path};
 
-use ast;
 use hir::*;
 use errors::*;
 
@@ -36,7 +35,7 @@ pub fn classes(program: &Program) -> Result<Tokens> {
 struct ClassContext<'ast> {
     program: &'ast Program<'ast>,
     class: &'ast Class<'ast>,
-    instance_private: &'ast ast::PrivateStruct,
+    instance_private: Option<&'ast Path>,
     ModuleName: Ident,
     InstanceName: &'ast Ident,
     ClassName: Ident,
@@ -56,10 +55,7 @@ impl<'ast> ClassContext<'ast> {
         // commonly-used symbol names for the class in question, for
         // example, "FooClass" out of "Foo".
 
-        let instance_private = match class.instance_private {
-            Some(p) => p,
-            None => unreachable!() // this was checked already by checking.rs
-        };
+        let instance_private = class.instance_private;
 
         let InstanceName = &class.name;
 

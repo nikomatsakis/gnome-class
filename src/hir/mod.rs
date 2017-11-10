@@ -33,7 +33,7 @@ pub struct Class<'ast> {
     pub parent_class_ffi: Tokens, // ffi::ParentClass
     pub implements: Vec<Path>,    // names of GTypeInterfaces
 
-    pub instance_private: Option<&'ast ast::PrivateStruct>,
+    pub instance_private: Option<&'ast Path>,
     // pub class_private: Option<&'ast ast::PrivateStruct>
 
     // The order of these is important; it's the order of the slots in FooClass
@@ -68,23 +68,13 @@ pub struct Signal {
     // FIXME: signal flags
 }
 
-fn get_instance_private<'ast>(ast_program: &'ast ast::Program) -> Option<&'ast ast::PrivateStruct> {
-    ast_program.items.iter().filter_map(|i| {
-        if let ast::Item::PrivateStruct(ref p) = *i {
-            Some(p)
-        } else {
-            None
-        }
-    }).next()
-}
-
 impl<'ast> Program<'ast> {
     pub fn from_ast_program(ast: &'ast ast::Program) -> Result<Program<'ast>> {
         check_program(ast)?;
 
         let mut classes = Classes::new();
         for class in ast.classes() {
-            classes.add(class, get_instance_private(ast))?;
+            classes.add(class)?;
         }
         for impl_ in ast.impls() {
             classes.add_impl(impl_)?;
@@ -111,9 +101,7 @@ impl<'ast> Classes<'ast> {
         self.items.iter().find(|c| c.1.name == name).unwrap().1
     }
 
-    fn add(&mut self,
-           ast_class: &'ast ast::Class,
-           instance_private: Option<&'ast ast::PrivateStruct>) -> Result<()>
+    fn add(&mut self, ast_class: &'ast ast::Class) -> Result<()>
     {
         let prev = self.items.insert(ast_class.name, Class {
             name: ast_class.name,
@@ -121,7 +109,11 @@ impl<'ast> Classes<'ast> {
             parent_ffi: tokens_ParentInstanceFfi(ast_class),
             parent_class_ffi: tokens_ParentClassFfi(ast_class),
             implements: Vec::new(),
-            instance_private,
+            instance_private: ast_class.items.iter().filter_map(|i| {
+                match *i {
+                    ast::ClassItem::InstancePrivate(ref ip) => Some(&ip.path),
+                }
+            }).next(),
             slots: Vec::new()
         });
         if prev.is_some() {
@@ -222,34 +214,14 @@ mod tests {
 
     #[test]
     fn creates_trivial_class() {
-        let raw = "class Foo {
-                       struct FooPrivate {
-                           foo: u32,
-                       }
-
-                       private_init () -> FooPrivate {
-                           FooPrivate {
-                               foo: 42,
-                           }
-                       }
-                   }";
+        let raw = "class Foo {}";
 
         test_class_and_superclass(raw, "Foo", "glib :: Object");
     }
 
     #[test]
     fn creates_class_with_superclass() {
-        let raw = "class Foo: Bar {
-                       struct FooPrivate {
-                           foo: u32,
-                       }
-
-                       private_init () -> FooPrivate {
-                           FooPrivate {
-                               foo: 42,
-                           }
-                       }
-                   }";
+        let raw = "class Foo: Bar {}";
 
         test_class_and_superclass(raw, "Foo", "Bar");
     }

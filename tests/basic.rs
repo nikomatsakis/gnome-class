@@ -8,18 +8,25 @@ use gobject_gen::gobject_gen;
 
 use std::cell::Cell;
 
-gobject_gen! {
-    class Counter {
-        struct CounterPrivate {
-            f: Cell<u32>
-        }
+struct CounterPrivate {
+    f: Cell<u32>
+}
 
-        private_init() -> CounterPrivate {
+impl Default for CounterPrivate {
+    fn default() -> Self {
             CounterPrivate {
                 f: Cell::new(0)
             }
-        }
-/*
+    }
+}
+
+gobject_gen! {
+    class Counter {
+        type InstancePrivate = CounterPrivate;
+    }
+
+    impl Counter {
+        /*
         fn add(&self, x: u32) -> u32 {
             let private = self.get_priv();
             let v = private.f.get() + x;
@@ -30,7 +37,7 @@ gobject_gen! {
         fn get(&self) -> u32 {
             self.get_priv().f.get()
         }
-*/
+        */
     }
 }
 

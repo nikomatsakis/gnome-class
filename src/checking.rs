@@ -17,27 +17,20 @@ fn check_class_items(class: &Class) -> Result<()> {
 }
 
 fn check_private_struct(class: &Class) -> Result<()> {
-    let (num_instance_private_items, num_private_inits) =
+    let num_instance_private_items =
         class
         .items
         .iter()
-        .fold((0, 0),
-              |(p, i), item| {
+        .fold(0,
+              |p, item| {
                   match *item {
-                      ClassItem::InstancePrivate(_) => (p + 1, i),
-                      ClassItem::PrivateInit(_)     => (p, i + 1),
-//                      _                        => (s, i)
+                      ClassItem::InstancePrivate(_) => p + 1,
                   }
               });
 
     if num_instance_private_items > 1 {
         bail!(ErrorKind::InstancePrivateError(format!("found {} InstancePrivate type declarations",
                                                       num_instance_private_items)));
-    }
-
-    // FIXME: zero private_init functions are allowed if we provide a Default initializer
-    if num_private_inits != 1 {
-        bail!(ErrorKind::OnePrivateInitError(format!("found {} private_init items", num_private_inits)));
     }
 
     Ok(())
@@ -52,14 +45,23 @@ mod tests {
     use ast;
 
     #[test]
-    fn checks_good_class() {
+    fn checks_empty_class() {
+        let raw = "class Foo {}";
+
+        let token_stream = raw.parse::<TokenStream>().unwrap();
+
+        let buffer = SynomBuffer::new(token_stream);
+        let cursor = buffer.begin();
+
+        let program = ast::Program::parse(cursor).unwrap().1;
+
+        assert!(check_program(&program).is_ok());
+    }
+
+    #[test]
+    fn checks_class_with_instance_private() {
         let raw = "class Foo {
-                       private_init () -> FooPrivate {
-                           FooPrivate {
-                               foo: 42,
-                               bar: \"hello\".to_string()
-                           }
-                       }
+                       type InstancePrivate = FooPrivate;
                    }";
 
         let token_stream = raw.parse::<TokenStream>().unwrap();
@@ -77,13 +79,6 @@ mod tests {
         let raw = "class Foo {
                        type InstancePrivate = FooPriv;
                        type InstancePrivate = BarPriv;
-
-                       private_init () -> FooPrivate {
-                           FooPrivate {
-                               foo: 42,
-                               bar: \"hello\".to_string()
-                           }
-                       }
                    }";
 
         let token_stream = raw.parse::<TokenStream>().unwrap();
@@ -95,101 +90,6 @@ mod tests {
 
         match check_program(&program) {
             Err(Error(ErrorKind::InstancePrivateError(_), _ )) => (),
-            _ => unreachable!()
-        }
-    }
-
-    #[test]
-    fn catches_no_private_struct() {
-        let raw = "class Foo {
-                   }";
-
-        let token_stream = raw.parse::<TokenStream>().unwrap();
-
-        let buffer = SynomBuffer::new(token_stream);
-        let cursor = buffer.begin();
-
-        let program = ast::Program::parse(cursor).unwrap().1;
-
-        match check_program(&program) {
-            Err(Error(ErrorKind::OnePrivateStructError(_), _ )) => (),
-            _ => unreachable!()
-        }
-    }
-
-    #[test]
-    fn catches_multiple_private_structs() {
-        let raw = "class Foo {
-                   }
-
-                   struct FooPrivate {
-                       foo: u32,
-                       bar: String
-                   }
-
-                   struct BarPrivate {
-                       foo: u32,
-                       bar: String
-                   }";
-
-        let token_stream = raw.parse::<TokenStream>().unwrap();
-
-        let buffer = SynomBuffer::new(token_stream);
-        let cursor = buffer.begin();
-
-        let program = ast::Program::parse(cursor).unwrap().1;
-
-        match check_program(&program) {
-            Err(Error(ErrorKind::OnePrivateStructError(_), _ )) => (),
-            _ => unreachable!()
-        }
-    }
-
-    #[test]
-    fn catches_no_private_init() {
-        let raw = "class Foo {
-                   }";
-
-        let token_stream = raw.parse::<TokenStream>().unwrap();
-
-        let buffer = SynomBuffer::new(token_stream);
-        let cursor = buffer.begin();
-
-        let program = ast::Program::parse(cursor).unwrap().1;
-
-        match check_program(&program) {
-            Err(Error(ErrorKind::OnePrivateInitError(_), _ )) => (),
-            _ => unreachable!()
-        }
-    }
-
-    #[test]
-    fn catches_multiple_private_inits() {
-        let raw = "class Foo {
-                       private_init () -> FooPrivate {
-                           FooPrivate {
-                               foo: 42,
-                               bar: \"hello\".to_string()
-                           }
-                       }
-
-                       private_init () -> FooPrivate {
-                           FooPrivate {
-                               foo: 42,
-                               bar: \"hello\".to_string()
-                           }
-                       }
-                   }";
-
-        let token_stream = raw.parse::<TokenStream>().unwrap();
-
-        let buffer = SynomBuffer::new(token_stream);
-        let cursor = buffer.begin();
-
-        let program = ast::Program::parse(cursor).unwrap().1;
-
-        match check_program(&program) {
-            Err(Error(ErrorKind::OnePrivateInitError(_), _ )) => (),
             _ => unreachable!()
         }
     }

@@ -17,18 +17,24 @@ use std::slice;
 use glib::object::*;
 use glib::translate::*;
 
+struct SignalerPrivate {
+    val: Cell<u32>
+}
+
+impl Default for SignalerPrivate {
+    fn default() -> Self {
+        SignalerPrivate {
+            val: Cell::new(0)
+        }
+    }
+}
+
 gobject_gen! {
     class Signaler {
-        struct SignalerPrivate {
-            val: Cell<u32>
-        }
+        type InstancePrivate = SignalerPrivate;
+    }
 
-        private_init() -> SignalerPrivate {
-            SignalerPrivate {
-                val: Cell::new(0)
-            }
-        }
-
+    impl Signaler {
         // signal value_changed(&self);
 
         /*
