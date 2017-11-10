@@ -14,9 +14,9 @@ struct CounterPrivate {
 
 impl Default for CounterPrivate {
     fn default() -> Self {
-            CounterPrivate {
-                f: Cell::new(0)
-            }
+        CounterPrivate {
+            f: Cell::new(0)
+        }
     }
 }
 
@@ -26,18 +26,16 @@ gobject_gen! {
     }
 
     impl Counter {
-        /*
-        fn add(&self, x: u32) -> u32 {
+        pub fn add(&self, x: u32) -> u32 {
             let private = self.get_priv();
             let v = private.f.get() + x;
             private.f.set(v);
             v
         }
 
-        fn get(&self) -> u32 {
+        pub fn get(&self) -> u32 {
             self.get_priv().f.get()
         }
-        */
     }
 }
 
@@ -45,7 +43,6 @@ gobject_gen! {
 fn test() {
     let c: Counter = Counter::new();
 
-    /*
     println!("Counter has value: {}", c.get());
 
     c.add(2);
@@ -53,5 +50,4 @@ fn test() {
     assert_eq!(c.get(), 22);
 
     println!("Counter has value: {}", c.get());
-    */
 }

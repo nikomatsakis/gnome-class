@@ -317,7 +317,7 @@ impl<'ast> ClassContext<'ast> {
                     //
                     // fn connect_signalname<F: Fn(&Self, type, type) -> type + 'static>(&self, f: F) -> u64;
                 }
-                
+
                 impl<O: IsA<#InstanceName> + IsA<glib::object::Object>> #InstanceExt for O {
                     #(#method_redirects)*
 

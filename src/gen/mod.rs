@@ -2,7 +2,8 @@
 #![allow(non_snake_case)]
 
 use quote::{Tokens, ToTokens};
-use syn::{Ident, Path};
+use syn::{Ident, Path, FnArg};
+use syn::tokens;
 
 use hir::*;
 use errors::*;
@@ -183,61 +184,67 @@ impl<'ast> ToTokens for SlotImplTy<'ast> {
         }
     }
 }
+*/
 
 
-/// Helper methods for printing out various bits of
-/// a method signature. For each of the comments below,
-/// assume an example method `fn get(&self, x: u32, y: u32) -> u32`.
-impl FnSig {
-    /// Generates `x: u32, y: u32`
-    fn arg_decls<'ast>(&'ast self) -> ArgDecls<'ast> {
-        ArgDecls { sig: self }
-    }
+// /// Helper methods for printing out various bits of
+// /// a method signature. For each of the comments below,
+// /// assume an example method `fn get(&self, x: u32, y: u32) -> u32`.
+// impl FnSig {
+//     /// Generates `x: u32, y: u32`
+//     fn arg_decls<'ast>(&'ast self) -> ArgDecls<'ast> {
+//         ArgDecls { sig: self }
+//     }
+//
+//     /// Generates `x, y`
+//     fn arg_names<'ast>(&'ast self) -> ArgNames<'ast> {
+//         ArgNames { sig: self }
+//     }
+//
+//     /// Generates `-> u32` (or `` if unit)
+//     fn return_ty<'ast>(&'ast self) -> ReturnTy<'ast> {
+//         ReturnTy { sig: self }
+//     }
+// }
 
-    /// Generates `x, y`
-    fn arg_names<'ast>(&'ast self) -> ArgNames<'ast> {
-        ArgNames { sig: self }
-    }
+// struct ArgDecls<'ast>(&'ast [FnArg]);
+//
+// impl<'ast> ToTokens for ArgDecls<'ast> {
+//     fn to_tokens(&self, tokens: &mut Tokens) {
+//         // let args = &self.sig.args;
+//         // quote_in!(tokens, #(#args),*);
+//     }
+// }
 
-    /// Generates `-> u32` (or `` if unit)
-    fn return_ty<'ast>(&'ast self) -> ReturnTy<'ast> {
-        ReturnTy { sig: self }
-    }
-}
-
-struct ArgDecls<'ast> {
-    sig: &'ast FnSig
-}
-
-impl<'ast> ToTokens for ArgDecls<'ast> {
-    fn to_tokens(&self, tokens: &mut Tokens) {
-        let args = &self.sig.args;
-        quote_in!(tokens, #(#args),*);
-    }
-}
-
-struct ArgNames<'ast> {
-    sig: &'ast FnSig
-}
+struct ArgNames<'ast>(&'ast [FnArg]);
 
 impl<'ast> ToTokens for ArgNames<'ast> {
     fn to_tokens(&self, tokens: &mut Tokens) {
-        let args = self.sig.args.iter().map(|arg| arg.name);
-        quote_in!(tokens, #(#args),*);
-    }
-}
+        for arg in self.0 {
+            match *arg {
+                FnArg::Captured(ref c) => {
+                    c.pat.to_tokens(tokens);
+                    tokens::Comma::default().to_tokens(tokens);
+                }
+                _ => panic!("bad"),
+            }
 
-struct ReturnTy<'ast> {
-    sig: &'ast FnSig,
-}
-
-impl<'ast> ToTokens for ReturnTy<'ast> {
-    fn to_tokens(&self, tokens: &mut Tokens) {
-        if let Some(ref return_ty) = self.sig.return_ty {
-            quote_in!(tokens, -> #return_ty)
         }
+        // let args = self.sig.args.iter().map(|arg| arg.name);
+        // quote_in!(tokens, #(#args),*);
     }
 }
+
+// struct ReturnTy<'ast>(&'ast FunctionRetTy);
+//
+// impl<'ast> ToTokens for ReturnTy<'ast> {
+//     fn to_tokens(&self, tokens: &mut Tokens) {
+//         // if let Some(ref return_ty) = self.sig.return_ty {
+//         //     quote_in!(tokens, -> #return_ty)
+//         // }
+//     }
+// }
+/*
 
 impl Path {
     fn ty<'a>(&'a self) -> SepPath<'a> {
