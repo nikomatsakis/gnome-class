@@ -101,20 +101,32 @@ impl<'ast> Classes<'ast> {
         self.items.iter().find(|c| c.1.name == name).unwrap().1
     }
 
-    fn add(&mut self, ast_class: &ast::Class) -> Result<()> {
+    fn add(&mut self, ast_class: &'ast ast::Class) -> Result<()> {
+        let instance_private = self.get_instance_private(ast_class);
+
         let prev = self.items.insert(ast_class.name, Class {
             name: ast_class.name,
             parent: tokens_ParentInstance(ast_class),
             parent_ffi: tokens_ParentInstanceFfi(ast_class),
             parent_class_ffi: tokens_ParentClassFfi(ast_class),
             implements: Vec::new(),
-            instance_private: None,
+            instance_private,
             slots: Vec::new()
         });
         if prev.is_some() {
             bail!("redefinition of class `{}`", ast_class.name);
         }
         Ok(())
+    }
+
+    fn get_instance_private(&self, ast_class: &'ast ast::Class) -> Option<&'ast ast::PrivateStruct> {
+        ast_class.items.iter().filter_map(|i| {
+            if let ast::ClassItem::PrivateStruct(ref p) = *i {
+                Some(p)
+            } else {
+                None
+            }
+        }).next()
     }
 
     fn add_impl(&mut self, impl_: &'ast ast::Impl) -> Result<()> {
@@ -198,7 +210,7 @@ mod tests {
         let cursor = buffer.begin();
         let ast_program = ast::Program::parse(cursor).unwrap().1;
 
-        let program = Program::from_ast_program(ast_program).unwrap();
+        let program = Program::from_ast_program(&ast_program).unwrap();
 
         assert!(program.classes.len() == 1);
 

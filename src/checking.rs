@@ -80,7 +80,7 @@ mod tests {
 
         let program = ast::Program::parse(cursor).unwrap().1;
 
-        assert!(check_program(program).is_ok());
+        assert!(check_program(&program).is_ok());
     }
 
     #[test]
@@ -109,7 +109,7 @@ mod tests {
 
         let program = ast::Program::parse(cursor).unwrap().1;
 
-        match check_program(program) {
+        match check_program(&program) {
             Err(Error(ErrorKind::InstancePrivateError(_), _ )) => (),
             _ => unreachable!()
         }
@@ -127,7 +127,7 @@ mod tests {
 
         let program = ast::Program::parse(cursor).unwrap().1;
 
-        match check_program(program) {
+        match check_program(&program) {
             Err(Error(ErrorKind::OnePrivateStructError(_), _ )) => (),
             _ => unreachable!()
         }
@@ -154,7 +154,7 @@ mod tests {
 
         let program = ast::Program::parse(cursor).unwrap().1;
 
-        match check_program(program) {
+        match check_program(&program) {
             Err(Error(ErrorKind::OnePrivateStructError(_), _ )) => (),
             _ => unreachable!()
         }
@@ -176,7 +176,7 @@ mod tests {
 
         let program = ast::Program::parse(cursor).unwrap().1;
 
-        match check_program(program) {
+        match check_program(&program) {
             Err(Error(ErrorKind::OnePrivateInitError(_), _ )) => (),
             _ => unreachable!()
         }
@@ -212,7 +212,7 @@ mod tests {
 
         let program = ast::Program::parse(cursor).unwrap().1;
 
-        match check_program(program) {
+        match check_program(&program) {
             Err(Error(ErrorKind::OnePrivateInitError(_), _ )) => (),
             _ => unreachable!()
         }
