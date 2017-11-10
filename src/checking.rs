@@ -17,16 +17,15 @@ fn check_class_items(class: &Class) -> Result<()> {
 }
 
 fn check_private_struct(class: &Class) -> Result<()> {
-    let (num_instance_private_items, num_private_structs, num_private_inits) =
+    let (num_instance_private_items, num_private_inits) =
         class
         .items
         .iter()
-        .fold((0, 0, 0),
-              |(p, s, i), item| {
+        .fold((0, 0),
+              |(p, i), item| {
                   match *item {
-                      ClassItem::InstancePrivate(_) => (p + 1, s, i),
-                      ClassItem::PrivateStruct(_)   => (p, s + 1, i),
-                      ClassItem::PrivateInit(_)     => (p, s, i + 1),
+                      ClassItem::InstancePrivate(_) => (p + 1, i),
+                      ClassItem::PrivateInit(_)     => (p, i + 1),
 //                      _                        => (s, i)
                   }
               });
@@ -34,11 +33,6 @@ fn check_private_struct(class: &Class) -> Result<()> {
     if num_instance_private_items > 1 {
         bail!(ErrorKind::InstancePrivateError(format!("found {} InstancePrivate type declarations",
                                                       num_instance_private_items)));
-    }
-
-    // FIXME: use the spans to provide exact locations of the errors
-    if num_private_structs != 1 {
-        bail!(ErrorKind::OnePrivateStructError(format!("found {} private structs", num_private_structs)));
     }
 
     // FIXME: zero private_init functions are allowed if we provide a Default initializer
@@ -60,11 +54,6 @@ mod tests {
     #[test]
     fn checks_good_class() {
         let raw = "class Foo {
-                       struct FooPrivate {
-                           foo: u32,
-                           bar: String
-                       }
-
                        private_init () -> FooPrivate {
                            FooPrivate {
                                foo: 42,
@@ -88,11 +77,6 @@ mod tests {
         let raw = "class Foo {
                        type InstancePrivate = FooPriv;
                        type InstancePrivate = BarPriv;
-
-                       struct FooPrivate {
-                           foo: u32,
-                           bar: String
-                       }
 
                        private_init () -> FooPrivate {
                            FooPrivate {
@@ -136,15 +120,16 @@ mod tests {
     #[test]
     fn catches_multiple_private_structs() {
         let raw = "class Foo {
-                       struct FooPrivate {
-                           foo: u32,
-                           bar: String
-                       }
+                   }
 
-                       struct BarPrivate {
-                           foo: u32,
-                           bar: String
-                       }
+                   struct FooPrivate {
+                       foo: u32,
+                       bar: String
+                   }
+
+                   struct BarPrivate {
+                       foo: u32,
+                       bar: String
                    }";
 
         let token_stream = raw.parse::<TokenStream>().unwrap();
@@ -163,10 +148,6 @@ mod tests {
     #[test]
     fn catches_no_private_init() {
         let raw = "class Foo {
-                       struct FooPrivate {
-                           foo: u32,
-                           bar: String
-                       }
                    }";
 
         let token_stream = raw.parse::<TokenStream>().unwrap();
@@ -185,11 +166,6 @@ mod tests {
     #[test]
     fn catches_multiple_private_inits() {
         let raw = "class Foo {
-                       struct FooPrivate {
-                           foo: u32,
-                           bar: String
-                       }
-
                        private_init () -> FooPrivate {
                            FooPrivate {
                                foo: 42,

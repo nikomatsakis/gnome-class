@@ -68,13 +68,23 @@ pub struct Signal {
     // FIXME: signal flags
 }
 
+fn get_instance_private<'ast>(ast_program: &'ast ast::Program) -> Option<&'ast ast::PrivateStruct> {
+    ast_program.items.iter().filter_map(|i| {
+        if let ast::Item::PrivateStruct(ref p) = *i {
+            Some(p)
+        } else {
+            None
+        }
+    }).next()
+}
+
 impl<'ast> Program<'ast> {
     pub fn from_ast_program(ast: &'ast ast::Program) -> Result<Program<'ast>> {
         check_program(ast)?;
 
         let mut classes = Classes::new();
         for class in ast.classes() {
-            classes.add(class)?;
+            classes.add(class, get_instance_private(ast))?;
         }
         for impl_ in ast.impls() {
             classes.add_impl(impl_)?;
@@ -101,9 +111,10 @@ impl<'ast> Classes<'ast> {
         self.items.iter().find(|c| c.1.name == name).unwrap().1
     }
 
-    fn add(&mut self, ast_class: &'ast ast::Class) -> Result<()> {
-        let instance_private = self.get_instance_private(ast_class);
-
+    fn add(&mut self,
+           ast_class: &'ast ast::Class,
+           instance_private: Option<&'ast ast::PrivateStruct>) -> Result<()>
+    {
         let prev = self.items.insert(ast_class.name, Class {
             name: ast_class.name,
             parent: tokens_ParentInstance(ast_class),
@@ -117,16 +128,6 @@ impl<'ast> Classes<'ast> {
             bail!("redefinition of class `{}`", ast_class.name);
         }
         Ok(())
-    }
-
-    fn get_instance_private(&self, ast_class: &'ast ast::Class) -> Option<&'ast ast::PrivateStruct> {
-        ast_class.items.iter().filter_map(|i| {
-            if let ast::ClassItem::PrivateStruct(ref p) = *i {
-                Some(p)
-            } else {
-                None
-            }
-        }).next()
     }
 
     fn add_impl(&mut self, impl_: &'ast ast::Impl) -> Result<()> {

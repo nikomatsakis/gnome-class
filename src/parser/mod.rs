@@ -92,8 +92,6 @@ impl Synom for ast::ClassItem {
     named!(parse -> Self, alt!(
         syn!(ast::InstancePrivateItem) => { |x| ast::ClassItem::InstancePrivate(x) }
         |
-        syn!(ast::PrivateStruct) => { |x| ast::ClassItem::PrivateStruct(x) }
-        |
         syn!(ast::PrivateInit) => { |x| ast::ClassItem::PrivateInit(x) }
     ));
 }
@@ -369,17 +367,6 @@ mod tests {
 
     #[test]
     fn parses_class_items() {
-        let raw = "struct FooPrivate {
-                       foo: u32,
-                       bar: String
-                   }";
-        let item = parse_str::<ast::ClassItem>(raw).unwrap();
-
-        match item {
-            ast::ClassItem::PrivateStruct(_) => (),
-            _ => unreachable!()
-        };
-
         let raw = "private_init () -> FooPrivate {
                        FooPrivate {
                            foo: 42,
@@ -397,11 +384,6 @@ mod tests {
     #[test]
     fn parses_private_struct_class_items() {
         let raw = "class Foo {
-                       struct FooPrivate {
-                           foo: u32,
-                           bar: String
-                       }
-
                        private_init () -> FooPrivate {
                            FooPrivate {
                                foo: 42,
@@ -412,15 +394,6 @@ mod tests {
         let class = parse_str::<ast::Class>(raw).unwrap();
 
         let mut iter = class.items.iter();
-
-        let m = iter.next().unwrap();
-        match *m {
-            ast::ClassItem::PrivateStruct(_) => {
-                (); // okay
-            },
-
-            _ => unreachable!()
-        };
 
         let m = iter.next().unwrap();
         match *m {

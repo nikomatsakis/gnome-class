@@ -63,7 +63,6 @@ pub struct Impl {
 
 pub enum ClassItem {
     InstancePrivate(InstancePrivateItem),
-    PrivateStruct(PrivateStruct),
     PrivateInit(PrivateInit),
 /*
     Method(Method),
