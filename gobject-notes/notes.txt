@@ -341,31 +341,25 @@ public class MyWidget : Box {
 
 * New syntax
 
+struct FooPrivate {
+    ...
+}
+
+// or #[derive(Default)] above if it works for you
+impl Default for FooPrivate {
+    fn default() -> FooPrivate {
+        ...
+    }
+}
+
+struct FooClassPrivate {
+    ...
+}
+
 gnome_class! {
     class Foo: Superclass {
-        type Private = FooPrivate; // similar to associated types, "type Foo = Bar;"
+        type InstancePrivate = FooPrivate; // similar to associated types, "type Foo = Bar;"
         type ClassPrivate = FooClassPrivate;
-    }
-
-    struct FooPrivate {
-        ...
-    }
-
-    struct FooClassPrivate {
-        ...
-    }
-
-    // or #[derive(Default)] above if it works for you
-    impl Default for FooPrivate {
-        fn default() -> FooPrivate {
-            ...
-        }
-    }
-
-    impl Drop for FooPrivate {
-        fn drop(&mut self) {
-            // this is called during finalization
-        }
     }
 
     // this defines the class ABI, basically
