@@ -12,30 +12,21 @@ impl<'ast> ClassContext<'ast> {
             .iter()
             .map(|slot| {
                 match *slot {
-                    Slot::Method(Method { public, name, inputs, output, body: _ }) => {
-                        drop(public); // TODO: use this?
+                    Slot::Method(Method { public: false, .. }) => {
+                        unimplemented!();
+                    },
+
+                    Slot::Method(Method { public: true, name, inputs, output, .. }) |
+                    Slot::VirtualMethod(VirtualMethod { name, inputs, output, .. }) => {
                         quote! {
                             fn #name(#(#inputs),*) #output;
                         }
                     }
-                    Slot::VirtualMethod(_) => panic!("virtual methods not implemented"),
+
                     Slot::Signal(_) => panic!("signals not implemented"),
                 }
             })
             .collect()
-        /*
-        self.methods()
-            .map(|method| {
-                let name = method.name;
-                let arg_decls = method.fn_def.sig.arg_decls();
-                let return_ty = method.fn_def.sig.return_ty();
-                quote! {
-                    fn #name(&self, #arg_decls) #return_ty;
-                }
-            })
-            .collect()
-         */
-        // Vec::new()
     }
 
     pub fn method_redirects(&self) -> Vec<Tokens> {
