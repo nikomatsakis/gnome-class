@@ -1,6 +1,7 @@
 //use lalrpop_intern::InternedString;
 //use quote::Tokens;
-use syn::{DeriveInput, Ident, ImplItem, Path, FnArg, FunctionRetTy, Block};
+use syn::{DeriveInput, Ident, Path, FnArg, FunctionRetTy, Block};
+use syn::{Attribute, Lit};
 use synom::delimited::Delimited;
 use synom::tokens;
 
@@ -49,6 +50,26 @@ pub enum ClassItem {
     Method(Method),
     Signal(Signal),
 */
+}
+
+pub struct ImplItem {
+    pub attrs: Vec<Attribute>,
+    pub node: ImplItemKind,
+}
+
+pub enum ImplItemKind {
+    Method(ImplItemMethod),
+    ReserveSlots(Lit),
+}
+
+pub struct ImplItemMethod {
+    pub public: bool,
+    pub virtual_: bool,
+    pub signal: bool,
+    pub name: Ident,
+    pub inputs: Vec<FnArg>,
+    pub output: FunctionRetTy,
+    pub body: Option<Block>,
 }
 
 // Mostly copied from syn's ImplItemType
