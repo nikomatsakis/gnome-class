@@ -69,7 +69,7 @@ mod parser;
 /// as for `FooPrivate` in the [syntax overview][syntax-overview] above.
 ///
 /// If you don't do anything else, all the fields in your `FooPrivate` structure
-/// will be initialized to `Default::default()` — this implies that all the types 
+/// will be initialized to `Default::default()` — this implies that all the types
 /// of your struct's fields must implement the `Default` trait.
 ///
 /// Alternatively, you can define a special `private_init()` function

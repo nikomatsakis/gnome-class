@@ -40,7 +40,7 @@ fn parse_var_tys(input: &str,
 
 use synom::delimited::Delimited;
 use synom::{Synom, Cursor, PResult, parse_error, tokens};
-use syn::{Block, DeriveInput, FunctionRetTy, Ident, ImplItem, Path};
+use syn::{Block, DeriveInput, FunctionRetTy, Ident, Path};
 
 impl Synom for ast::Program {
     named!(parse -> Self, do_parse!(
@@ -157,24 +157,64 @@ impl Synom for ast::PrivateInit {
 
 impl Synom for ast::Impl {
     named!(parse -> Self, do_parse!(
-        impl_: syn!(tokens::Impl) >>
-        trait_: alt!(
-            do_parse!(
-                path: syn!(Path) >>
-                for_: syn!(tokens::For) >>
-                (Some((path, for_)))
-            )
-            |
-            epsilon!() => { |_| None }
-        ) >>
-        self_path: syn!(Path) >>
-        body: braces!(many0!(syn!(ImplItem))) >>
+        syn!(tokens::Impl) >>
+        trait_: option!(do_parse!(
+            path: syn!(Ident) >>
+            syn!(tokens::For) >>
+            (path)
+        )) >>
+        self_path: syn!(Ident) >>
+        body: braces!(many0!(syn!(ast::ImplItem))) >>
         (ast::Impl {
-            impl_token: impl_,
             trait_: trait_,
             self_path: self_path,
-            brace_token: body.1,
             items: body.0
+        })
+    ));
+}
+
+impl Synom for ast::ImplItem {
+    named!(parse -> Self, do_parse!(
+        attrs: many0!(call!(syn::Attribute::parse_outer)) >>
+        node: syn!(ast::ImplItemKind) >>
+        (ast::ImplItem { attrs, node })
+    ));
+}
+
+impl Synom for ast::ImplItemKind {
+    named!(parse -> Self, alt!(
+        syn!(ast::ImplItemMethod) => { |x| ast::ImplItemKind::Method(x) }
+        |
+        do_parse!(
+            call!(keyword("reserve_slots")) >>
+            slots: parens!(syn!(syn::Lit)) >>
+            (ast::ImplItemKind::ReserveSlots(slots.0))
+        )
+    ));
+}
+
+impl Synom for ast::ImplItemMethod {
+    named!(parse -> Self, do_parse!(
+        public: map!(option!(call!(keyword("pub"))), |x| x.is_some()) >>
+        virtual_: map!(option!(call!(keyword("virtual"))), |x| x.is_some()) >>
+        signal: map!(option!(call!(keyword("signal"))), |x| x.is_some()) >>
+        call!(keyword("fn")) >>
+        name: syn!(syn::Ident) >>
+        inputs: parens!(call!(Delimited::<_, tokens::Comma>::parse_terminated)) >>
+        output: syn!(syn::FunctionRetTy) >>
+        body: alt!(
+            syn!(syn::Block) => { Some }
+            |
+            syn!(tokens::Semi) => { |_| None }
+        ) >>
+        (ast::ImplItemMethod {
+            public,
+            virtual_,
+            signal,
+            name,
+            inputs: inputs.0.into_vec(),
+            output,
+            body,
         })
     ));
 }
@@ -427,8 +467,8 @@ mod tests {
         let item = parse_str::<ast::Item>(raw).unwrap();
 
         if let ast::Item::Impl(ref impl_) = item {
-            if let Some((ref trait_path, _)) = impl_.trait_ {
-                assert_tokens_equal(trait_path, trait_name.as_ref().unwrap());
+            if let Some(trait_path) = impl_.trait_ {
+                assert_tokens_equal(&trait_path, trait_name.as_ref().unwrap());
             } else {
                 assert!(trait_name.is_none());
             }
