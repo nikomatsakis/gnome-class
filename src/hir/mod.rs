@@ -37,31 +37,31 @@ pub struct Class<'ast> {
     // pub class_private: Option<&'ast ast::PrivateStruct>
 
     // The order of these is important; it's the order of the slots in FooClass
-    pub slots: Vec<Slot>,
+    pub slots: Vec<Slot<'ast>>,
     // pub n_reserved_slots: usize,
 
     // pub properties: Vec<Property>,
 }
 
-pub enum Slot {
-    Method(Method),
-    VirtualMethod(VirtualMethod),
+pub enum Slot<'ast> {
+    Method(Method<'ast>),
+    VirtualMethod(VirtualMethod<'ast>),
     Signal(Signal)
 }
 
-pub struct Method {
+pub struct Method<'ast> {
     pub public: bool,
     pub name: Ident,
-    pub inputs: Vec<FnArg>,
-    pub output: FunctionRetTy,
-    pub body: Block,
+    pub inputs: &'ast [FnArg],
+    pub output: &'ast FunctionRetTy,
+    pub body: &'ast Block,
 }
 
-pub struct VirtualMethod {
+pub struct VirtualMethod<'ast> {
     pub name: Ident,
-    pub inputs: Vec<FnArg>,
-    pub output: FunctionRetTy,
-    pub body: Option<Block>,
+    pub inputs: &'ast [FnArg],
+    pub output: &'ast FunctionRetTy,
+    pub body: Option<&'ast Block>,
 }
 
 pub struct Signal {
@@ -69,8 +69,8 @@ pub struct Signal {
 }
 
 impl<'ast> Program<'ast> {
-    pub fn from_ast_program(ast_program: ast::Program) -> Result<Program<'ast>> {
-        let ast = check_program(ast_program)?;
+    pub fn from_ast_program(ast: &'ast ast::Program) -> Result<Program<'ast>> {
+        check_program(ast)?;
 
         let mut classes = Classes::new();
         for class in ast.classes() {
@@ -117,14 +117,14 @@ impl<'ast> Classes<'ast> {
         Ok(())
     }
 
-    fn add_impl(&mut self, impl_: &ast::Impl) -> Result<()> {
+    fn add_impl(&mut self, impl_: &'ast ast::Impl) -> Result<()> {
         let class = match self.items.get_mut(&impl_.self_path) {
             Some(class) => class,
             None => bail!("impl for class that doesn't exist: {}", impl_.self_path),
         };
         if impl_.trait_.is_some() {
             // would want to attach destructors/such here
-            unimplemented!()
+            panic!("trait-like impls not implemented");
         } else {
             for item in impl_.items.iter() {
                 class.add_slot(item)?;
@@ -140,19 +140,19 @@ impl<'ast> Classes<'ast> {
 }
 
 impl<'ast> Class<'ast> {
-    fn add_slot(&mut self, item: &ast::ImplItem) -> Result<()> {
+    fn add_slot(&mut self, item: &'ast ast::ImplItem) -> Result<()> {
         assert_eq!(item.attrs.len(), 0); // attributes unimplemented
         match item.node {
             ast::ImplItemKind::Method(ref method) => self.add_method(method),
             ast::ImplItemKind::ReserveSlots(ref _slots) => {
-                unimplemented!()
+                panic!("reserve slots not implemented");
             }
         }
     }
 
-    fn add_method(&mut self, method: &ast::ImplItemMethod) -> Result<()> {
+    fn add_method(&mut self, method: &'ast ast::ImplItemMethod) -> Result<()> {
         if method.signal {
-            unimplemented!()
+            panic!("signals not implemented");
         }
         if method.virtual_ {
             if method.public {
@@ -161,17 +161,17 @@ impl<'ast> Class<'ast> {
             }
             self.slots.push(Slot::VirtualMethod(VirtualMethod {
                 name: method.name,
-                inputs: method.inputs.clone(),
-                output: method.output.clone(),
-                body: method.body.clone(),
+                inputs: &method.inputs,
+                output: &method.output,
+                body: method.body.as_ref(),
             }));
         } else {
             self.slots.push(Slot::Method(Method {
                 name: method.name,
-                inputs: method.inputs.clone(),
-                output: method.output.clone(),
+                inputs: &method.inputs,
+                output: &method.output,
                 public: method.public,
-                body: method.body.clone().ok_or_else(|| {
+                body: method.body.as_ref().ok_or_else(|| {
                     format!("function `{}` requires a body", method.name)
                 })?,
             }));

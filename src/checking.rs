@@ -1,12 +1,11 @@
 use ast::*;
 use errors::*;
 
-pub fn check_program(program: Program) -> Result<Program> {
-    for class in get_program_classes (&program) {
+pub fn check_program(program: &Program) -> Result<()> {
+    for class in get_program_classes(program) {
         check_class(class)?;
     }
-
-    Ok(program)
+    Ok(())
 }
 
 fn check_class(class: &Class) -> Result<()> {

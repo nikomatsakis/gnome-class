@@ -157,7 +157,7 @@ pub fn gobject_gen(input: TokenStream) -> TokenStream {
 
     let result: Result<quote::Tokens> = do catch {
         let ast_program = parser::parse_program(input)?;
-        let program = hir::Program::from_ast_program(ast_program)?;
+        let program = hir::Program::from_ast_program(&ast_program)?;
         gen::classes(&program)
     };
 
