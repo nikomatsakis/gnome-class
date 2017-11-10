@@ -26,6 +26,7 @@ mod ast;
 mod checking;
 mod errors;
 mod gen;
+mod glib_utils;
 mod hir;
 mod param;
 mod parser;
@@ -153,9 +154,10 @@ mod parser;
 ///
 #[proc_macro]
 pub fn gobject_gen(input: TokenStream) -> TokenStream {
+
     let result: Result<quote::Tokens> = do catch {
-        let program = parser::parse_program(input)?;
-        let program = checking::check_program(program)?;
+        let ast_program = parser::parse_program(input)?;
+        let program = hir::Program::from_ast_program(ast_program)?;
         gen::classes(&program)
     };
 

@@ -41,6 +41,8 @@ impl<'ast> ClassContext<'ast> {
         //
         // Otherwise, just initialize all of the struct's fields to Default::default().
 
+        quote! {}
+        /*
         let private_init_item =
             self.class.items
             .iter()
@@ -57,6 +59,7 @@ impl<'ast> ClassContext<'ast> {
             quote! { #block }
         } else {
             panic!("Class must have a private_init() item");
+         */
             /*
             let PrivateName = self.private_struct.name();
             // FIXME: self.private_struct.fields is no longer Vec<VarTy>; it is now syn::VariantData.
@@ -71,8 +74,8 @@ impl<'ast> ClassContext<'ast> {
                     }
                 }
             }
-            */
         }
+         */
     }
 
     pub fn imp_slot_default_handlers(&self) -> Vec<Tokens> {

@@ -1,20 +1,20 @@
 // We give `ClassName` variables an identifier that uses upper-case.
 #![allow(non_snake_case)]
 
-use quote::{Tokens};
+use quote::{Tokens, ToTokens};
 use syn::Ident;
 
-use ast::*;
+use ast;
+use hir::*;
 use errors::*;
 
 mod boilerplate;
 mod cstringident;
-mod glib_utils;
 mod imp;
 mod instance_ext;
 mod signals;
 
-use self::glib_utils::lower_case_instance_name;
+use glib_utils::*;
 
 // HYGIENE NOTE:
 //
@@ -23,7 +23,7 @@ use self::glib_utils::lower_case_instance_name;
 
 pub fn classes(program: &Program) -> Result<Tokens> {
     let class_tokens =
-        get_program_classes(program)
+        program.classes
         .iter()
         .map(|class| {
             let cx = ClassContext::new(program, class);
@@ -34,16 +34,16 @@ pub fn classes(program: &Program) -> Result<Tokens> {
 }
 
 struct ClassContext<'ast> {
-    program: &'ast Program,
-    class: &'ast Class,
-    private_struct: &'ast PrivateStruct,
+    program: &'ast Program<'ast>,
+    class: &'ast Class<'ast>,
+    instance_private: &'ast ast::PrivateStruct,
     ModuleName: Ident,
     InstanceName: &'ast Ident,
     ClassName: Ident,
     PrivateClassName: Ident,
-    ParentInstance: Tokens,
-    ParentInstanceFfi: Tokens,
-    ParentClassFfi: Tokens,
+    ParentInstance: &'ast ToTokens,
+    ParentInstanceFfi: &'ast Tokens,
+    ParentClassFfi: &'ast Tokens,
     GObject: Tokens,
     GObjectFfi: Tokens,
     GObjectClassFfi: Tokens,
@@ -56,16 +56,7 @@ impl<'ast> ClassContext<'ast> {
         // commonly-used symbol names for the class in question, for
         // example, "FooClass" out of "Foo".
 
-        let private_struct =
-            class.items
-                 .iter()
-                 .filter_map(|item| match *item {
-                     ClassItem::PrivateStruct(ref ps) => Some(ps),
-                     _ => None,
-                 })
-                 .next();
-
-        let private_struct = match private_struct {
+        let instance_private = match class.instance_private {
             Some(p) => p,
             None => unreachable!() // this was checked already by checking.rs
         };
@@ -85,18 +76,18 @@ impl<'ast> ClassContext<'ast> {
         let PrivateClassName = container_name!("ClassPrivate");
         let InstanceExt      = container_name!("Ext"); // public trait with all the class's methods
 
-        let GObject          = Self::tokens_GObject();
-        let GObjectFfi       = Self::tokens_GObjectFfi();
-        let GObjectClassFfi  = Self::tokens_GObjectClassFfi();
+        let GObject          = tokens_GObject();
+        let GObjectFfi       = tokens_GObjectFfi();
+        let GObjectClassFfi  = tokens_GObjectClassFfi();
 
-        let ParentInstance    = Self::tokens_ParentInstance(class);
-        let ParentInstanceFfi = Self::tokens_ParentInstanceFfi(class);
-        let ParentClassFfi    = Self::tokens_ParentClassFfi(class);
+        let ParentInstance    = &class.parent;
+        let ParentInstanceFfi = &class.parent_ffi;
+        let ParentClassFfi    = &class.parent_class_ffi;
 
         ClassContext {
             program,
             class,
-            private_struct,
+            instance_private,
             ModuleName,
             InstanceName,
             ClassName,

@@ -7,6 +7,7 @@
 // Tree (AST) from the previous stage.
 
 use proc_macro2::{TokenStream};
+use quote::{Tokens};
 use syn::{Ident, ImplItem, Path};
 use synom::{Synom, SynomBuffer};
 
@@ -14,15 +15,18 @@ use super::ast;
 use super::ast::get_program_classes;
 use super::checking::*;
 use super::errors::*;
+use super::glib_utils::*;
 
 pub struct Program<'ast> {
     pub classes: Vec<Class<'ast>>
 }
 
 pub struct Class<'ast> {
-    pub name: Ident,
-    pub superclass: Path,
-    pub implements: Vec<Path>, // names of GTypeInterfaces
+    pub name: Ident,              // Foo
+    pub parent: Tokens,           // Parent
+    pub parent_ffi: Tokens,       // ffi::Parent
+    pub parent_class_ffi: Tokens, // ffi::ParentClass
+    pub implements: Vec<Path>,    // names of GTypeInterfaces
 
     pub instance_private: Option<&'ast ast::PrivateStruct>,
     // pub class_private: Option<&'ast ast::PrivateStruct>
@@ -71,7 +75,9 @@ impl<'ast> Program<'ast> {
     fn extract_class(ast_class: &ast::Class) -> Class<'ast> {
         Class {
             name: ast_class.name.clone(),
-            superclass: ast_class.extends.clone().unwrap_or(make_path_glib_object()),
+            parent: tokens_ParentInstance(ast_class),
+            parent_ffi: tokens_ParentInstanceFfi(ast_class),
+            parent_class_ffi: tokens_ParentClassFfi(ast_class),
             implements: Vec::new(),
             instance_private: None,
             slots: Vec::new()
@@ -90,7 +96,6 @@ fn make_path_glib_object() -> Path {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use quote::{ToTokens};
 
     fn test_class_and_superclass (raw: &str, class_name: &str, superclass_name: &str) {
         let token_stream = raw.parse::<TokenStream>().unwrap();
@@ -104,7 +109,7 @@ mod tests {
 
         let class = &program.classes[0];
         assert_eq!(class.name.as_ref(), class_name);
-        assert_eq!(class.superclass.clone().into_tokens().to_string(), superclass_name);
+        assert_eq!(class.parent.to_string(), superclass_name);
     }
 
     #[test]

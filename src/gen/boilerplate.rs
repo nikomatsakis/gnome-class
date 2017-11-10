@@ -17,19 +17,19 @@ impl<'ast> ClassContext<'ast> {
         let ClassName                        = self.ClassName;
         let InstanceName                     = self.InstanceName;
         let InstanceExt                      = &self.InstanceExt;
-        let ParentClassFfi                   = &self.ParentClassFfi;
-        let ParentInstance                   = &self.ParentInstance;
-        let ParentInstanceFfi                = &self.ParentInstanceFfi;
+        let ParentClassFfi                   = self.ParentClassFfi;
+        let ParentInstance                   = self.ParentInstance;
+        let ParentInstanceFfi                = self.ParentInstanceFfi;
         let PrivateClassName                 = &self.PrivateClassName;
-        let PrivateName                      = &self.private_struct.name();
+        let PrivateName                      = &self.instance_private.name();
 
-        let callback_guard                   = self.glib_callback_guard();
+        let callback_guard                   = glib_callback_guard();
         let get_type_fn_name                 = self.instance_get_type_fn_name();
         let imp_new_fn_name                  = self.imp_new_fn_name();
 
         let slots                            = self.slots();
         // let signal_id_names                  = self.signal_id_names();
-        let private_struct                   = &self.private_struct.derive_input;
+        let instance_private                 = &self.instance_private.derive_input;
         let private_init_fn_body             = &self.private_init_fn_body();
         let slot_default_handlers            = self.imp_slot_default_handlers();
         let slot_assignments                 = self.slot_assignments();
@@ -127,7 +127,7 @@ impl<'ast> ClassContext<'ast> {
                         // #(#signal_id_names),*
                     }
 
-                    #private_struct
+                    #instance_private
 
                     impl #PrivateName {
                         pub fn new() -> Self #private_init_fn_body
