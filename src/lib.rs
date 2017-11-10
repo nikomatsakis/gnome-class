@@ -20,7 +20,6 @@ extern crate syn;
 
 use proc_macro::TokenStream;
 use errors::*;
-use std::str::FromStr;
 
 mod ast;
 mod checking;
