@@ -6,17 +6,22 @@
 // We construct this view of the world from the raw Abstract Syntax
 // Tree (AST) from the previous stage.
 
+use std::collections::HashMap;
+
 use proc_macro2::{TokenStream};
-use syn::{Ident, ImplItem, Path};
+use syn::{Ident, Path, Block, FnArg, FunctionRetTy};
 use synom::{Synom, SynomBuffer};
 
 use super::ast;
-use super::ast::get_program_classes;
 use super::checking::*;
 use super::errors::*;
 
 pub struct Program<'ast> {
-    pub classes: Vec<Class<'ast>>
+    pub classes: Classes<'ast>,
+}
+
+pub struct Classes<'ast> {
+    items: HashMap<Ident, Class<'ast>>,
 }
 
 pub struct Class<'ast> {
@@ -36,46 +41,132 @@ pub struct Class<'ast> {
 
 pub enum Slot {
     Method(Method),
+    VirtualMethod(VirtualMethod),
     Signal(Signal)
 }
 
 pub struct Method {
-    pub is_virtual: bool,
-    pub item: ImplItem,
+    pub public: bool,
+    pub name: Ident,
+    pub inputs: Vec<FnArg>,
+    pub output: FunctionRetTy,
+    pub body: Block,
+}
+
+pub struct VirtualMethod {
+    pub name: Ident,
+    pub inputs: Vec<FnArg>,
+    pub output: FunctionRetTy,
+    pub body: Option<Block>,
 }
 
 pub struct Signal {
     // FIXME: signal flags
-    pub item: ImplItem
 }
 
 impl<'ast> Program<'ast> {
     pub fn from_ast_program(ast_program: ast::Program) -> Result<Program<'ast>> {
-        let ast_program = check_program(ast_program)?;
+        let ast = check_program(ast_program)?;
 
-        Ok(Program {
-            classes: Self::extract_classes (ast_program)
-        })
-    }
-
-    fn extract_classes(ast_program: ast::Program) -> Vec<Class<'ast>> {
-        let mut classes = Vec::new();
-
-        for ast_class in get_program_classes(&ast_program) {
-            classes.push (Self::extract_class (ast_class));
+        let mut classes = Classes::new();
+        for class in ast.classes() {
+            classes.add(class)?;
+        }
+        for impl_ in ast.impls() {
+            classes.add_impl(impl_)?;
         }
 
-        classes
+        Ok(Program {
+            classes: classes,
+        })
+    }
+}
+
+impl<'ast> Classes<'ast> {
+    fn new() -> Classes<'ast> {
+        Classes {
+            items: HashMap::new(),
+        }
     }
 
-    fn extract_class(ast_class: &ast::Class) -> Class<'ast> {
-        Class {
-            name: ast_class.name.clone(),
-            superclass: ast_class.extends.clone().unwrap_or(make_path_glib_object()),
+    pub fn len(&self) -> usize {
+        self.items.len()
+    }
+
+    pub fn get(&self, name: &str) -> &Class {
+        self.items.iter().find(|c| c.1.name == name).unwrap().1
+    }
+
+    fn add(&mut self, class: &ast::Class) -> Result<()> {
+        let prev = self.items.insert(class.name, Class {
+            name: class.name,
+            superclass: class.extends.clone().unwrap_or(make_path_glib_object()),
             implements: Vec::new(),
             instance_private: None,
             slots: Vec::new()
+        });
+        if prev.is_some() {
+            bail!("redefinition of class `{}`", class.name);
         }
+        Ok(())
+    }
+
+    fn add_impl(&mut self, impl_: &ast::Impl) -> Result<()> {
+        let class = match self.items.get_mut(&impl_.self_path) {
+            Some(class) => class,
+            None => bail!("impl for class that doesn't exist: {}", impl_.self_path),
+        };
+        if impl_.trait_.is_some() {
+            // would want to attach destructors/such here
+            unimplemented!()
+        } else {
+            for item in impl_.items.iter() {
+                class.add_slot(item)?;
+            }
+        }
+
+        Ok(())
+    }
+}
+
+impl<'ast> Class<'ast> {
+    fn add_slot(&mut self, item: &ast::ImplItem) -> Result<()> {
+        assert_eq!(item.attrs.len(), 0); // attributes unimplemented
+        match item.node {
+            ast::ImplItemKind::Method(ref method) => self.add_method(method),
+            ast::ImplItemKind::ReserveSlots(ref _slots) => {
+                unimplemented!()
+            }
+        }
+    }
+
+    fn add_method(&mut self, method: &ast::ImplItemMethod) -> Result<()> {
+        if method.signal {
+            unimplemented!()
+        }
+        if method.virtual_ {
+            if method.public {
+                bail!("function `{}` is virtual so it doesn't need to be public",
+                      method.name)
+            }
+            self.slots.push(Slot::VirtualMethod(VirtualMethod {
+                name: method.name,
+                inputs: method.inputs.clone(),
+                output: method.output.clone(),
+                body: method.body.clone(),
+            }));
+        } else {
+            self.slots.push(Slot::Method(Method {
+                name: method.name,
+                inputs: method.inputs.clone(),
+                output: method.output.clone(),
+                public: method.public,
+                body: method.body.clone().ok_or_else(|| {
+                    format!("function `{}` requires a body", method.name)
+                })?,
+            }));
+        }
+        Ok(())
     }
 }
 
@@ -102,7 +193,7 @@ mod tests {
 
         assert!(program.classes.len() == 1);
 
-        let class = &program.classes[0];
+        let class = program.classes.get(class_name);
         assert_eq!(class.name.as_ref(), class_name);
         assert_eq!(class.superclass.clone().into_tokens().to_string(), superclass_name);
     }

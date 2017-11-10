@@ -9,6 +9,26 @@ pub struct Program {
     pub items: Vec<Item>
 }
 
+impl Program {
+    pub fn classes<'a>(&'a self) -> impl Iterator<Item = &'a Class> + 'a {
+        self.items.iter().filter_map(|item| {
+            match *item {
+                Item::Class(ref c) => Some(c),
+                _ => None,
+            }
+        })
+    }
+
+    pub fn impls<'a>(&'a self) -> impl Iterator<Item = &'a Impl> + 'a {
+        self.items.iter().filter_map(|item| {
+            match *item {
+                Item::Impl(ref i) => Some(i),
+                _ => None,
+            }
+        })
+    }
+}
+
 pub enum Item {
     Class(Class),
     Impl(Impl)
@@ -35,10 +55,8 @@ pub struct Class {
 
 // similar to syn::ItemImpl
 pub struct Impl {
-    pub impl_token: tokens::Impl,
-    pub trait_: Option<(Path, tokens::For)>,
-    pub self_path: Path,
-    pub brace_token: tokens::Brace,
+    pub trait_: Option<Ident>,
+    pub self_path: Ident,
     pub items: Vec<ImplItem>
 }
 
@@ -63,11 +81,11 @@ pub enum ImplItemKind {
 }
 
 pub struct ImplItemMethod {
-    pub public: bool,
-    pub virtual_: bool,
-    pub signal: bool,
+    pub public: bool, // requires body
+    pub virtual_: bool, // implies public, doesn't need body
+    pub signal: bool, // ignore
     pub name: Ident,
-    pub inputs: Vec<FnArg>,
+    pub inputs: Vec<FnArg>, // must start with &self
     pub output: FunctionRetTy,
     pub body: Option<Block>,
 }

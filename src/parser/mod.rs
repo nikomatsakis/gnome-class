@@ -155,23 +155,17 @@ impl Synom for ast::PrivateInit {
 
 impl Synom for ast::Impl {
     named!(parse -> Self, do_parse!(
-        impl_: syn!(tokens::Impl) >>
-        trait_: alt!(
-            do_parse!(
-                path: syn!(Path) >>
-                for_: syn!(tokens::For) >>
-                (Some((path, for_)))
-            )
-            |
-            epsilon!() => { |_| None }
-        ) >>
-        self_path: syn!(Path) >>
+        syn!(tokens::Impl) >>
+        trait_: option!(do_parse!(
+            path: syn!(Ident) >>
+            syn!(tokens::For) >>
+            (path)
+        )) >>
+        self_path: syn!(Ident) >>
         body: braces!(many0!(syn!(ast::ImplItem))) >>
         (ast::Impl {
-            impl_token: impl_,
             trait_: trait_,
             self_path: self_path,
-            brace_token: body.1,
             items: body.0
         })
     ));
@@ -538,8 +532,8 @@ mod tests {
         let item = ast::Item::parse(cursor).unwrap().1;
 
         if let ast::Item::Impl(ref impl_) = item {
-            if let Some((ref trait_path, _)) = impl_.trait_ {
-                assert_tokens_equal(trait_path, trait_name.as_ref().unwrap());
+            if let Some(trait_path) = impl_.trait_ {
+                assert_tokens_equal(&trait_path, trait_name.as_ref().unwrap());
             } else {
                 assert!(trait_name.is_none());
             }
