@@ -1,3 +1,4 @@
+#![deny(warnings)]
 #![feature(proc_macro)]
 
 extern crate gobject_gen;
@@ -5,8 +6,6 @@ extern crate gobject_gen;
 #[macro_use]
 extern crate glib;
 use gobject_gen::gobject_gen;
-
-use std::cell::Cell;
 
 gobject_gen! {
     class One {

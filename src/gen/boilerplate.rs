@@ -50,26 +50,26 @@ impl<'ast> ClassContext<'ast> {
 
         quote! {
             pub mod #ModuleName {
-                #![allow(non_snake_case)]
+                #![allow(non_snake_case)] // "oddly" named module above
                 extern crate glib_sys as glib_ffi;
                 extern crate gobject_sys as gobject_ffi;
 
                 // #[macro_use]
                 extern crate glib;
 
-                extern crate libc;
+                // extern crate libc;
 
-                use glib::{IsA, Value};
-                use glib::object::Downcast;
-                use glib::signal::connect;
+                use glib::IsA;
+                // use glib::object::Downcast;
+                // use glib::signal::connect;
                 use glib::translate::*;
                 use std::ptr;
                 use std::mem;
-                use std::mem::transmute;
+                // use std::mem::transmute;
 
                 // Bring in our parent's stuff so the user's implementation
                 // can use what they had already defined there.
-                use super::*;
+                // use super::*;
 
                 // #[cfg(feature = "bindings")]
                 // mod ffi;
@@ -88,14 +88,17 @@ impl<'ast> ClassContext<'ast> {
                 }
 
                 pub mod imp {
-                    // Bring in our grandparent's stuff so the user's implementation
-                    // can use what they had already defined there.
+                    // Bring in our grandparent's stuff so the user's
+                    // implementation can use what they had already defined
+                    // there. Note that this isn't guaranteed to get used though
+                    // so stick an #[allow] on it
+                    #[allow(unused_imports)]
                     use super::super::*;
 
                     use super::glib;
                     use super::glib_ffi;
                     use super::gobject_ffi;
-                    use super::libc;
+                    // use super::libc;
 
                     use std::mem;
                     use std::ptr;
@@ -113,33 +116,33 @@ impl<'ast> ClassContext<'ast> {
                         #(#slots)*
                     }
 
-                    #[repr(u32)]
-                    enum Properties {
-                        FIXMEDummy = 1,
-                        // first one starts at 1
-                        // FIXME - do not emit this enum at all if there are no properties
-                    }
+                    // #[repr(u32)]
+                    // enum Properties {
+                    //     FIXMEDummy = 1,
+                    //     // first one starts at 1
+                    //     // FIXME - do not emit this enum at all if there are no properties
+                    // }
 
-                    #[repr(u32)]
-                    enum Signals {
-                        FIXMEDummy = 0,
-                        // first one starts at 0
-                        // FIXME - do not emit this enum at all if there are no signals
-                        // #(#signal_id_names),*
-                    }
+                    // #[repr(u32)]
+                    // enum Signals {
+                    //     FIXMEDummy = 0,
+                    //     // first one starts at 0
+                    //     // FIXME - do not emit this enum at all if there are no signals
+                    //     // #(#signal_id_names),*
+                    // }
 
                     struct #PrivateClassName {
                         parent_class: *const #ParentClassFfi,
-                        properties:   *const Vec<*const gobject_ffi::GParamSpec>,
-                        signals:      *const Vec<u32>
+                        // properties:   *const Vec<*const gobject_ffi::GParamSpec>,
+                        // signals:      *const Vec<u32>
                     }
 
                     static mut PRIV: #PrivateClassName = #PrivateClassName {
                         // we use this instead of "ptr::null()" because using
                         // function calls to set constants is feature-gated.
                         parent_class: 0 as *const _,
-                        properties:   0 as *const _,
-                        signals:      0 as *const _,
+                        // properties:   0 as *const _,
+                        // signals:      0 as *const _,
                     };
 
                     // We are inside the "mod imp".  We will create function
@@ -154,6 +157,7 @@ impl<'ast> ClassContext<'ast> {
                     }
 
                     impl #InstanceName {
+                        #[allow(dead_code)] // not used if no virtual methods
                         fn get_class(&self) -> &#ClassName {
                             unsafe {
                                 let klass = (*(self as *const _ as *const gobject_ffi::GTypeInstance)).g_class;
@@ -163,6 +167,8 @@ impl<'ast> ClassContext<'ast> {
 
                         // Instance struct and private data initialization, called from GObject
                         unsafe extern "C" fn init(obj: *mut gobject_ffi::GTypeInstance, _klass: glib_ffi::gpointer) {
+                            #[allow(unused_variables)] // not used if no private
+                            let obj = obj;
                             #callback_guard
 
                             #init_priv_with_default
@@ -211,6 +217,7 @@ impl<'ast> ClassContext<'ast> {
 
                             // Slots
                             {
+                                #[allow(unused_variables)] // not used if no virtual methods
                                 let klass = &mut *(klass as *mut #ClassName);
                                 #(#slot_assignments)*
                             }
