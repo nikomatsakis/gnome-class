@@ -1,3 +1,4 @@
+#![deny(warnings)]
 #![feature(proc_macro)]
 
 extern crate gobject_gen;
