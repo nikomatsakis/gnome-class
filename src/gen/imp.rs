@@ -22,7 +22,7 @@ impl<'ast> ClassContext<'ast> {
                                 this: *mut #InstanceName,
                                 #(#inputs),*
                             ) #output>,
-                            
+
                         })
                     }
 
@@ -38,6 +38,11 @@ impl<'ast> ClassContext<'ast> {
             .iter()
             .map(|slot| {
                 match *slot {
+                    Slot::Method(Method { public: false, name, inputs, output, body }) => {
+                        quote! {
+                            fn #name(#(#inputs),*) #output #body
+                        }
+                    },
                     Slot::Method(Method { name, inputs, output, body, .. }) |
                     Slot::VirtualMethod(VirtualMethod { name, inputs, output, body: Some(body), .. }) => {
                         let name = Self::slot_impl_name(&name);
@@ -203,7 +208,7 @@ impl<'ast> ClassContext<'ast> {
         match self.instance_private {
             Some(name) => {
                 let PrivateName = name;
-                
+
                 quote! {
                     // This is an Option<_> so that we can replace its value with None on finalize() to
                     // release all memory it holds

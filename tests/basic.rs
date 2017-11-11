@@ -30,7 +30,12 @@ gobject_gen! {
             let private = self.get_priv();
             let v = private.f.get() + x;
             private.f.set(v);
+            self.get();
+            self.foo();
             v
+        }
+
+        fn foo(&self) {
         }
 
         pub fn get(&self) -> u32 {
