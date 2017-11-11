@@ -4,7 +4,6 @@
 use quote::{Tokens, ToTokens};
 use syn::{Ident, Path, FnArg};
 use syn::tokens;
-use proc_macro2::Span;
 
 use hir::*;
 use errors::*;
@@ -61,26 +60,18 @@ impl<'ast> ClassContext<'ast> {
 
         let InstanceName = &class.name;
 
-        // If our instance name is "Foo" and we have a suffix "Bar", generates a
-        // "FooBar" Ident.  These are used for the generated module name,
-        // instance/class struct names, etc.
-        //
-        // Note that we switch the spans of all identifiers to be
-        // `Span::call_site` which differs from what `syn` does upstream which
-        // is to use `Span::default` (currently). This is sort of a...
-        //
-        // FIXME(rust-lang/rust#45934) we should be able to use vanilla upstream
-        // `syn` ideally, but it's not clear how that would change, if at all
-        let container_name = |suffix: &str| {
-            let mut i = Ident::from(format!("{}{}", InstanceName.as_ref(), suffix));
-            i.span.0 = Span::call_site();
-            return i
-        };
+        // If our instance name is "Foo" and we have a suffix "Bar", generates a "FooBar" Ident.
+        // These are used for the generated module name, instance/class struct names, etc.
+        macro_rules! container_name {
+            ($suffix:expr) => {
+                Ident::from(format!("{}{}", InstanceName.as_ref(), $suffix))
+            };
+        }
 
-        let ModuleName       = container_name("Mod"); // toplevel "InstanceMod" module name
-        let ClassName        = container_name("Class");
-        let PrivateClassName = container_name("ClassPrivate");
-        let InstanceExt      = container_name("Ext"); // public trait with all the class's methods
+        let ModuleName       = container_name!("Mod"); // toplevel "InstanceMod" module name
+        let ClassName        = container_name!("Class");
+        let PrivateClassName = container_name!("ClassPrivate");
+        let InstanceExt      = container_name!("Ext"); // public trait with all the class's methods
 
         let GObject          = tokens_GObject();
         let GObjectFfi       = tokens_GObjectFfi();
