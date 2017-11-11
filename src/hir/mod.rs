@@ -28,6 +28,7 @@ pub struct Classes<'ast> {
 
 pub struct Class<'ast> {
     pub name: Ident,              // Foo
+    pub gobject_parent: bool,
     pub parent: Tokens,           // Parent
     pub parent_ffi: Tokens,       // ffi::Parent
     pub parent_class_ffi: Tokens, // ffi::ParentClass
@@ -107,6 +108,7 @@ impl<'ast> Classes<'ast> {
     {
         let prev = self.items.insert(ast_class.name, Class {
             name: ast_class.name,
+            gobject_parent: ast_class.extends.is_none(),
             parent: tokens_ParentInstance(ast_class),
             parent_ffi: tokens_ParentInstanceFfi(ast_class),
             parent_class_ffi: tokens_ParentClassFfi(ast_class),

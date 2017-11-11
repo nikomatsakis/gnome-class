@@ -48,6 +48,12 @@ impl<'ast> ClassContext<'ast> {
         let method_redirects                 = self.method_redirects();
         let signal_trampolines               = self.signal_trampolines();
 
+        let parent_instance_tokens = if self.class.gobject_parent {
+            quote! {}
+        } else {
+            quote! { : #ParentInstance }
+        };
+
         quote! {
             pub mod #ModuleName {
                 #![allow(non_snake_case)] // "oddly" named module above
@@ -80,7 +86,8 @@ impl<'ast> ClassContext<'ast> {
                 // }
 
                 glib_wrapper! {
-                    pub struct #InstanceName(Object<imp::#InstanceName>); // FIXME: parent classes/interfaces
+                    pub struct #InstanceName(Object<imp::#InstanceName, imp::#ClassName>)
+                        #parent_instance_tokens;
 
                     match fn {
                         get_type => || imp::#get_type_fn_name(),
@@ -179,7 +186,7 @@ impl<'ast> ClassContext<'ast> {
 
                             #free_instance_private
 
-                            (*PRIV.parent_class).finalize.map(|f| f(obj));
+                            (*(PRIV.parent_class as *mut gobject_ffi::GObjectClass)).finalize.map(|f| f(obj));
                         }
 
                         // FIXME: set_property() handler

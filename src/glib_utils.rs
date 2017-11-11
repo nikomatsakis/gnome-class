@@ -27,19 +27,14 @@ pub fn tokens_ParentInstance(class: &ast::Class) -> Tokens {
 }
 
 pub fn tokens_ParentInstanceFfi(class: &ast::Class) -> Tokens {
-    class.extends
-        .as_ref()
-        .map(|path| {
-            let mut tokens = Tokens::new();
-            path.to_tokens(&mut tokens);
-            tokens
-        })
-        .unwrap_or_else(|| tokens_GObjectFfi())
+    let ParentInstance = tokens_ParentInstance(class);
+    quote! {
+        <#ParentInstance as glib::wrapper::Wrapper>::GlibType
+    }
 }
 
 pub fn tokens_ParentClassFfi(class: &ast::Class) -> Tokens {
     let ParentInstance = tokens_ParentInstance(class);
-
     quote! {
         <#ParentInstance as glib::wrapper::Wrapper>::GlibClassType
     }

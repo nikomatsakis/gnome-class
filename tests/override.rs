@@ -12,13 +12,18 @@ gobject_gen! {
     }
 
     impl One {
+        pub fn one(&self) -> u32 {
+            1
+        }
+
         virtual fn get(&self) -> u32 {
             1
         }
     }
-/*
+
     class Two: One {
     }
+/*
 
     impl One for Two {
         fn get(&self) -> u32 {
@@ -32,8 +37,11 @@ gobject_gen! {
 #[test]
 fn test() {
     let one = One::new();
-//    let two = Two::new();
+    let two = Two::new();
 
+    assert!(one.one() == 1);
     assert!(one.get() == 1);
+    assert!(two.one() == 1);
+    assert!(two.get() == 1);
 //    assert!(two.get() == 2);
 }
