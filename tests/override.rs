@@ -23,14 +23,12 @@ gobject_gen! {
 
     class Two: One {
     }
-/*
 
     impl One for Two {
-        fn get(&self) -> u32 {
+        virtual fn get(&self) -> u32 {
             2
         }
     }
-*/
 }
 
 
@@ -42,6 +40,5 @@ fn test() {
     assert!(one.one() == 1);
     assert!(one.get() == 1);
     assert!(two.one() == 1);
-    assert!(two.get() == 1);
-//    assert!(two.get() == 2);
+    assert!(two.get() == 2);
 }

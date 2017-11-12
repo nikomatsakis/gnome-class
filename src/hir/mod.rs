@@ -44,7 +44,7 @@ pub struct Class<'ast> {
 
     // pub properties: Vec<Property>,
 
-    // pub overrides: HashMap<Ident, Vec<Method<'ast>>>
+    pub overrides: HashMap<Ident, Vec<Method<'ast>>>
 }
 
 pub enum Slot<'ast> {
@@ -139,7 +139,8 @@ impl<'ast> Classes<'ast> {
                     ast::ClassItem::InstancePrivate(ref ip) => Some(&ip.path),
                 }
             }).next(),
-            slots: Vec::new()
+            slots: Vec::new(),
+            overrides: HashMap::new(),
         });
         if prev.is_some() {
             bail!("redefinition of class `{}`", ast_class.name);
@@ -152,12 +153,45 @@ impl<'ast> Classes<'ast> {
             Some(class) => class,
             None => bail!("impl for class that doesn't exist: {}", impl_.self_path),
         };
-        if impl_.trait_.is_some() {
-            // would want to attach destructors/such here
-            panic!("trait-like impls not implemented");
-        } else {
-            for item in impl_.items.iter() {
-                class.add_slot(item)?;
+        match impl_.trait_ {
+            Some(parent_class) => {
+                for item in impl_.items.iter() {
+                    let item = match item.node {
+                        ast::ImplItemKind::Method(ref m) => m,
+                        ast::ImplItemKind::ReserveSlots(_) => {
+                            bail!("can't reserve slots in a parent class impl");
+                        }
+                    };
+                    if item.signal {
+                        bail!("can't implement signals for parent classes")
+                    }
+                    if !item.virtual_ {
+                        bail!("can only implement virtual functions for parent classes")
+                    }
+                    if item.public {
+                        bail!("overrides are always public, no `pub` needed")
+                    }
+                    let method = match class.translate_method(item)? {
+                        Slot::VirtualMethod(VirtualMethod { sig, body: Some(body) }) => {
+                            Method { public: false, sig, body }
+                        }
+                        Slot::VirtualMethod(VirtualMethod { .. }) => {
+                            bail!("overrides must provide a body for virtual \
+                                   methods");
+                        }
+                        _ => unreachable!(),
+                    };
+                    class.overrides
+                        .entry(parent_class)
+                        .or_insert(Vec::new())
+                        .push(method);
+                }
+            }
+            None => {
+                for item in impl_.items.iter() {
+                    let slot = class.translate_slot(item)?;
+                    class.slots.push(slot);
+                }
             }
         }
 
@@ -170,17 +204,19 @@ impl<'ast> Classes<'ast> {
 }
 
 impl<'ast> Class<'ast> {
-    fn add_slot(&mut self, item: &'ast ast::ImplItem) -> Result<()> {
+    fn translate_slot(&mut self, item: &'ast ast::ImplItem) -> Result<Slot<'ast>> {
         assert_eq!(item.attrs.len(), 0); // attributes unimplemented
         match item.node {
-            ast::ImplItemKind::Method(ref method) => self.add_method(method),
+            ast::ImplItemKind::Method(ref method) => self.translate_method(method),
             ast::ImplItemKind::ReserveSlots(ref _slots) => {
                 panic!("reserve slots not implemented");
             }
         }
     }
 
-    fn add_method(&mut self, method: &'ast ast::ImplItemMethod) -> Result<()> {
+    fn translate_method(&mut self, method: &'ast ast::ImplItemMethod)
+        -> Result<Slot<'ast>>
+    {
         if method.signal {
             panic!("signals not implemented");
         }
@@ -190,21 +226,20 @@ impl<'ast> Class<'ast> {
                       method.name)
             }
             let sig = self.extract_sig(method)?;
-            self.slots.push(Slot::VirtualMethod(VirtualMethod {
+            Ok(Slot::VirtualMethod(VirtualMethod {
                 sig,
                 body: method.body.as_ref(),
-            }));
+            }))
         } else {
             let sig = self.extract_sig(method)?;
-            self.slots.push(Slot::Method(Method {
+            Ok(Slot::Method(Method {
                 sig,
                 public: method.public,
                 body: method.body.as_ref().ok_or_else(|| {
                     format!("function `{}` requires a body", method.name)
                 })?,
-            }));
+            }))
         }
-        Ok(())
     }
 
     fn extract_sig(&mut self, method: &'ast ast::ImplItemMethod) -> Result<FnSig<'ast>> {

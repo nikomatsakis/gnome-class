@@ -1,3 +1,5 @@
+use syn::Block;
+
 use super::*;
 
 impl<'ast> ClassContext<'ast> {
@@ -35,27 +37,25 @@ impl<'ast> ClassContext<'ast> {
     }
 
     pub fn imp_slot_default_handlers(&self) -> Vec<Tokens> {
-        self.class
+        let method = |sig: &FnSig, body: &Block, name: Option<Ident>| {
+            let name = name.unwrap_or(Self::slot_impl_name(&sig.name));
+            let inputs = &sig.inputs;
+            let output = &sig.output;
+            quote! {
+                fn #name(#(#inputs),*) -> #output #body
+            }
+        };
+        let mut ret = self.class
             .slots
             .iter()
             .map(|slot| {
                 match *slot {
                     Slot::Method(Method { public: false, ref sig, body }) => {
-                        let name = sig.name;
-                        let inputs = &sig.inputs;
-                        let output = &sig.output;
-                        quote! {
-                            fn #name(#(#inputs),*) -> #output #body
-                        }
+                        method(sig, body, Some(sig.name))
                     },
                     Slot::Method(Method { ref sig, body, .. }) |
                     Slot::VirtualMethod(VirtualMethod { ref sig, body: Some(body), .. }) => {
-                        let name = Self::slot_impl_name(&sig.name);
-                        let inputs = &sig.inputs;
-                        let output = &sig.output;
-                        quote! {
-                            fn #name(#(#inputs),*) -> #output #body
-                        }
+                        method(sig, body, None)
                     },
 
                     Slot::VirtualMethod(VirtualMethod { ref sig, body: None, .. }) => {
@@ -72,14 +72,54 @@ impl<'ast> ClassContext<'ast> {
                     Slot::Signal(_) => panic!("signals not implemented"),
                 }
             })
-            .collect()
+            .collect::<Vec<_>>();
+
+        ret.extend(self.class
+            .overrides
+            .values()
+            .flat_map(|m| m.iter())
+            .map(|m| {
+                method(&m.sig, m.body, None)
+            }));
+
+        return ret
     }
 
     pub fn instance_method_trampolines(&self) -> Vec<Tokens> {
         let callback_guard = glib_callback_guard();
         let InstanceName = self.InstanceName;
         let InstanceNameFfi = self.InstanceNameFfi;
-        self.class
+        let tokens = |sig: &FnSig, parent_class: Option<Ident>| {
+            let trampoline_name = Self::slot_trampoline_name(&sig.name);
+            let method_impl_name = Self::slot_impl_name(&sig.name);
+            let inputs = sig.input_args_with_glib_types();
+            let arg_names = sig.input_args_from_glib_types();
+
+            let ret = quote! { instance.#method_impl_name(#arg_names) };
+            let ret = sig.ret_to_glib(ret);
+            let output = sig.output_glib_type();
+            let receiver_instance = match parent_class {
+                Some(parent) => {
+                    quote! { <#parent as glib::wrapper::Wrapper>::GlibType }
+                }
+                None => quote! { #InstanceNameFfi },
+            };
+            quote! {
+                unsafe extern "C" fn #trampoline_name(
+                    this: *mut #receiver_instance,
+                    #inputs
+                )
+                    -> #output
+                {
+                    #callback_guard
+
+                    let this = this as *mut #InstanceNameFfi;
+                    let instance: &super::#InstanceName = &from_glib_borrow(this);
+                    #ret
+                }
+            }
+        };
+        let mut ret = self.class
             .slots
             .iter()
             .filter_map(|slot| {
@@ -87,31 +127,24 @@ impl<'ast> ClassContext<'ast> {
                     Slot::Method(_) => None,
 
                     Slot::VirtualMethod(VirtualMethod { ref sig, .. }) => {
-                        let trampoline_name = Self::slot_trampoline_name(&sig.name);
-                        let method_impl_name = Self::slot_impl_name(&sig.name);
-                        let inputs = sig.input_args_with_glib_types();
-                        let arg_names = sig.input_args_from_glib_types();
-
-                        let ret = quote! { instance.#method_impl_name(#arg_names) };
-                        let ret = sig.ret_to_glib(ret);
-                        let output = sig.output_glib_type();
-                        Some (quote! {
-                            unsafe extern "C" fn #trampoline_name(this: *mut #InstanceNameFfi,
-                                                                  #inputs)
-                                -> #output
-                            {
-                                #callback_guard
-
-                                let instance: &super::#InstanceName = &from_glib_borrow(this);
-                                #ret
-                            }
-                        })
+                        Some(tokens(sig, None))
                     },
 
                     Slot::Signal(_) => panic!("signals not implemented"),
                 }
             })
-            .collect()
+            .collect::<Vec<_>>();
+
+        ret.extend(self.class
+            .overrides
+            .iter()
+            .flat_map(|(&p, methods)| methods.iter().map(move |m| (p, m)))
+            .map(|(parent_class, method)| {
+                // TODO: does the name here need mangling with the parent class?
+                tokens(&method.sig, Some(parent_class))
+            }));
+
+        return ret
     }
 
     pub fn instance_signal_trampolines(&self) -> Vec<Tokens> {
@@ -199,7 +232,7 @@ impl<'ast> ClassContext<'ast> {
 
     pub fn slot_assignments(&self) -> Vec<Tokens> {
         let InstanceNameFfi = &self.InstanceNameFfi;
-        self.class
+        let mut ret = self.class
             .slots
             .iter()
             .filter_map(|slot| {
@@ -218,7 +251,24 @@ impl<'ast> ClassContext<'ast> {
                     Slot::Signal(_) => panic!("signals not implemented"),
                 }
             })
-            .collect()
+            .collect::<Vec<_>>();
+
+        for (parent_class, methods) in self.class.overrides.iter() {
+            for method in methods.iter() {
+                let name = method.sig.name;
+                let trampoline_name = Self::slot_trampoline_name(&method.sig.name);
+
+                ret.push(quote! {
+                    (
+                        *(klass as *mut _ as *mut <
+                           #parent_class as glib::wrapper::Wrapper
+                        >::GlibClassType)
+                    ).#name = Some(#InstanceNameFfi::#trampoline_name);
+                });
+            }
+        }
+
+        return ret
     }
 
     pub fn imp_new_fn_name(&self) -> Ident {
