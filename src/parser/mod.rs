@@ -190,12 +190,21 @@ fn keyword<'a>(name: &'static str) -> impl Fn(Cursor<'a>) -> PResult<()> {
     }
 }
 
-#[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
     use quote;
     use quote::ToTokens;
     use syn::{parse_str};
+
+    pub fn run() {
+        parses_class_with_no_superclass();
+        parses_class_with_superclass();
+        parses_instance_private_item();
+        parses_class_item();
+        parses_program();
+        parses_plain_impl_item();
+        parses_impl_item_with_trait();
+    }
 
     fn assert_tokens_equal<T: ToTokens>(x: &T, s: &str) {
         let mut tokens = quote::Tokens::new();
@@ -203,7 +212,6 @@ mod tests {
         assert_eq!(tokens.to_string(), s);
     }
 
-    #[test]
     fn parses_class_with_no_superclass() {
         let raw = "class Foo {}";
         let class = parse_str::<ast::Class>(raw).unwrap();
@@ -212,7 +220,6 @@ mod tests {
         assert!(class.extends.is_none());
     }
 
-    #[test]
     fn parses_class_with_superclass() {
         let raw = "class Foo: Bar {}";
         let class = parse_str::<ast::Class>(raw).unwrap();
@@ -221,7 +228,6 @@ mod tests {
         assert_tokens_equal(&class.extends, "Bar");
     }
 
-    #[test]
     fn parses_instance_private_item() {
         let raw = "type InstancePrivate = FooPrivate;";
         let item = parse_str::<ast::ClassItem>(raw).unwrap();
@@ -233,7 +239,6 @@ mod tests {
         }
     }
 
-    #[test]
     fn parses_class_item() {
         let raw = "class Foo {}";
         let item = parse_str::<ast::Item>(raw).unwrap();
@@ -246,7 +251,6 @@ mod tests {
         }
     }
 
-    #[test]
     fn parses_program() {
         let raw = "class Foo {
                        type InstancePrivate = FooPrivate;
@@ -273,12 +277,10 @@ mod tests {
         }
     }
 
-    #[test]
     fn parses_plain_impl_item() {
         test_parsing_impl_item("impl Foo {}", None, "Foo");
     }
 
-    #[test]
     fn parses_impl_item_with_trait() {
         test_parsing_impl_item("impl Foo for Bar {}", Some("Foo"), "Bar");
     }

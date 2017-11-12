@@ -116,7 +116,9 @@ impl<'ast> ClassContext<'ast> {
     }
 
     fn exported_fn_name(&self, method_name: &str) -> Ident {
-        Ident::from(format!("{}_{}", lower_case_instance_name(self.InstanceName.as_ref()), method_name))
+        let mut i = Ident::from(format!("{}_{}", lower_case_instance_name(self.InstanceName.as_ref()), method_name));
+        i.span.0 = Span::call_site();
+        return i
     }
 
     fn instance_get_type_fn_name(&self) -> Ident {

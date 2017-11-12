@@ -187,3 +187,12 @@ pub fn gobject_gen(input: TokenStream) -> TokenStream {
         }
     }
 }
+
+#[proc_macro]
+pub fn testme(input: TokenStream) -> TokenStream {
+    checking::tests::run();
+    glib_utils::tests::run();
+    hir::tests::run();
+    parser::tests::run();
+    return input
+}

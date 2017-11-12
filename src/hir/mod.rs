@@ -390,9 +390,13 @@ impl<'a> ToTokens for Ty<'a> {
     }
 }
 
-#[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
+
+    pub fn run() {
+        creates_trivial_class();
+        creates_class_with_superclass();
+    }
 
     fn test_class_and_superclass (raw: &str, class_name: &str, superclass_name: &str) {
         let token_stream = raw.parse::<TokenStream>().unwrap();
@@ -409,14 +413,12 @@ mod tests {
         assert_eq!(class.parent.to_string(), superclass_name);
     }
 
-    #[test]
     fn creates_trivial_class() {
         let raw = "class Foo {}";
 
         test_class_and_superclass(raw, "Foo", "glib :: Object");
     }
 
-    #[test]
     fn creates_class_with_superclass() {
         let raw = "class Foo: Bar {}";
 

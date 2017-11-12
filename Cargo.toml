@@ -6,6 +6,7 @@ authors = ["Niko Matsakis <niko@alum.mit.edu>"]
 
 [lib]
 proc-macro = true
+test = false
 
 # Add a dependency on the regex crate; this is not
 # needed if you are writing your own tokenizer by

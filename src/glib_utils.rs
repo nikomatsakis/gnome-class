@@ -52,11 +52,13 @@ pub fn lower_case_instance_name(instance_name: &str) -> String {
     first_char.to_lowercase().chain(name_chars).collect()
 }
 
-#[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
 
-    #[test]
+    pub fn run() {
+        lower_cases_simple_names();
+    }
+
     fn lower_cases_simple_names() {
         assert_eq!("foo", lower_case_instance_name("Foo"));
     }

@@ -36,15 +36,19 @@ fn check_private_struct(class: &Class) -> Result<()> {
     Ok(())
 }
 
-#[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
     use proc_macro2::{TokenStream};
     use synom::{Synom, SynomBuffer};
 
     use ast;
 
-    #[test]
+    pub fn run() {
+        checks_empty_class();
+        checks_class_with_instance_private();
+        catches_several_instance_private_items();
+    }
+
     fn checks_empty_class() {
         let raw = "class Foo {}";
 
@@ -58,7 +62,6 @@ mod tests {
         assert!(check_program(&program).is_ok());
     }
 
-    #[test]
     fn checks_class_with_instance_private() {
         let raw = "class Foo {
                        type InstancePrivate = FooPrivate;
@@ -74,7 +77,6 @@ mod tests {
         assert!(check_program(&program).is_ok());
     }
 
-    #[test]
     fn catches_several_instance_private_items() {
         let raw = "class Foo {
                        type InstancePrivate = FooPriv;
