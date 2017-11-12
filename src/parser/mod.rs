@@ -154,7 +154,7 @@ impl Synom for ast::ImplItemMethod {
         call!(keyword("fn")) >>
         name: syn!(syn::Ident) >>
         inputs: parens!(call!(Delimited::<_, tokens::Comma>::parse_terminated)) >>
-        output: syn!(syn::FunctionRetTy) >>
+        output: syn!(syn::ReturnType) >>
         body: alt!(
             syn!(syn::Block) => { Some }
             |

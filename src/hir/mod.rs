@@ -9,8 +9,9 @@
 use std::collections::HashMap;
 
 use proc_macro2::{TokenStream};
-use quote::{Tokens};
-use syn::{Ident, Path, Block, FnArg, FunctionRetTy};
+use quote::{Tokens, ToTokens};
+use syn::{self, Ident, Path, Block, ReturnType};
+use syn::tokens;
 use synom::{Synom, SynomBuffer};
 
 use super::ast;
@@ -54,21 +55,41 @@ pub enum Slot<'ast> {
 
 pub struct Method<'ast> {
     pub public: bool,
-    pub name: Ident,
-    pub inputs: &'ast [FnArg],
-    pub output: &'ast FunctionRetTy,
+    pub sig: FnSig<'ast>,
     pub body: &'ast Block,
 }
 
 pub struct VirtualMethod<'ast> {
-    pub name: Ident,
-    pub inputs: &'ast [FnArg],
-    pub output: &'ast FunctionRetTy,
+    pub sig: FnSig<'ast>,
     pub body: Option<&'ast Block>,
+}
+
+pub struct FnSig<'ast> {
+    pub name: Ident,
+    pub inputs: Vec<FnArg<'ast>>,
+    pub output: Ty<'ast>,
+}
+
+pub enum FnArg<'ast> {
+    SelfRef(tokens::And, tokens::Self_),
+    Arg {
+        mutbl: syn::Mutability,
+        name: Ident,
+        ty: Ty<'ast>,
+    }
 }
 
 pub struct Signal {
     // FIXME: signal flags
+}
+
+pub enum Ty<'ast> {
+    Unit,
+    Char(Ident),
+    Bool(Ident),
+    Borrowed(Box<Ty<'ast>>),
+    Integer(Ident),
+    Owned(&'ast syn::Path),
 }
 
 impl<'ast> Program<'ast> {
@@ -168,17 +189,15 @@ impl<'ast> Class<'ast> {
                 bail!("function `{}` is virtual so it doesn't need to be public",
                       method.name)
             }
+            let sig = self.extract_sig(method)?;
             self.slots.push(Slot::VirtualMethod(VirtualMethod {
-                name: method.name,
-                inputs: &method.inputs,
-                output: &method.output,
+                sig,
                 body: method.body.as_ref(),
             }));
         } else {
+            let sig = self.extract_sig(method)?;
             self.slots.push(Slot::Method(Method {
-                name: method.name,
-                inputs: &method.inputs,
-                output: &method.output,
+                sig,
                 public: method.public,
                 body: method.body.as_ref().ok_or_else(|| {
                     format!("function `{}` requires a body", method.name)
@@ -186,6 +205,147 @@ impl<'ast> Class<'ast> {
             }));
         }
         Ok(())
+    }
+
+    fn extract_sig(&mut self, method: &'ast ast::ImplItemMethod) -> Result<FnSig<'ast>> {
+        Ok(FnSig {
+            output: self.extract_output(&method.output)?,
+            inputs: self.extract_inputs(&method.inputs)?,
+            name: method.name,
+        })
+    }
+
+    fn extract_output(&mut self, output: &'ast ReturnType) -> Result<Ty<'ast>> {
+        match *output {
+            ReturnType::Ty(ref t, _) => self.extract_ty(t),
+            ReturnType::Default => Ok(Ty::Unit),
+        }
+    }
+
+    fn extract_inputs(&mut self, t: &'ast [syn::FnArg]) -> Result<Vec<FnArg<'ast>>> {
+        t.iter().map(|arg| {
+            match *arg {
+                syn::FnArg::Captured(syn::ArgCaptured { ref pat, ref ty, .. }) => {
+                    let (name, mutbl) = match *pat {
+                        syn::Pat::Ident(syn::PatIdent {
+                            mode: syn::BindingMode::ByValue(m),
+                            ident,
+                            subpat: None,
+                            at_token: None,
+                        }) => {
+                            (ident, m)
+                        }
+                        _ => bail!("only bare identifiers are allowed as \
+                                    argument patterns"),
+                    };
+
+                    Ok(FnArg::Arg {
+                        mutbl,
+                        name,
+                        ty: self.extract_ty(ty)?,
+                    })
+                }
+                syn::FnArg::SelfRef(syn::ArgSelfRef {
+                    mutbl: syn::Mutability::Immutable,
+                    lifetime: None,
+                    self_token,
+                    and_token,
+                }) => {
+                    Ok(FnArg::SelfRef(and_token, self_token))
+                }
+                syn::FnArg::SelfRef(syn::ArgSelfRef {
+                    mutbl: syn::Mutability::Mutable(_),
+                    ..
+                }) => {
+                    bail!("&mut self not implemented yet")
+                }
+                syn::FnArg::SelfRef(syn::ArgSelfRef {
+                    lifetime: Some(..),
+                    ..
+                }) => {
+                    bail!("lifetime arguments on self not implemented yet")
+                }
+                syn::FnArg::SelfValue(_) => bail!("by-value self not implemented"),
+                syn::FnArg::Ignored(_) => bail!("cannot have ignored function arguments"),
+            }
+        }).collect()
+    }
+
+    fn extract_ty(&mut self, t: &'ast syn::Ty) -> Result<Ty<'ast>> {
+        match *t {
+            syn::Ty::Slice(_) => bail!("slice types not implemented yet"),
+            syn::Ty::Array(_) => bail!("array types not implemented yet"),
+            syn::Ty::Ptr(_) => bail!("ptr types not implemented yet"),
+            syn::Ty::Rptr(syn::TyRptr { lifetime: Some(_), .. }) => {
+                bail!("borrowed types with lifetimes not implemented yet")
+            }
+            syn::Ty::Rptr(syn::TyRptr { lifetime: None, ref ty, .. }) => {
+                if let syn::Mutability::Mutable(_) = ty.mutability {
+                    bail!("mutable borrowed pointers not implemented");
+                }
+                let path = match ty.ty {
+                    syn::Ty::Path(syn::TyPath { qself: None, ref path }) => path,
+                    _ => bail!("only borrowed pointers to paths supported"),
+                };
+                let ty = self.extract_ty_path(path)?;
+                Ok(Ty::Borrowed(Box::new(ty)))
+            }
+            syn::Ty::BareFn(_) => bail!("function pointer types not implemented yet"),
+            syn::Ty::Never(_) => bail!("never not implemented yet"),
+            syn::Ty::Tup(syn::TyTup { ref tys, .. }) => {
+                if tys.len() == 0 {
+                    Ok(Ty::Unit)
+                } else {
+                    bail!("tuple types not implemented yet")
+                }
+            }
+            syn::Ty::Path(syn::TyPath { qself: Some(_), .. }) => {
+                bail!("path types with qualified self (`as` syntax) not allowed")
+            }
+            syn::Ty::Path(syn::TyPath { qself: None, ref path }) => {
+                self.extract_ty_path(path)
+            }
+            syn::Ty::TraitObject(_) => bail!("trait objects not implemented yet"),
+            syn::Ty::ImplTrait(_) => bail!("trait objects not implemented yet"),
+            syn::Ty::Paren(syn::TyParen { ref ty, .. }) => self.extract_ty(ty),
+            syn::Ty::Group(syn::TyGroup { ref ty, .. }) => self.extract_ty(ty),
+            syn::Ty::Infer(_) => bail!("underscore types not allowed"),
+            syn::Ty::Macro(_) => bail!("type macros not allowed"),
+        }
+    }
+
+    fn extract_ty_path(&mut self, t: &'ast syn::Path) -> Result<Ty<'ast>> {
+        if t.segments.items().any(|i| {
+            match i.parameters {
+                syn::PathParameters::None => false,
+                _ => true,
+            }
+        }) {
+            bail!("type or lifetime parameters not allowed")
+        }
+        if t.leading_colon.is_some() || t.segments.len() > 1 {
+            return Ok(Ty::Owned(t))
+        }
+
+        let ident = t.segments.get(0).item().ident;
+
+        match ident.as_ref() {
+            "char" => Ok(Ty::Char(ident)),
+            "bool" => Ok(Ty::Bool(ident)),
+            "i8" |
+            "i16" |
+            "i32" |
+            "i64" |
+            "isize" |
+            "u8" |
+            "u16" |
+            "u32" |
+            "u64" |
+            "usize" => {
+                Ok(Ty::Integer(ident))
+            }
+            _other => Ok(Ty::Owned(t)),
+        }
     }
 }
 
@@ -195,6 +355,39 @@ fn make_path_glib_object() -> Path {
     let buffer = SynomBuffer::new(token_stream);
     let cursor = buffer.begin();
     Path::parse(cursor).unwrap().1
+}
+
+impl<'a> ToTokens for FnArg<'a> {
+    fn to_tokens(&self, tokens: &mut Tokens) {
+        match *self {
+            FnArg::SelfRef(and, self_) => {
+                and.to_tokens(tokens);
+                self_.to_tokens(tokens);
+            }
+            FnArg::Arg { name, ref ty, mutbl } => {
+                mutbl.to_tokens(tokens);
+                name.to_tokens(tokens);
+                tokens::Colon::default().to_tokens(tokens);
+                ty.to_tokens(tokens);
+            }
+        }
+    }
+}
+
+impl<'a> ToTokens for Ty<'a> {
+    fn to_tokens(&self, tokens: &mut Tokens) {
+        match *self {
+            Ty::Unit => tokens.append_delimited("(", Default::default(), |_| ()),
+            Ty::Char(tok) => tok.to_tokens(tokens),
+            Ty::Bool(tok) => tok.to_tokens(tokens),
+            Ty::Integer(t) => t.to_tokens(tokens),
+            Ty::Borrowed(ref t) => {
+                tokens::And::default().to_tokens(tokens);
+                t.to_tokens(tokens)
+            }
+            Ty::Owned(t) => t.to_tokens(tokens),
+        }
+    }
 }
 
 #[cfg(test)]

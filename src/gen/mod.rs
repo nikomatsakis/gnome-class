@@ -2,7 +2,7 @@
 #![allow(non_snake_case)]
 
 use quote::{Tokens, ToTokens};
-use syn::{Ident, Path, FnArg};
+use syn::{Ident, Path};
 use syn::tokens;
 
 use hir::*;
@@ -39,6 +39,7 @@ struct ClassContext<'ast> {
     instance_private: Option<&'ast Path>,
     ModuleName: Ident,
     InstanceName: &'ast Ident,
+    InstanceNameFfi: Ident,
     ClassName: Ident,
     PrivateClassName: Ident,
     ParentInstance: &'ast ToTokens,
@@ -68,6 +69,7 @@ impl<'ast> ClassContext<'ast> {
             };
         }
 
+        let InstanceNameFfi  = container_name!("Ffi");
         let ModuleName       = container_name!("Mod"); // toplevel "InstanceMod" module name
         let ClassName        = container_name!("Class");
         let PrivateClassName = container_name!("ClassPrivate");
@@ -96,6 +98,7 @@ impl<'ast> ClassContext<'ast> {
             GObjectFfi,
             GObjectClassFfi,
             InstanceExt,
+            InstanceNameFfi,
         }
     }
 
@@ -112,198 +115,175 @@ impl<'ast> ClassContext<'ast> {
     }
 }
 
-/*
-use quote::{ToTokens};
+impl<'ast> FnSig<'ast> {
+    fn output_glib_type<'a>(&'a self) -> impl ToTokens + 'a {
+        ToGlibType(&self.output, self)
+    }
 
+    fn input_args_with_glib_types<'a>(&'a self) -> impl ToTokens + 'a {
+        FnArgsWithGlibTypes(self)
+    }
 
-macro_rules! quote_in {
-    ($tokens:expr, $($t:tt)*) => {
-        $tokens.append_all(Some(quote!{$($t)*}));
+    fn input_args_from_glib_types<'a>(&'a self) -> impl ToTokens + 'a {
+        ArgNamesFromGlib(&self.inputs[1..])
+    }
+
+    fn input_args_to_glib_types<'a>(&'a self) -> impl ToTokens + 'a {
+        ArgNamesToGlib(&self.inputs[1..])
+    }
+
+    fn input_arg_names<'a>(&'a self) -> impl ToTokens + 'a {
+        ArgNames(&self.inputs[1..])
+    }
+
+    fn ret_to_glib<'a, T: ToTokens + 'a>(&'a self, tokens: T) -> impl ToTokens + 'a {
+        ToGlib(&self.output, tokens)
+    }
+
+    fn ret_from_glib_fn<'a>(&'a self) -> impl ToTokens + 'a {
+        FromGlib(&self.output)
     }
 }
 
-impl ToTokens for VarTy {
-    fn to_tokens(&self, tokens: &mut Tokens) {
-        let &VarTy { name, ref ty } = self;
-        quote_in!(tokens, #name: #ty)
-    }
-}
+struct ToGlibType<'ast>(&'ast Ty<'ast>, &'ast FnSig<'ast>);
 
-impl ToTokens for Type {
+impl<'ast> ToTokens for ToGlibType<'ast> {
     fn to_tokens(&self, tokens: &mut Tokens) {
-        match *self {
-            Type::Path(ref path) => {
-                path.ty().to_tokens(tokens)
+        match *self.0 {
+            Ty::Unit => self.0.to_tokens(tokens),
+            Ty::Char(i) |
+            Ty::Bool(i) => {
+                (quote! {
+                    <#i as ToGlib>::GlibType
+                }).to_tokens(tokens);
             }
-            Type::Array(ref ty) => {
-                quote_in!(tokens, [ #ty ]);
+            Ty::Borrowed(ref t) => {
+                (quote! {
+                    <#t as GlibPtrDefault>::GlibType
+                }).to_tokens(tokens);
             }
-            Type::Sum(ref tys) => {
-                quote_in!(tokens, #(#tys)+*);
-            }
+            Ty::Integer(i) => i.to_tokens(tokens),
+            Ty::Owned(_) => panic!("unimplemented glib type for owned types"),
         }
     }
 }
 
-impl ToTokens for CodeBlock {
+struct ToGlib<'ast, T>(&'ast Ty<'ast>, T);
+
+impl<'ast, T: ToTokens> ToTokens for ToGlib<'ast, T> {
     fn to_tokens(&self, tokens: &mut Tokens) {
-        self.tokens.to_tokens(tokens)
-    }
-}
+        let expr = &self.1;
+        match *self.0 {
+            // no conversion necessary
+            Ty::Unit |
+            Ty::Integer(_) => self.1.to_tokens(tokens),
 
-struct SlotTy<'ast> {
-    class_name: Ident,
-    sig: &'ast FnSig,
-}
-
-impl<'ast> ToTokens for SlotTy<'ast> {
-    fn to_tokens(&self, tokens: &mut Tokens) {
-        let class_name = self.class_name;
-        let arg_decls = self.sig.arg_decls();
-        let return_ty = self.sig.return_ty();
-
-        quote_in! {
-            tokens,
-            (this: *mut #class_name, #arg_decls) #return_ty
+            Ty::Char(i) |
+            Ty::Bool(i) => {
+                (quote! {
+                    <#i as ToGlib>::to_glib(&#expr)
+                }).to_tokens(tokens);
+            }
+            Ty::Borrowed(ref t) => {
+                (quote! {
+                    <#t as ToGlibPtr<_>>::to_glib_none(#expr).0
+                }).to_tokens(tokens);
+            }
+            Ty::Owned(_) => panic!("unimplemented to glib type for owned types"),
         }
     }
 }
 
-struct SlotImplTy<'ast> {
-    sig:  &'ast FnSig,
-}
+struct FromGlib<'ast>(&'ast Ty<'ast>);
 
-impl<'ast> ToTokens for SlotImplTy<'ast> {
+impl<'ast> ToTokens for FromGlib<'ast> {
     fn to_tokens(&self, tokens: &mut Tokens) {
-        let arg_decls = self.sig.arg_decls();
-        let return_ty = self.sig.return_ty();
-
-        quote_in! {
-            tokens,
-            (&self, #arg_decls) #return_ty
+        match *self.0 {
+            Ty::Unit => {} // no conversion necessary
+            Ty::Char(i) |
+            Ty::Bool(i) => {
+                (quote! {
+                    <#i as FromGlib<_>>::from_glib
+                }).to_tokens(tokens);
+            }
+            Ty::Borrowed(ref t) => {
+                (quote! {
+                    &<#t as FromGlibPtrBorrow<_>>::from_glib_borrow
+                }).to_tokens(tokens);
+            }
+            Ty::Integer(_) => {} // no conversion necessary
+            Ty::Owned(_) => panic!("unimplemented from glib on owned types"),
         }
     }
 }
-*/
 
+struct FnArgsWithGlibTypes<'ast>(&'ast FnSig<'ast>);
 
-// /// Helper methods for printing out various bits of
-// /// a method signature. For each of the comments below,
-// /// assume an example method `fn get(&self, x: u32, y: u32) -> u32`.
-// impl FnSig {
-//     /// Generates `x: u32, y: u32`
-//     fn arg_decls<'ast>(&'ast self) -> ArgDecls<'ast> {
-//         ArgDecls { sig: self }
-//     }
-//
-//     /// Generates `x, y`
-//     fn arg_names<'ast>(&'ast self) -> ArgNames<'ast> {
-//         ArgNames { sig: self }
-//     }
-//
-//     /// Generates `-> u32` (or `` if unit)
-//     fn return_ty<'ast>(&'ast self) -> ReturnTy<'ast> {
-//         ReturnTy { sig: self }
-//     }
-// }
+impl<'ast> ToTokens for FnArgsWithGlibTypes<'ast> {
+    fn to_tokens(&self, tokens: &mut Tokens) {
+        for arg in self.0.inputs[1..].iter() {
+            match *arg {
+                FnArg::Arg { name, ref ty, mutbl: _ } => {
+                    name.to_tokens(tokens);
+                    tokens::Colon::default().to_tokens(tokens);
+                    ToGlibType(ty, self.0).to_tokens(tokens);
+                }
+                FnArg::SelfRef(..) => unreachable!(),
+            }
 
-// struct ArgDecls<'ast>(&'ast [FnArg]);
-//
-// impl<'ast> ToTokens for ArgDecls<'ast> {
-//     fn to_tokens(&self, tokens: &mut Tokens) {
-//         // let args = &self.sig.args;
-//         // quote_in!(tokens, #(#args),*);
-//     }
-// }
+        }
+    }
+}
 
-struct ArgNames<'ast>(&'ast [FnArg]);
+struct ArgNamesFromGlib<'ast>(&'ast [FnArg<'ast>]);
+
+impl<'ast> ToTokens for ArgNamesFromGlib<'ast> {
+    fn to_tokens(&self, tokens: &mut Tokens) {
+        for arg in self.0 {
+            match *arg {
+                FnArg::Arg { name, ref ty, mutbl: _ } => {
+                    FromGlib(ty).to_tokens(tokens);
+                    tokens.append_delimited("(", Default::default(), |tokens| {
+                        name.to_tokens(tokens);
+                    });
+                    tokens::Comma::default().to_tokens(tokens);
+                }
+                FnArg::SelfRef(..) => unreachable!(),
+            }
+
+        }
+    }
+}
+
+struct ArgNamesToGlib<'ast>(&'ast [FnArg<'ast>]);
+
+impl<'ast> ToTokens for ArgNamesToGlib<'ast> {
+    fn to_tokens(&self, tokens: &mut Tokens) {
+        for arg in self.0 {
+            match *arg {
+                FnArg::Arg { ref ty, name, mutbl: _ } => {
+                    ToGlib(ty, name).to_tokens(tokens);
+                    tokens::Comma::default().to_tokens(tokens);
+                }
+                FnArg::SelfRef(..) => unreachable!(),
+            }
+
+        }
+    }
+}
+
+struct ArgNames<'ast>(&'ast [FnArg<'ast>]);
 
 impl<'ast> ToTokens for ArgNames<'ast> {
     fn to_tokens(&self, tokens: &mut Tokens) {
         for arg in self.0 {
             match *arg {
-                FnArg::Captured(ref c) => {
-                    c.pat.to_tokens(tokens);
+                FnArg::Arg { name, .. } => {
+                    name.to_tokens(tokens);
                     tokens::Comma::default().to_tokens(tokens);
                 }
-                _ => panic!("bad"),
-            }
-
-        }
-        // let args = self.sig.args.iter().map(|arg| arg.name);
-        // quote_in!(tokens, #(#args),*);
-    }
-}
-
-// struct ReturnTy<'ast>(&'ast FunctionRetTy);
-//
-// impl<'ast> ToTokens for ReturnTy<'ast> {
-//     fn to_tokens(&self, tokens: &mut Tokens) {
-//         // if let Some(ref return_ty) = self.sig.return_ty {
-//         //     quote_in!(tokens, -> #return_ty)
-//         // }
-//     }
-// }
-/*
-
-impl Path {
-    fn ty<'a>(&'a self) -> SepPath<'a> {
-        SepPath { cc: false, path: self }
-    }
-
-    fn exprty<'a>(&'a self) -> SepPath<'a> {
-        SepPath { cc: true, path: self }
-    }
-}
-
-struct SepPath<'a> {
-    cc: bool,
-    path: &'a Path,
-}
-
-impl<'a> ToTokens for SepPath<'a> {
-    fn to_tokens(&self, tokens: &mut Tokens) {
-        match *self.path {
-            Path::FromRoot => tokens.append("::"),
-            Path::FromSelf => tokens.append("self"),
-            Path::FromSuper => tokens.append("super"),
-            Path::FromTraitItem(ref i) => i.to_tokens(tokens),
-            Path::From(ref i) => {
-                let i = SepPathId { cc: self.cc, path_id: i};
-                i.to_tokens(tokens)
-            }
-            Path::Extend(ref b, ref i) => {
-                let b = SepPath { cc: self.cc, path: b };
-                let i = SepPathId { cc: self.cc, path_id: i };
-                quote_in!(tokens, #b :: #i)
+                FnArg::SelfRef(..) => unreachable!(),
             }
         }
     }
 }
-
-struct SepPathId<'a> {
-    cc: bool,
-    path_id: &'a PathId,
-}
-
-impl<'a> ToTokens for SepPathId<'a> {
-    fn to_tokens(&self, tokens: &mut Tokens) {
-        self.path_id.name.to_tokens(tokens);
-        let tys = &self.path_id.tys;
-        if !tys.is_empty() {
-            if self.cc {
-                tokens.append("::");
-            }
-            quote_in!(tokens, <#(#tys),*>);
-        }
-    }
-}
-
-impl ToTokens for TraitItemId {
-    fn to_tokens(&self, tokens: &mut Tokens) {
-        let &TraitItemId { ref self_ty, ref trait_ref, item } = self;
-        let trait_ref = trait_ref.ty();
-        quote_in!(tokens, < #self_ty as #trait_ref > :: #item);
-    }
-}
-*/

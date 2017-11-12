@@ -14,14 +14,16 @@ impl<'ast> ClassContext<'ast> {
                 match *slot {
                     Slot::Method(_) => None,
 
-                    Slot::VirtualMethod(VirtualMethod { name, inputs, output, .. }) => {
-                        let inputs = &inputs[1..];
-                        let InstanceName = &self.InstanceName;
+                    Slot::VirtualMethod(VirtualMethod { ref sig, .. }) => {
+                        let InstanceNameFfi = &self.InstanceNameFfi;
+                        let output = sig.output_glib_type();
+                        let inputs = sig.input_args_with_glib_types();
+                        let name = sig.name;
                         Some(quote! {
                             pub #name: Option<unsafe extern "C" fn(
-                                this: *mut #InstanceName,
-                                #(#inputs),*
-                            ) #output>,
+                                this: *mut #InstanceNameFfi,
+                                #inputs
+                            ) -> #output>,
 
                         })
                     }
@@ -38,23 +40,30 @@ impl<'ast> ClassContext<'ast> {
             .iter()
             .map(|slot| {
                 match *slot {
-                    Slot::Method(Method { public: false, name, inputs, output, body }) => {
+                    Slot::Method(Method { public: false, ref sig, body }) => {
+                        let name = sig.name;
+                        let inputs = &sig.inputs;
+                        let output = &sig.output;
                         quote! {
-                            fn #name(#(#inputs),*) #output #body
+                            fn #name(#(#inputs),*) -> #output #body
                         }
                     },
-                    Slot::Method(Method { name, inputs, output, body, .. }) |
-                    Slot::VirtualMethod(VirtualMethod { name, inputs, output, body: Some(body), .. }) => {
-                        let name = Self::slot_impl_name(&name);
+                    Slot::Method(Method { ref sig, body, .. }) |
+                    Slot::VirtualMethod(VirtualMethod { ref sig, body: Some(body), .. }) => {
+                        let name = Self::slot_impl_name(&sig.name);
+                        let inputs = &sig.inputs;
+                        let output = &sig.output;
                         quote! {
-                            fn #name(#(#inputs),*) #output #body
+                            fn #name(#(#inputs),*) -> #output #body
                         }
                     },
 
-                    Slot::VirtualMethod(VirtualMethod { name, inputs, output, body: None, .. }) => {
-                        let name = Self::slot_impl_name(&name);
+                    Slot::VirtualMethod(VirtualMethod { ref sig, body: None, .. }) => {
+                        let name = Self::slot_impl_name(&sig.name);
+                        let inputs = &sig.inputs;
+                        let output = &sig.output;
                         quote! {
-                            fn #name(#(#inputs),*) #output {
+                            fn #name(#(#inputs),*) -> #output {
                                 panic!("Called abstract method {} with no implementation", stringify!(#name));
                             }
                         }
@@ -69,6 +78,7 @@ impl<'ast> ClassContext<'ast> {
     pub fn instance_method_trampolines(&self) -> Vec<Tokens> {
         let callback_guard = glib_callback_guard();
         let InstanceName = self.InstanceName;
+        let InstanceNameFfi = self.InstanceNameFfi;
         self.class
             .slots
             .iter()
@@ -76,23 +86,24 @@ impl<'ast> ClassContext<'ast> {
                 match *slot {
                     Slot::Method(_) => None,
 
-                    Slot::VirtualMethod(VirtualMethod { name, inputs, output, .. }) => {
-                        let trampoline_name = Self::slot_trampoline_name(&name);
-                        let method_impl_name = Self::slot_impl_name(&name);
-                        let inputs = &inputs[1..];
-                        let arg_names = ArgNames(inputs);
+                    Slot::VirtualMethod(VirtualMethod { ref sig, .. }) => {
+                        let trampoline_name = Self::slot_trampoline_name(&sig.name);
+                        let method_impl_name = Self::slot_impl_name(&sig.name);
+                        let inputs = sig.input_args_with_glib_types();
+                        let arg_names = sig.input_args_from_glib_types();
+
+                        let ret = quote! { instance.#method_impl_name(#arg_names) };
+                        let ret = sig.ret_to_glib(ret);
+                        let output = sig.output_glib_type();
                         Some (quote! {
-                            unsafe extern "C" fn #trampoline_name(this: *mut #InstanceName,
-                                                                  #(#inputs),*)
-                                #output
+                            unsafe extern "C" fn #trampoline_name(this: *mut #InstanceNameFfi,
+                                                                  #inputs)
+                                -> #output
                             {
                                 #callback_guard
 
                                 let instance: &super::#InstanceName = &from_glib_borrow(this);
-
-                                // FIXME: do we need to from_glib_*() each argument?
-                                // FIXME: do we need to .to_glib() the return value?
-                                instance.#method_impl_name(#arg_names)
+                                #ret
                             }
                         })
                     },
@@ -120,6 +131,7 @@ impl<'ast> ClassContext<'ast> {
 
     pub fn imp_extern_methods(&self) -> Vec<Tokens> {
         let InstanceName = self.InstanceName;
+        let InstanceNameFfi = self.InstanceNameFfi;
         let callback_guard = glib_callback_guard();
         self.class
             .slots
@@ -128,40 +140,48 @@ impl<'ast> ClassContext<'ast> {
                 match *slot {
                     Slot::Method(Method { public: false, .. }) => None, // these don't get exposed in the C API
 
-                    Slot::Method(Method { public: true, name, inputs, output, .. }) => {
-                        let ffi_name = self.method_ffi_name(name.sym.as_str());
-                        let method_impl_name = Self::slot_impl_name(&name);
-                        let inputs = &inputs[1..];
-                        let arg_names = ArgNames(inputs);
+                    Slot::Method(Method { public: true, ref sig, .. }) => {
+                        let ffi_name = self.method_ffi_name(sig.name.sym.as_str());
+                        let method_impl_name = Self::slot_impl_name(&sig.name);
+                        let inputs = sig.input_args_with_glib_types();
+                        let args = sig.input_args_from_glib_types();
+                        let ret = quote! { instance.#method_impl_name(#args) };
+                        let ret = sig.ret_to_glib(ret);
+                        let output = sig.output_glib_type();
                         Some(quote! {
                             #[no_mangle]
-                            pub unsafe extern "C" fn #ffi_name(this: *mut #InstanceName, #(#inputs),*) #output {
+                            pub unsafe extern "C" fn #ffi_name(this: *mut #InstanceNameFfi,
+                                                               #inputs)
+                                -> #output
+                            {
                                 #callback_guard
 
                                 let instance: &super::#InstanceName = &from_glib_borrow(this);
-
-                                // FIXME: do we need to from_glib_*() each argument?
-                                // FIXME: do we need to .to_glib() the return value?
-                                instance.#method_impl_name(#arg_names)
+                                #ret
                             }
                         })
-                    },
+                    }
 
-                    Slot::VirtualMethod(VirtualMethod { name, inputs, output, .. }) => {
-                        let ffi_name = self.method_ffi_name(name.sym.as_str());
-                        let inputs = &inputs[1..];
-                        let arg_names = ArgNames(inputs);
+                    Slot::VirtualMethod(VirtualMethod { ref sig, .. }) => {
+                        let name = sig.name;
+                        let ffi_name = self.method_ffi_name(sig.name.sym.as_str());
+                        let inputs = sig.input_args_with_glib_types();
+                        let args = sig.input_arg_names();
+                        let output = sig.output_glib_type();
                         Some(quote! {
                             #[no_mangle]
-                            pub unsafe extern "C" fn #ffi_name(this: *mut #InstanceName, #(#inputs),*) #output {
+                            pub unsafe extern "C" fn #ffi_name(this: *mut #InstanceNameFfi,
+                                                               #inputs)
+                                -> #output
+                            {
                                 #callback_guard
 
                                 let klass = (*this).get_class();
                                 // We unwrap() because klass.method_name is always set to a method_trampoline
-                                (klass.#name.as_ref().unwrap())(this, #arg_names)
+                                (klass.#name.as_ref().unwrap())(this, #args)
                             }
                         })
-                    },
+                    }
 
                     Slot::Signal(_) => panic!("signals not implemented"),
                 }
@@ -178,7 +198,7 @@ impl<'ast> ClassContext<'ast> {
     }
 
     pub fn slot_assignments(&self) -> Vec<Tokens> {
-        let InstanceName = &self.InstanceName;
+        let InstanceNameFfi = &self.InstanceNameFfi;
         self.class
             .slots
             .iter()
@@ -186,11 +206,12 @@ impl<'ast> ClassContext<'ast> {
                 match *slot {
                     Slot::Method(_) => None,
 
-                    Slot::VirtualMethod(VirtualMethod { name, .. }) => {
-                        let trampoline_name = Self::slot_trampoline_name(&name);
+                    Slot::VirtualMethod(VirtualMethod { ref sig, .. }) => {
+                        let name = sig.name;
+                        let trampoline_name = Self::slot_trampoline_name(&sig.name);
 
                         Some(quote! {
-                            klass.#name = Some(#InstanceName::#trampoline_name);
+                            klass.#name = Some(#InstanceNameFfi::#trampoline_name);
                         })
                     }
 
@@ -214,7 +235,7 @@ impl<'ast> ClassContext<'ast> {
                     // release all memory it holds
                     gobject_ffi::g_type_class_add_private(klass, mem::size_of::<Option<#PrivateName>>());
                 }
-            },
+            }
 
             None => {
                 quote! {}
@@ -226,14 +247,14 @@ impl<'ast> ClassContext<'ast> {
         match self.instance_private {
             Some(name) => {
                 let PrivateName = name;
-                let InstanceName = self.InstanceName;
+                let InstanceNameFfi = self.InstanceNameFfi;
                 let get_type_fn_name = self.instance_get_type_fn_name();
 
                 quote! {
                     fn get_priv(&self) -> &#PrivateName {
                         unsafe {
                             let private = gobject_ffi::g_type_instance_get_private(
-                                <Self as ToGlibPtr<*mut #InstanceName>>::to_glib_none(self).0 as *mut gobject_ffi::GTypeInstance,
+                                <Self as ToGlibPtr<*mut #InstanceNameFfi>>::to_glib_none(self).0 as *mut gobject_ffi::GTypeInstance,
                                 #get_type_fn_name(),
                             ) as *const Option<#PrivateName>;
 
@@ -241,7 +262,7 @@ impl<'ast> ClassContext<'ast> {
                         }
                     }
                 }
-            },
+            }
 
             None => quote! {}
         }
@@ -264,7 +285,7 @@ impl<'ast> ClassContext<'ast> {
                     // data.
                     ptr::write(private, Some(<#PrivateName as Default>::default()));
                 }
-            },
+            }
 
             None => quote! {}
         }
@@ -286,7 +307,7 @@ impl<'ast> ClassContext<'ast> {
                     // Option container with None
                     let _ = (*private).take();
                 }
-            },
+            }
 
             None => quote! {}
         }

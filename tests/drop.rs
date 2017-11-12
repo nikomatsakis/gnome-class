@@ -50,8 +50,11 @@ gobject_gen! {
     }
 
     impl Dummy {
-        pub fn set_dc(&self, dc: DropCounter) {
+        pub fn set_dc(&self, dc: usize) {
             let mut self_dc = self.get_priv().dc.borrow_mut();
+            let dc = unsafe {
+                DropCounter { counter: Arc::from_raw(dc as *const _) }
+            };
             *self_dc = dc;
         }
     }
@@ -63,7 +66,7 @@ fn check() {
 
     {
         let c: Dummy = Dummy::new();
-        c.set_dc(dc.clone());
+        c.set_dc(Arc::into_raw(dc.counter.clone()) as usize);
         println!("Drop counter has value: {}", dc.get());
         assert_eq!(dc.get(), 0);
     }

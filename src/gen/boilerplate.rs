@@ -16,6 +16,7 @@ impl<'ast> ClassContext<'ast> {
         let ModuleName                       = &self.ModuleName;
         let ClassName                        = self.ClassName;
         let InstanceName                     = self.InstanceName;
+        let InstanceNameFfi                  = self.InstanceNameFfi;
         let InstanceExt                      = &self.InstanceExt;
         let ParentClassFfi                   = self.ParentClassFfi;
         let ParentInstance                   = self.ParentInstance;
@@ -86,7 +87,7 @@ impl<'ast> ClassContext<'ast> {
                 // }
 
                 glib_wrapper! {
-                    pub struct #InstanceName(Object<imp::#InstanceName, imp::#ClassName>)
+                    pub struct #InstanceName(Object<imp::#InstanceNameFfi, imp::#ClassName>)
                         #parent_instance_tokens;
 
                     match fn {
@@ -113,7 +114,7 @@ impl<'ast> ClassContext<'ast> {
                     use glib::translate::*;
 
                     #[repr(C)]
-                    pub struct #InstanceName {
+                    pub struct #InstanceNameFfi {
                         pub parent: #ParentInstanceFfi,
                     }
 
@@ -163,7 +164,7 @@ impl<'ast> ClassContext<'ast> {
                         #(#slot_default_handlers)*
                     }
 
-                    impl #InstanceName {
+                    impl #InstanceNameFfi {
                         #[allow(dead_code)] // not used if no virtual methods
                         fn get_class(&self) -> &#ClassName {
                             unsafe {
@@ -211,9 +212,9 @@ impl<'ast> ClassContext<'ast> {
                             // GObjectClass methods; properties
                             {
                                 let gobject_class = &mut *(klass as *mut gobject_ffi::GObjectClass);
-                                gobject_class.finalize = Some(#InstanceName::finalize);
-                                // FIXME: gobject_class.set_property = Some(#InstanceName::set_property);
-                                // FIXME: gobject_class.get_property = Some(#InstanceName::get_property);
+                                gobject_class.finalize = Some(#InstanceNameFfi::finalize);
+                                // FIXME: gobject_class.set_property = Some(#InstanceNameFfi::set_property);
+                                // FIXME: gobject_class.get_property = Some(#InstanceNameFfi::get_property);
 
                                 // FIXME
                                 // let mut properties = Vec::new();
@@ -239,7 +240,7 @@ impl<'ast> ClassContext<'ast> {
                     }
 
                     #[no_mangle]
-                    pub unsafe extern "C" fn #imp_new_fn_name(/* FIXME: args */) -> *mut #InstanceName {
+                    pub unsafe extern "C" fn #imp_new_fn_name(/* FIXME: args */) -> *mut #InstanceNameFfi {
                         #callback_guard
 
                         let this = gobject_ffi::g_object_newv(
@@ -248,7 +249,7 @@ impl<'ast> ClassContext<'ast> {
                             ptr::null_mut() // FIXME: args
                         );
 
-                        this as *mut #InstanceName
+                        this as *mut #InstanceNameFfi
                     }
 
                     #(#imp_extern_methods)*
@@ -267,7 +268,7 @@ impl<'ast> ClassContext<'ast> {
                             let class_size = mem::size_of::<#ClassName>();
                             assert!(class_size <= u16::MAX as usize);
 
-                            let instance_size = mem::size_of::<#InstanceName>();
+                            let instance_size = mem::size_of::<#InstanceNameFfi>();
                             assert!(instance_size <= u16::MAX as usize);
 
                             TYPE = gobject_ffi::g_type_register_static_simple(
@@ -276,7 +277,7 @@ impl<'ast> ClassContext<'ast> {
                                 class_size as u32,
                                 Some(#ClassName::init),
                                 instance_size as u32,
-                                Some(#InstanceName::init),
+                                Some(#InstanceNameFfi::init),
                                 gobject_ffi::GTypeFlags::empty()
                             );
 

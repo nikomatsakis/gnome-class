@@ -1,6 +1,6 @@
 //use lalrpop_intern::InternedString;
 //use quote::Tokens;
-use syn::{Ident, Path, FnArg, FunctionRetTy, Block};
+use syn::{Ident, Path, FnArg, ReturnType, Block};
 use syn::{Attribute, Lit};
 use synom::tokens;
 
@@ -79,7 +79,7 @@ pub struct ImplItemMethod {
     pub signal: bool, // ignore
     pub name: Ident,
     pub inputs: Vec<FnArg>, // must start with &self
-    pub output: FunctionRetTy,
+    pub output: ReturnType,
     pub body: Option<Block>,
 }
 
