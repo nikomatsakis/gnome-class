@@ -252,7 +252,7 @@ impl<'ast> Class<'ast> {
 
     fn extract_output(&mut self, output: &'ast ReturnType) -> Result<Ty<'ast>> {
         match *output {
-            ReturnType::Ty(ref t, _) => self.extract_ty(t),
+            ReturnType::Type(ref t, _) => self.extract_ty(t),
             ReturnType::Default => Ok(Ty::Unit),
         }
     }
@@ -306,46 +306,46 @@ impl<'ast> Class<'ast> {
         }).collect()
     }
 
-    fn extract_ty(&mut self, t: &'ast syn::Ty) -> Result<Ty<'ast>> {
+    fn extract_ty(&mut self, t: &'ast syn::Type) -> Result<Ty<'ast>> {
         match *t {
-            syn::Ty::Slice(_) => bail!("slice types not implemented yet"),
-            syn::Ty::Array(_) => bail!("array types not implemented yet"),
-            syn::Ty::Ptr(_) => bail!("ptr types not implemented yet"),
-            syn::Ty::Rptr(syn::TyRptr { lifetime: Some(_), .. }) => {
+            syn::Type::Slice(_) => bail!("slice types not implemented yet"),
+            syn::Type::Array(_) => bail!("array types not implemented yet"),
+            syn::Type::Ptr(_) => bail!("ptr types not implemented yet"),
+            syn::Type::Reference(syn::TypeReference { lifetime: Some(_), .. }) => {
                 bail!("borrowed types with lifetimes not implemented yet")
             }
-            syn::Ty::Rptr(syn::TyRptr { lifetime: None, ref ty, .. }) => {
+            syn::Type::Reference(syn::TypeReference { lifetime: None, ref ty, .. }) => {
                 if let syn::Mutability::Mutable(_) = ty.mutability {
                     bail!("mutable borrowed pointers not implemented");
                 }
                 let path = match ty.ty {
-                    syn::Ty::Path(syn::TyPath { qself: None, ref path }) => path,
+                    syn::Type::Path(syn::TypePath { qself: None, ref path }) => path,
                     _ => bail!("only borrowed pointers to paths supported"),
                 };
                 let ty = self.extract_ty_path(path)?;
                 Ok(Ty::Borrowed(Box::new(ty)))
             }
-            syn::Ty::BareFn(_) => bail!("function pointer types not implemented yet"),
-            syn::Ty::Never(_) => bail!("never not implemented yet"),
-            syn::Ty::Tup(syn::TyTup { ref tys, .. }) => {
+            syn::Type::BareFn(_) => bail!("function pointer types not implemented yet"),
+            syn::Type::Never(_) => bail!("never not implemented yet"),
+            syn::Type::Tup(syn::TypeTup { ref tys, .. }) => {
                 if tys.len() == 0 {
                     Ok(Ty::Unit)
                 } else {
                     bail!("tuple types not implemented yet")
                 }
             }
-            syn::Ty::Path(syn::TyPath { qself: Some(_), .. }) => {
+            syn::Type::Path(syn::TypePath { qself: Some(_), .. }) => {
                 bail!("path types with qualified self (`as` syntax) not allowed")
             }
-            syn::Ty::Path(syn::TyPath { qself: None, ref path }) => {
+            syn::Type::Path(syn::TypePath { qself: None, ref path }) => {
                 self.extract_ty_path(path)
             }
-            syn::Ty::TraitObject(_) => bail!("trait objects not implemented yet"),
-            syn::Ty::ImplTrait(_) => bail!("trait objects not implemented yet"),
-            syn::Ty::Paren(syn::TyParen { ref ty, .. }) => self.extract_ty(ty),
-            syn::Ty::Group(syn::TyGroup { ref ty, .. }) => self.extract_ty(ty),
-            syn::Ty::Infer(_) => bail!("underscore types not allowed"),
-            syn::Ty::Macro(_) => bail!("type macros not allowed"),
+            syn::Type::TraitObject(_) => bail!("trait objects not implemented yet"),
+            syn::Type::ImplTrait(_) => bail!("trait objects not implemented yet"),
+            syn::Type::Paren(syn::TypeParen { ref ty, .. }) => self.extract_ty(ty),
+            syn::Type::Group(syn::TypeGroup { ref ty, .. }) => self.extract_ty(ty),
+            syn::Type::Infer(_) => bail!("underscore types not allowed"),
+            syn::Type::Macro(_) => bail!("type macros not allowed"),
         }
     }
 
