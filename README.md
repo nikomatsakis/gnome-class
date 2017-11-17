@@ -43,6 +43,7 @@ gobject_gen! {
         }
     }
 }
+```
 
 Then the `gobject_gen!` procedural macro will generate a bunch of code
 which both defines a GObject implementation that is callable from
@@ -59,10 +60,10 @@ as [glib-rs][glib-rs].
   from the outside.  The generated GObjects should be callable from C
   or other languages in exactly the same way as traditional GTK+/GNOME
   libraries.
-  
+
 * Automatically emit GObject Introspection information so that the
   generated objects can be consumed by language bindings.
-  
+
 * In the end, we aim to make it compelling for users to *not* write
   new GObject libraries in C, but rather to give them an "obvious" way
   to it in Rust.  This should ensure higher-quality, safer code for
@@ -110,7 +111,7 @@ parsing to code generation.
 
   * Generate appropriate Rust documentation for the Rust-side public
     API of the generated objects.
-    
+
   * Integrate the documentation with the GObject Introspection
     information as the rest of GNOME expects.
 
@@ -132,7 +133,7 @@ a compiler:
    example, we check that there is not more than one `InstancePrivate`
    structure for each class, or that the same signal is not being
    declared twice.  The HIR is defined in `src/hir`.
-   
+
 3. We generate code based on the HIR.  For each class defined in the
    HIR, we emit the necessary GObject boilerplate to register that
    class, its methods, signals, properties, etc.  We emit the actual
@@ -160,7 +161,7 @@ that actually generates the tests.
 [boilerplate]: https://developer.gnome.org/SubclassGObject/
 [gtk]: https://www.gtk.org/
 [gnome]: https://www.gnome.org/
-[gi]: https://developer.gnome.org/gi/stable/
+[gi]: https://wiki.gnome.org/Projects/GObjectIntrospection
 [glib-rs]: http://gtk-rs.org/docs/glib/
 [syntax]: gobject-notes/syntax.md
 [syn]: https://github.com/dtolnay/syn/
