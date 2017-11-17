@@ -81,8 +81,8 @@ features of GObject.
 ## Do you want to help with the syntax?
 
 Take a look at the [syntax document][syntax].  Then, read the
-"[Internal structure](#internal-structure)" section below to see how
-`gobject_gen!` works.
+"[Internal structure](README.md#internal-structure)" section below to
+see how `gobject_gen!` works.
 
 To implement a new syntactic construct, you must first define the
 corresponding representation in the AST, and write parser for it.
@@ -115,7 +115,7 @@ parsing to code generation.
   * Integrate the documentation with the GObject Introspection
     information as the rest of GNOME expects.
 
-# Internal structure {#internal-structure}
+# Internal structure
 
 The `gobject_gen!` procedural macro works in stages roughly similar to
 a compiler:
