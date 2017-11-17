@@ -160,6 +160,11 @@ HIR.
 **FIXME:** mention how lib.rs::testme() is a second procedural macro
 that actually generates the tests.
 
+# Anything else?
+
+Is there anything else you would like to know about the structure of
+gnome-class or how it works, or how to contribute, that is not in this
+guide?  [Please mail me!][mail]
 
 
 [gobject]: https://developer.gnome.org/platform-overview/unstable/tech-gobject.html.en
@@ -170,3 +175,4 @@ that actually generates the tests.
 [glib-rs]: http://gtk-rs.org/docs/glib/
 [syntax]: gobject-notes/syntax.md
 [syn]: https://github.com/dtolnay/syn/
+[mail]: mailto:federico@gnome.org
