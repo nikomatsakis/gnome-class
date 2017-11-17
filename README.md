@@ -124,16 +124,17 @@ a compiler:
    the user put inside the `gobject_gen!` invocation using a
    [syn][syn]-based parser.  The parser generates an Abstract Syntax
    Tree (**AST**), which closely matches the structure of the user's
-   code.  At the end of this process, the AST will be fully parsed,
-   but it may not be semantically valid.  The AST is defined in
+   code.  At the end of this process, the code will be fully parsed
+   into an AST (or it will have failed with a syntax error), but the
+   AST may not be semantically valid.  The AST is defined in
    [`src/ast.rs`](src/ast.rs).
 
-2. **High-level Internal Representation.** We turn the AST into a
+2. **High-level Internal Representation.**  We turn the AST into a
    High-level Internal Representation (**HIR**), which matches GObject
    concepts more closely.  This is also where we ensure that the
    user's code is semantically valid.  For example, we check that
    there is not more than one `InstancePrivate` structure for each
-   class, or that the same signal is not being declared twice.  The
+   class, or that the same signal name is not being declared twice.  The
    HIR is defined in [`src/hir`](src/hir).
 
 3. **Code generation.** We generate code based on the HIR.  For each
