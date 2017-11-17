@@ -43,6 +43,7 @@ gobject_gen! {
         }
     }
 }
+```
 
 Then the `gobject_gen!` procedural macro will generate a bunch of code
 which both defines a GObject implementation that is callable from
@@ -114,7 +115,7 @@ parsing to code generation.
   * Integrate the documentation with the GObject Introspection
     information as the rest of GNOME expects.
 
-# Internal structure {#internal-structure}
+# Internal structure
 
 The `gobject_gen!` procedural macro works in stages roughly similar to
 a compiler:
