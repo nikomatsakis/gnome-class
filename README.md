@@ -120,35 +120,39 @@ parsing to code generation.
 The `gobject_gen!` procedural macro works in stages roughly similar to
 a compiler:
 
-1. **Parsing.** We parse the code that the user put inside the
-   `gobject_gen!` invocation using a [syn][syn]-based parser.  The
-   parser generates an **Abstract Syntax Tree** (AST), which closely
-   matches the structure of the user's code.  At the end of this
-   process, the AST will be fully parsed, but it may not be
-   semantically valid.  The AST is defined in `src/ast.rs`.
+1. **Parsing into an Abstract Syntax Tree.** We parse the code that
+   the user put inside the `gobject_gen!` invocation using a
+   [syn][syn]-based parser.  The parser generates an Abstract Syntax
+   Tree (**AST**), which closely matches the structure of the user's
+   code.  At the end of this process, the AST will be fully parsed,
+   but it may not be semantically valid.  The AST is defined in
+   [`src/ast.rs`](src/ast.rs).
 
-2. We turn the AST into a **High-level Internal Representation**
-   (HIR), which matches GObject concepts more closely.  This is also
-   where we ensure that the user's code is semantically valid.  For
-   example, we check that there is not more than one `InstancePrivate`
-   structure for each class, or that the same signal is not being
-   declared twice.  The HIR is defined in `src/hir`.
+2. **High-level Internal Representation.** We turn the AST into a
+   High-level Internal Representation (**HIR**), which matches GObject
+   concepts more closely.  This is also where we ensure that the
+   user's code is semantically valid.  For example, we check that
+   there is not more than one `InstancePrivate` structure for each
+   class, or that the same signal is not being declared twice.  The
+   HIR is defined in [`src/hir`](src/hir).
 
-3. We generate code based on the HIR.  For each class defined in the
-   HIR, we emit the necessary GObject boilerplate to register that
-   class, its methods, signals, properties, etc.  We emit the actual
-   code for methods and signal handlers, and the necessary trampolines
-   to call Rust methods and signal handlers from C.  The code
-   generator is defined in `src/gen`.  In there, the one-time,
-   per-class GObject boilerplate is in `src/gen/boilerplate.rs`.  The
-   other files in the `gen` directory are used for things that require
-   extra code generation like signals and traits for method trampolines.
+3. **Code generation.** We generate code based on the HIR.  For each
+   class defined in the HIR, we emit the necessary GObject boilerplate
+   to register that class, its methods, signals, properties, etc.  We
+   emit the actual code for methods and signal handlers, and the
+   necessary trampolines to call Rust methods and signal handlers from
+   C.  The code generator is defined in [`src/gen`](src/gen).  In
+   there, the one-time, per-class GObject boilerplate is in
+   [`src/gen/boilerplate.rs`](src/gen/boilerplate.rs).  The other
+   files in the `src/gen` directory are used for things that require extra
+   code generation like signals and traits for method trampolines.
 
-The main entry point to the procedural macro is in `src/lib.rs` in the
-`gobject_gen` function — note how it has the `#[proc_macro]`
-attribute.  This function takes the incoming `TokenStream` from the
-Rust compiler, parses it into our AST, creates the HIR from the AST,
-and finally calls the code generator upon the HIR.
+The main entry point to the procedural macro is in
+[`src/lib.rs`](src/lib.rs) in the `gobject_gen` function — note how it
+has the `#[proc_macro]` attribute.  This function takes the incoming
+`TokenStream` from the Rust compiler, parses it into our AST, creates
+the HIR from the AST, and finally calls the code generator upon the
+HIR.
 
 # Testing
 
