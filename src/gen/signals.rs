@@ -34,7 +34,7 @@ impl<'ast> ClassContext<'ast> {
 
                 let signal_id_name = signal_id_name(&signal);
                 let signal_name = CStringIdent(signal.name);
-                quote! {
+                quote_cs! {
                     PRIV.signals[signal_id_name] =
                         gobject_sys::g_signal_newv (#signal_name as *const u8 as *const i8,
                                                     (*g_object_class).g_type_class.g_type,

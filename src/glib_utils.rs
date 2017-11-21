@@ -4,15 +4,15 @@ use quote::{Tokens, ToTokens};
 use ast;
 
 pub fn tokens_GObject() -> Tokens {
-    quote! { glib::Object }
+    quote_cs! { glib::Object }
 }
 
 pub fn tokens_GObjectFfi() -> Tokens {
-    quote! { gobject_ffi::GObject }
+    quote_cs! { gobject_ffi::GObject }
 }
 
 pub fn tokens_GObjectClassFfi() -> Tokens {
-    quote! { gobject_ffi::GObjectClass }
+    quote_cs! { gobject_ffi::GObjectClass }
 }
 
 pub fn tokens_ParentInstance(class: &ast::Class) -> Tokens {
@@ -28,20 +28,20 @@ pub fn tokens_ParentInstance(class: &ast::Class) -> Tokens {
 
 pub fn tokens_ParentInstanceFfi(class: &ast::Class) -> Tokens {
     let ParentInstance = tokens_ParentInstance(class);
-    quote! {
+    quote_cs! {
         <#ParentInstance as glib::wrapper::Wrapper>::GlibType
     }
 }
 
 pub fn tokens_ParentClassFfi(class: &ast::Class) -> Tokens {
     let ParentInstance = tokens_ParentInstance(class);
-    quote! {
+    quote_cs! {
         <#ParentInstance as glib::wrapper::Wrapper>::GlibClassType
     }
 }
 
 pub fn glib_callback_guard() -> Tokens {
-    quote! {
+    quote_cs! {
         let _guard = glib::CallbackGuard::new();
     }
 }

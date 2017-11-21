@@ -385,7 +385,7 @@ impl<'ast> Class<'ast> {
 }
 
 fn make_path_glib_object() -> Path {
-    let tokens = quote! { glib::Object };
+    let tokens = quote_cs! { glib::Object };
     let token_stream = TokenStream::from(tokens);
     let buffer = SynomBuffer::new(token_stream);
     let cursor = buffer.begin();

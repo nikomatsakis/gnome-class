@@ -31,7 +31,7 @@ pub fn classes(program: &Program) -> Result<Tokens> {
             cx.gen_class()
         })
         .collect::<Result<Vec<_>>>()?;
-    Ok(quote! { #(#class_tokens)* })
+    Ok(quote_cs! { #(#class_tokens)* })
 }
 
 struct ClassContext<'ast> {
@@ -164,12 +164,12 @@ impl<'ast> ToTokens for ToGlibType<'ast> {
             Ty::Unit => self.0.to_tokens(tokens),
             Ty::Char(i) |
             Ty::Bool(i) => {
-                (quote! {
+                (quote_cs! {
                     <#i as ToGlib>::GlibType
                 }).to_tokens(tokens);
             }
             Ty::Borrowed(ref t) => {
-                (quote! {
+                (quote_cs! {
                     <#t as GlibPtrDefault>::GlibType
                 }).to_tokens(tokens);
             }
@@ -191,12 +191,12 @@ impl<'ast, T: ToTokens> ToTokens for ToGlib<'ast, T> {
 
             Ty::Char(i) |
             Ty::Bool(i) => {
-                (quote! {
+                (quote_cs! {
                     <#i as ToGlib>::to_glib(&#expr)
                 }).to_tokens(tokens);
             }
             Ty::Borrowed(ref t) => {
-                (quote! {
+                (quote_cs! {
                     <#t as ToGlibPtr<_>>::to_glib_none(#expr).0
                 }).to_tokens(tokens);
             }
@@ -213,12 +213,12 @@ impl<'ast> ToTokens for FromGlib<'ast> {
             Ty::Unit => {} // no conversion necessary
             Ty::Char(i) |
             Ty::Bool(i) => {
-                (quote! {
+                (quote_cs! {
                     <#i as FromGlib<_>>::from_glib
                 }).to_tokens(tokens);
             }
             Ty::Borrowed(ref t) => {
-                (quote! {
+                (quote_cs! {
                     &<#t as FromGlibPtrBorrow<_>>::from_glib_borrow
                 }).to_tokens(tokens);
             }
