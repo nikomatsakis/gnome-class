@@ -36,8 +36,3 @@ synom = { git="https://github.com/dtolnay/syn" }
 [dev-dependencies]
 glib-sys = { git="https://github.com/gtk-rs/sys", version="0.4.0" }
 lazy_static = "0.2.2"
-
-# FIXME(rust-lang/rust#45934) should be able to use upstream `quote`, but not
-# clear how to "fix" upstream quote yet (if at all)
-[patch.'https://github.com/dtolnay/quote']
-quote = { git = 'https://github.com/alexcrichton/quote', branch = 'span-call-site' }

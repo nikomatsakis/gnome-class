@@ -50,12 +50,12 @@ impl<'ast> ClassContext<'ast> {
         let signal_trampolines               = self.signal_trampolines();
 
         let parent_instance_tokens = if self.class.gobject_parent {
-            quote! {}
+            quote_cs! {}
         } else {
-            quote! { : #ParentInstance }
+            quote_cs! { : #ParentInstance }
         };
 
-        quote! {
+        quote_cs! {
             pub mod #ModuleName {
                 #![allow(non_snake_case)] // "oddly" named module above
                 extern crate glib_sys as glib_ffi;

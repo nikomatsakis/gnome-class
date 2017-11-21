@@ -19,7 +19,7 @@ impl<'ast> ClassContext<'ast> {
                         let name = sig.name;
                         let inputs = &sig.inputs;
                         let output = &sig.output;
-                        Some(quote! {
+                        Some(quote_cs! {
                             fn #name(#(#inputs),*) -> #output;
                         })
                     }
@@ -46,7 +46,7 @@ impl<'ast> ClassContext<'ast> {
                         let output_from = sig.ret_from_glib_fn();
                         let inputs = &sig.inputs;
                         let output = &sig.output;
-                        Some(quote! {
+                        Some(quote_cs! {
                             fn #name(#(#inputs),*) -> #output {
                                 #output_from(unsafe {
                                     imp::#ffi_name(self.to_glib_none().0,

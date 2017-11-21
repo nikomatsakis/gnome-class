@@ -21,6 +21,10 @@ extern crate syn;
 use proc_macro::TokenStream;
 use errors::*;
 
+macro_rules! quote_cs {
+    ($($tt:tt)*) => (quote_spanned!(::proc_macro2::Span::call_site(), $($tt)*))
+}
+
 mod ast;
 mod checking;
 mod errors;

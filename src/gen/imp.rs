@@ -21,7 +21,7 @@ impl<'ast> ClassContext<'ast> {
                         let output = sig.output_glib_type();
                         let inputs = sig.input_args_with_glib_types();
                         let name = sig.name;
-                        Some(quote! {
+                        Some(quote_cs! {
                             pub #name: Option<unsafe extern "C" fn(
                                 this: *mut #InstanceNameFfi,
                                 #inputs
@@ -41,7 +41,7 @@ impl<'ast> ClassContext<'ast> {
             let name = name.unwrap_or(Self::slot_impl_name(&sig.name));
             let inputs = &sig.inputs;
             let output = &sig.output;
-            quote! {
+            quote_cs! {
                 fn #name(#(#inputs),*) -> #output #body
             }
         };
@@ -62,7 +62,7 @@ impl<'ast> ClassContext<'ast> {
                         let name = Self::slot_impl_name(&sig.name);
                         let inputs = &sig.inputs;
                         let output = &sig.output;
-                        quote! {
+                        quote_cs! {
                             fn #name(#(#inputs),*) -> #output {
                                 panic!("Called abstract method {} with no implementation", stringify!(#name));
                             }
@@ -95,16 +95,16 @@ impl<'ast> ClassContext<'ast> {
             let inputs = sig.input_args_with_glib_types();
             let arg_names = sig.input_args_from_glib_types();
 
-            let ret = quote! { instance.#method_impl_name(#arg_names) };
+            let ret = quote_cs! { instance.#method_impl_name(#arg_names) };
             let ret = sig.ret_to_glib(ret);
             let output = sig.output_glib_type();
             let receiver_instance = match parent_class {
                 Some(parent) => {
-                    quote! { <#parent as glib::wrapper::Wrapper>::GlibType }
+                    quote_cs! { <#parent as glib::wrapper::Wrapper>::GlibType }
                 }
-                None => quote! { #InstanceNameFfi },
+                None => quote_cs! { #InstanceNameFfi },
             };
-            quote! {
+            quote_cs! {
                 unsafe extern "C" fn #trampoline_name(
                     this: *mut #receiver_instance,
                     #inputs
@@ -178,10 +178,10 @@ impl<'ast> ClassContext<'ast> {
                         let method_impl_name = Self::slot_impl_name(&sig.name);
                         let inputs = sig.input_args_with_glib_types();
                         let args = sig.input_args_from_glib_types();
-                        let ret = quote! { instance.#method_impl_name(#args) };
+                        let ret = quote_cs! { instance.#method_impl_name(#args) };
                         let ret = sig.ret_to_glib(ret);
                         let output = sig.output_glib_type();
-                        Some(quote! {
+                        Some(quote_cs! {
                             #[no_mangle]
                             pub unsafe extern "C" fn #ffi_name(this: *mut #InstanceNameFfi,
                                                                #inputs)
@@ -201,7 +201,7 @@ impl<'ast> ClassContext<'ast> {
                         let inputs = sig.input_args_with_glib_types();
                         let args = sig.input_arg_names();
                         let output = sig.output_glib_type();
-                        Some(quote! {
+                        Some(quote_cs! {
                             #[no_mangle]
                             pub unsafe extern "C" fn #ffi_name(this: *mut #InstanceNameFfi,
                                                                #inputs)
@@ -243,7 +243,7 @@ impl<'ast> ClassContext<'ast> {
                         let name = sig.name;
                         let trampoline_name = Self::slot_trampoline_name(&sig.name);
 
-                        Some(quote! {
+                        Some(quote_cs! {
                             klass.#name = Some(#InstanceNameFfi::#trampoline_name);
                         })
                     }
@@ -258,7 +258,7 @@ impl<'ast> ClassContext<'ast> {
                 let name = method.sig.name;
                 let trampoline_name = Self::slot_trampoline_name(&method.sig.name);
 
-                ret.push(quote! {
+                ret.push(quote_cs! {
                     (
                         *(klass as *mut _ as *mut <
                            #parent_class as glib::wrapper::Wrapper
@@ -280,7 +280,7 @@ impl<'ast> ClassContext<'ast> {
             Some(name) => {
                 let PrivateName = name;
 
-                quote! {
+                quote_cs! {
                     // This is an Option<_> so that we can replace its value with None on finalize() to
                     // release all memory it holds
                     gobject_ffi::g_type_class_add_private(klass, mem::size_of::<Option<#PrivateName>>());
@@ -288,7 +288,7 @@ impl<'ast> ClassContext<'ast> {
             }
 
             None => {
-                quote! {}
+                quote_cs! {}
             }
         }
     }
@@ -300,7 +300,7 @@ impl<'ast> ClassContext<'ast> {
                 let InstanceNameFfi = self.InstanceNameFfi;
                 let get_type_fn_name = self.instance_get_type_fn_name();
 
-                quote! {
+                quote_cs! {
                     fn get_priv(&self) -> &#PrivateName {
                         unsafe {
                             let private = gobject_ffi::g_type_instance_get_private(
@@ -314,7 +314,7 @@ impl<'ast> ClassContext<'ast> {
                 }
             }
 
-            None => quote! {}
+            None => quote_cs! {}
         }
     }
 
@@ -324,7 +324,7 @@ impl<'ast> ClassContext<'ast> {
                 let PrivateName = name;
                 let get_type_fn_name = self.instance_get_type_fn_name();
 
-                quote! {
+                quote_cs! {
                     let private = gobject_ffi::g_type_instance_get_private(
                         obj,
                         #get_type_fn_name()
@@ -337,7 +337,7 @@ impl<'ast> ClassContext<'ast> {
                 }
             }
 
-            None => quote! {}
+            None => quote_cs! {}
         }
     }
 
@@ -347,7 +347,7 @@ impl<'ast> ClassContext<'ast> {
                 let PrivateName = name;
                 let get_type_fn_name = self.instance_get_type_fn_name();
 
-                quote! {
+                quote_cs! {
                     let private = gobject_ffi::g_type_instance_get_private(
                         obj as *mut gobject_ffi::GTypeInstance,
                         #get_type_fn_name(),
@@ -359,7 +359,7 @@ impl<'ast> ClassContext<'ast> {
                 }
             }
 
-            None => quote! {}
+            None => quote_cs! {}
         }
     }
 }
