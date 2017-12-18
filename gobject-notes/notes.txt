@@ -365,3 +365,7 @@ fn error(msg: &str, span: proc_macro2::Span) -> Tokens {
 }
 
 <antoyo> Instead of returning the generated code, you return that.
+
+* Inspiration:
+
+** Rustc's structure: https://github.com/rust-lang/rust/blob/master/src/librustc/README.md
