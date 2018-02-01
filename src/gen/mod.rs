@@ -151,8 +151,10 @@ impl<'ast> FnSig<'ast> {
         ToGlib(&self.output, tokens)
     }
 
-    fn ret_from_glib_fn<'a>(&'a self) -> impl ToTokens + 'a {
-        FromGlib(&self.output)
+    fn ret_from_glib_fn<'a, V: ToTokens>(&'a self, v: &'a V) -> impl ToTokens + 'a {
+        let mut tokens = Tokens::new();
+        v.to_tokens(&mut tokens);
+        FromGlib(&self.output, tokens)
     }
 }
 
@@ -205,25 +207,36 @@ impl<'ast, T: ToTokens> ToTokens for ToGlib<'ast, T> {
     }
 }
 
-struct FromGlib<'ast>(&'ast Ty<'ast>);
+struct FromGlib<'ast>(&'ast Ty<'ast>, Tokens);
 
 impl<'ast> ToTokens for FromGlib<'ast> {
     fn to_tokens(&self, tokens: &mut Tokens) {
-        match *self.0 {
-            Ty::Unit => {} // no conversion necessary
-            Ty::Char(i) |
-            Ty::Bool(i) => {
-                (quote_cs! {
-                    <#i as FromGlib<_>>::from_glib
-                }).to_tokens(tokens);
-            }
-            Ty::Borrowed(ref t) => {
-                (quote_cs! {
-                    &<#t as FromGlibPtrBorrow<_>>::from_glib_borrow
-                }).to_tokens(tokens);
-            }
-            Ty::Integer(_) => {} // no conversion necessary
-            Ty::Owned(_) => panic!("unimplemented from glib on owned types"),
+        let needs_conversion =
+            match *self.0 {
+                Ty::Unit => { false } // no conversion necessary
+                Ty::Char(i) |
+                Ty::Bool(i) => {
+                    (quote_cs! {
+                        <#i as FromGlib<_>>::from_glib
+                    }).to_tokens(tokens);
+                    true
+                }
+                Ty::Borrowed(ref t) => {
+                    (quote_cs! {
+                        &<#t as FromGlibPtrBorrow<_>>::from_glib_borrow
+                    }).to_tokens(tokens);
+                    true
+                }
+                Ty::Integer(_) => { false } // no conversion necessary
+                Ty::Owned(_) => panic!("unimplemented from glib on owned types"),
+            };
+
+        if needs_conversion {
+            tokens.append_delimited("(", Default::default(), |tokens| {
+                self.1.to_tokens(tokens);
+            });
+        } else {
+            self.1.to_tokens(tokens);
         }
     }
 }
@@ -253,11 +266,10 @@ impl<'ast> ToTokens for ArgNamesFromGlib<'ast> {
     fn to_tokens(&self, tokens: &mut Tokens) {
         for arg in self.0 {
             match *arg {
-                FnArg::Arg { name, ref ty, mutbl: _ } => {
-                    FromGlib(ty).to_tokens(tokens);
-                    tokens.append_delimited("(", Default::default(), |tokens| {
-                        name.to_tokens(tokens);
-                    });
+                FnArg::Arg { ref name, ref ty, mutbl: _ } => {
+                    let mut name_tokens = Tokens::new();
+                    name.to_tokens(&mut name_tokens);
+                    FromGlib(ty, name_tokens).to_tokens(tokens);
                     tokens::Comma::default().to_tokens(tokens);
                 }
                 FnArg::SelfRef(..) => unreachable!(),
