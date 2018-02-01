@@ -238,6 +238,7 @@ impl<'ast> ToTokens for FnArgsWithGlibTypes<'ast> {
                     name.to_tokens(tokens);
                     tokens::Colon::default().to_tokens(tokens);
                     ToGlibType(ty, self.0).to_tokens(tokens);
+                    tokens::Comma::default().to_tokens(tokens);
                 }
                 FnArg::SelfRef(..) => unreachable!(),
             }

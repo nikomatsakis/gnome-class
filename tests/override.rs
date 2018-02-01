@@ -16,8 +16,8 @@ gobject_gen! {
             1
         }
 
-        virtual fn get(&self) -> u32 {
-            1
+        virtual fn get(&self, i: u32, j: u32) -> u32 {
+            1 + i + j
         }
     }
 
@@ -25,12 +25,11 @@ gobject_gen! {
     }
 
     impl One for Two {
-        virtual fn get(&self) -> u32 {
-            2
+        virtual fn get(&self, i: u32, j: u32) -> u32 {
+            2 + i + j
         }
     }
 }
-
 
 #[test]
 fn test() {
@@ -38,7 +37,7 @@ fn test() {
     let two = Two::new();
 
     assert!(one.one() == 1);
-    assert!(one.get() == 1);
+    assert!(one.get(0, 0) == 1);
     assert!(two.one() == 1);
-    assert!(two.get() == 2);
+    assert!(two.get(0, 0) == 2);
 }

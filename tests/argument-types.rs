@@ -29,8 +29,8 @@ gobject_gen! {
             true
         }
 
-        pub fn two(&self, a: bool) -> bool {
-            self.three(a)
+        pub fn two(&self, a: bool, b: i32) -> bool {
+            self.three(a) && b == b
         }
 
         fn three(&self, a: bool) -> bool {
@@ -80,8 +80,8 @@ fn test() {
     use glib_sys::*;
 
     let t = Test::new();
-    assert!(t.two(true));
-    assert!(!t.two(false));
+    assert!(t.two(true, 2));
+    assert!(!t.two(false, 2));
     assert!(t.four(true));
     assert!(!t.four(false));
 
