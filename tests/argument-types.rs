@@ -95,7 +95,7 @@ fn test() {
     // assert that the generated functions have the right type
     let _: unsafe extern fn(*mut T) -> gboolean =
         TestMod::imp::test_one;
-    let _: unsafe extern fn(*mut T, gboolean) -> gboolean =
+    let _: unsafe extern fn(*mut T, gboolean, i32) -> gboolean =
         TestMod::imp::test_two;
     let _: unsafe extern fn(*mut T, gboolean) -> gboolean =
         TestMod::imp::test_four;
