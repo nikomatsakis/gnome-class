@@ -252,7 +252,7 @@ impl<'ast> Class<'ast> {
 
     fn extract_output(&mut self, output: &'ast ReturnType) -> Result<Ty<'ast>> {
         match *output {
-            ReturnType::Type(ref t, _) => self.extract_ty(t),
+            ReturnType::Type(_, ref boxt) => self.extract_ty(boxt),
             ReturnType::Default => Ok(Ty::Unit),
         }
     }
@@ -314,11 +314,11 @@ impl<'ast> Class<'ast> {
             syn::Type::Reference(syn::TypeReference { lifetime: Some(_), .. }) => {
                 bail!("borrowed types with lifetimes not implemented yet")
             }
-            syn::Type::Reference(syn::TypeReference { lifetime: None, ref ty, .. }) => {
-                if let Some(_) = ty.mutability {
+            syn::Type::Reference(syn::TypeReference { lifetime: None, ref elem, ref mutability, .. }) => {
+                if let Some(_) = *mutability {
                     bail!("mutable borrowed pointers not implemented");
                 }
-                let path = match ty.ty {
+                let path = match **elem {
                     syn::Type::Path(syn::TypePath { qself: None, ref path }) => path,
                     _ => bail!("only borrowed pointers to paths supported"),
                 };
@@ -327,7 +327,7 @@ impl<'ast> Class<'ast> {
             }
             syn::Type::BareFn(_) => bail!("function pointer types not implemented yet"),
             syn::Type::Never(_) => bail!("never not implemented yet"),
-            syn::Type::Tup(syn::TypeTuple { ref elems, .. }) => {
+            syn::Type::Tuple(syn::TypeTuple { ref elems, .. }) => {
                 if elems.len() == 0 {
                     Ok(Ty::Unit)
                 } else {
@@ -342,8 +342,8 @@ impl<'ast> Class<'ast> {
             }
             syn::Type::TraitObject(_) => bail!("trait objects not implemented yet"),
             syn::Type::ImplTrait(_) => bail!("trait objects not implemented yet"),
-            syn::Type::Paren(syn::TypeParen { ref ty, .. }) => self.extract_ty(ty),
-            syn::Type::Group(syn::TypeGroup { ref ty, .. }) => self.extract_ty(ty),
+            syn::Type::Paren(syn::TypeParen { ref elem, .. }) => self.extract_ty(elem),
+            syn::Type::Group(syn::TypeGroup { ref elem, .. }) => self.extract_ty(elem),
             syn::Type::Infer(_) => bail!("underscore types not allowed"),
             syn::Type::Macro(_) => bail!("type macros not allowed"),
         }
