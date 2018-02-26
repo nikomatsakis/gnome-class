@@ -8,7 +8,7 @@
 
 use std::collections::HashMap;
 
-use proc_macro2::{TokenStream};
+use proc_macro::TokenStream;
 use quote::{Tokens, ToTokens};
 use syn::{self, Ident, Path, Block, ReturnType};
 use syn::synom::Synom;
@@ -389,7 +389,7 @@ fn make_path_glib_object() -> Path {
     let token_stream = TokenStream::from(tokens);
     let buffer = TokenBuffer::new(token_stream);
     let cursor = buffer.begin();
-    Path::parse(cursor).unwrap().1
+    Path::parse(cursor).unwrap().0
 }
 
 impl<'a> ToTokens for FnArg<'a> {
