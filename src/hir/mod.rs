@@ -9,6 +9,7 @@
 use std::collections::HashMap;
 
 use proc_macro::TokenStream;
+use proc_macro2::Span;
 use quote::{Tokens, ToTokens};
 use syn::{self, Ident, Path, Block, ReturnType};
 use syn::synom::Synom;
@@ -402,7 +403,7 @@ impl<'a> ToTokens for FnArg<'a> {
             FnArg::Arg { name, ref ty, mutbl } => {
                 mutbl.to_tokens(tokens);
                 name.to_tokens(tokens);
-                Default::<Token!(:)>::default().to_tokens(tokens);
+                Token!(:)([Span::def_site()]).to_tokens(tokens);
                 ty.to_tokens(tokens);
             }
         }
@@ -417,7 +418,7 @@ impl<'a> ToTokens for Ty<'a> {
             Ty::Bool(tok) => tok.to_tokens(tokens),
             Ty::Integer(t) => t.to_tokens(tokens),
             Ty::Borrowed(ref t) => {
-                Default::<Token!(&)>::default().to_tokens(tokens);
+                Token!(&)([Span::def_site()]).to_tokens(tokens);
                 t.to_tokens(tokens)
             }
             Ty::Owned(t) => t.to_tokens(tokens),
@@ -437,7 +438,7 @@ pub mod tests {
         let token_stream = raw.parse::<TokenStream>().unwrap();
         let buffer = TokenBuffer::new(token_stream);
         let cursor = buffer.begin();
-        let ast_program = ast::Program::parse(cursor).unwrap().1;
+        let ast_program = ast::Program::parse(cursor).unwrap().0;
 
         let program = Program::from_ast_program(&ast_program).unwrap();
 
