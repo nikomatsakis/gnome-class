@@ -3,44 +3,10 @@ use syn;
 
 use ast;
 use errors::*;
-//use lalrpop_util::ParseError;
-//use proc_macro2::{TokenStream, TokenTree, TokenNode, Term, Delimiter};
-
-//mod grammar;
 
 pub fn parse_program(token_stream: TokenStream) -> Result<ast::Program> {
     syn::parse(token_stream).map_err(|e| e.into())
 }
-
-/*
-type ParseResult<'input, T> =
-    ::std::result::Result<T, ParseError<usize, Tok<'input>, Error>>;
-fn parse_members(input: &str,
-                 offset: usize)
-                 -> ParseResult<Vec<ast::Member>> {
-    assert_eq!(input.chars().next(), Some('{'));
-    assert!(input.len() >= 2); // at least `{}`
-    let len = input.len();
-    let contents = &input[1..len - 1];
-    let tokenizer = tok::Tokenizer::new(contents, offset + 1);
-    grammar::parse_Members(tokenizer)
-}
-
-fn parse_var_tys(input: &str,
-                 offset: usize)
-                 -> ParseResult<Vec<ast::VarTy>> {
-    assert_eq!(input.chars().next(), Some('{'));
-    assert!(input.len() >= 2); // at least `{}`
-    let len = input.len();
-    let contents = &input[1..len - 1];
-    let tokenizer = tok::Tokenizer::new(contents, offset + 1);
-    grammar::parse_VarTys(tokenizer)
-}
- */
-
-use synom::delimited::Delimited;
-use synom::{Synom, Cursor, PResult, parse_error, tokens};
-use syn::{Ident, Path};
 
 impl Synom for ast::Program {
     named!(parse -> Self, do_parse!(

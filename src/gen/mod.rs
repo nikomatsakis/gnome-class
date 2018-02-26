@@ -17,11 +17,6 @@ mod signals;
 
 use glib_utils::*;
 
-// HYGIENE NOTE:
-//
-// I am using the `__` prefix to indicate names that, while visible
-// to the user, are eventually intended to be hidden by hygiene.
-
 pub fn classes(program: &Program) -> Result<Tokens> {
     let class_tokens =
         program.classes
