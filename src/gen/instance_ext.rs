@@ -41,7 +41,7 @@ impl<'ast> ClassContext<'ast> {
                     Slot::Method(Method { public: true, ref sig, .. }) |
                     Slot::VirtualMethod(VirtualMethod { ref sig, .. }) => {
                         let name = sig.name;
-                        let ffi_name = self.method_ffi_name(name.sym.as_str());
+                        let ffi_name = self.method_ffi_name(name.as_ref());
                         let arg_names = sig.input_args_to_glib_types();
                         let value = quote_cs! {
                             unsafe {

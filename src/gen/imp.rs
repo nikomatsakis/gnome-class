@@ -174,7 +174,7 @@ impl<'ast> ClassContext<'ast> {
                     Slot::Method(Method { public: false, .. }) => None, // these don't get exposed in the C API
 
                     Slot::Method(Method { public: true, ref sig, .. }) => {
-                        let ffi_name = self.method_ffi_name(sig.name.sym.as_str());
+                        let ffi_name = self.method_ffi_name(sig.name.as_ref());
                         let method_impl_name = Self::slot_impl_name(&sig.name);
                         let inputs = sig.input_args_with_glib_types();
                         let args = sig.input_args_from_glib_types();
@@ -197,7 +197,7 @@ impl<'ast> ClassContext<'ast> {
 
                     Slot::VirtualMethod(VirtualMethod { ref sig, .. }) => {
                         let name = sig.name;
-                        let ffi_name = self.method_ffi_name(sig.name.sym.as_str());
+                        let ffi_name = self.method_ffi_name(sig.name.as_ref());
                         let inputs = sig.input_args_with_glib_types();
                         let args = sig.input_arg_names();
                         let output = sig.output_glib_type();
