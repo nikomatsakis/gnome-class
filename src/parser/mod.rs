@@ -1,5 +1,9 @@
 use proc_macro::TokenStream;
-use syn;
+
+use syn::{self, Ident, Path, FnArg, parse_error};
+use syn::punctuated::Punctuated;
+use syn::synom::{Synom, PResult};
+use syn::buffer::Cursor;
 
 use ast;
 use errors::*;
@@ -39,7 +43,7 @@ impl Synom for ast::Class {
         call!(keyword("class"))                                  >>
         name: syn!(Ident)                                        >>
         extends: option!(do_parse!(
-            syn!(tokens::Colon)                                  >>
+            punct!(:)                                            >>
             superclass: syn!(Path)                               >>
             // FIXME: interfaces
             (superclass)))                                       >>
@@ -60,11 +64,11 @@ impl Synom for ast::ClassItem {
 
 impl Synom for ast::InstancePrivateItem {
     named!(parse -> Self, do_parse!(
-        type_: syn!(tokens::Type)         >>
+        type_: keyword!(type)             >>
         call!(keyword("InstancePrivate")) >>
-        eq: syn!(tokens::Eq)              >>
+        eq: punct!(=)                     >>
         path: syn!(Path)                  >>
-        semi: syn!(tokens::Semi)          >>
+        semi: punct!(;)                   >>
         (ast::InstancePrivateItem {
             type_token: type_,
             eq_token:   eq,
@@ -76,10 +80,10 @@ impl Synom for ast::InstancePrivateItem {
 
 impl Synom for ast::Impl {
     named!(parse -> Self, do_parse!(
-        syn!(tokens::Impl) >>
+        keyword!(impl) >>
         trait_: option!(do_parse!(
             path: syn!(Ident) >>
-            syn!(tokens::For) >>
+            keyword!(for) >>
             (path)
         )) >>
         self_path: syn!(Ident) >>
@@ -117,14 +121,14 @@ impl Synom for ast::ImplItemMethod {
         public: map!(option!(call!(keyword("pub"))), |x| x.is_some()) >>
         virtual_: map!(option!(call!(keyword("virtual"))), |x| x.is_some()) >>
         signal: map!(option!(call!(keyword("signal"))), |x| x.is_some()) >>
-        call!(keyword("fn")) >>
+        keyword!(fn) >>
         name: syn!(syn::Ident) >>
-        inputs: parens!(call!(Delimited::<_, tokens::Comma>::parse_terminated)) >>
+        inputs: parens!(syn!(Punctuated<FnArg, Token!(,)>)) >>
         output: syn!(syn::ReturnType) >>
         body: alt!(
             syn!(syn::Block) => { Some }
             |
-            syn!(tokens::Semi) => { |_| None }
+            punct!(;) => { |_| None }
         ) >>
         (ast::ImplItemMethod {
             public,

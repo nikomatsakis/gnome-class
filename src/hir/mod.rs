@@ -11,8 +11,8 @@ use std::collections::HashMap;
 use proc_macro2::{TokenStream};
 use quote::{Tokens, ToTokens};
 use syn::{self, Ident, Path, Block, ReturnType};
-use syn::tokens;
-use synom::{Synom, SynomBuffer};
+use syn::synom::Synom;
+use syn::buffer::TokenBuffer;
 
 use super::ast;
 use super::checking::*;
@@ -71,9 +71,9 @@ pub struct FnSig<'ast> {
 }
 
 pub enum FnArg<'ast> {
-    SelfRef(tokens::And, tokens::Self_),
+    SelfRef(Token!(&), Token!(self)),
     Arg {
-        mutbl: syn::Mutability,
+        mutbl: Option<Token![mut]>,
         name: Ident,
         ty: Ty<'ast>,
     }
@@ -263,10 +263,10 @@ impl<'ast> Class<'ast> {
                 syn::FnArg::Captured(syn::ArgCaptured { ref pat, ref ty, .. }) => {
                     let (name, mutbl) = match *pat {
                         syn::Pat::Ident(syn::PatIdent {
-                            mode: syn::BindingMode::ByValue(m),
+                            by_ref: None,
+                            mutability: m,
                             ident,
                             subpat: None,
-                            at_token: None,
                         }) => {
                             (ident, m)
                         }
@@ -281,15 +281,15 @@ impl<'ast> Class<'ast> {
                     })
                 }
                 syn::FnArg::SelfRef(syn::ArgSelfRef {
-                    mutbl: syn::Mutability::Immutable,
-                    lifetime: None,
-                    self_token,
                     and_token,
+                    lifetime: None,
+                    mutability: None,
+                    self_token,
                 }) => {
                     Ok(FnArg::SelfRef(and_token, self_token))
                 }
                 syn::FnArg::SelfRef(syn::ArgSelfRef {
-                    mutbl: syn::Mutability::Mutable(_),
+                    mutability: Some(..),
                     ..
                 }) => {
                     bail!("&mut self not implemented yet")
@@ -315,7 +315,7 @@ impl<'ast> Class<'ast> {
                 bail!("borrowed types with lifetimes not implemented yet")
             }
             syn::Type::Reference(syn::TypeReference { lifetime: None, ref ty, .. }) => {
-                if let syn::Mutability::Mutable(_) = ty.mutability {
+                if let Some(_) = ty.mutability {
                     bail!("mutable borrowed pointers not implemented");
                 }
                 let path = match ty.ty {
@@ -327,8 +327,8 @@ impl<'ast> Class<'ast> {
             }
             syn::Type::BareFn(_) => bail!("function pointer types not implemented yet"),
             syn::Type::Never(_) => bail!("never not implemented yet"),
-            syn::Type::Tup(syn::TypeTup { ref tys, .. }) => {
-                if tys.len() == 0 {
+            syn::Type::Tup(syn::TypeTuple { ref elems, .. }) => {
+                if elems.len() == 0 {
                     Ok(Ty::Unit)
                 } else {
                     bail!("tuple types not implemented yet")
@@ -350,9 +350,9 @@ impl<'ast> Class<'ast> {
     }
 
     fn extract_ty_path(&mut self, t: &'ast syn::Path) -> Result<Ty<'ast>> {
-        if t.segments.items().any(|i| {
-            match i.parameters {
-                syn::PathParameters::None => false,
+        if t.segments.iter().any(|segment| {
+            match segment.arguments {
+                syn::PathArguments::None => false,
                 _ => true,
             }
         }) {
@@ -387,7 +387,7 @@ impl<'ast> Class<'ast> {
 fn make_path_glib_object() -> Path {
     let tokens = quote_cs! { glib::Object };
     let token_stream = TokenStream::from(tokens);
-    let buffer = SynomBuffer::new(token_stream);
+    let buffer = TokenBuffer::new(token_stream);
     let cursor = buffer.begin();
     Path::parse(cursor).unwrap().1
 }
@@ -402,7 +402,7 @@ impl<'a> ToTokens for FnArg<'a> {
             FnArg::Arg { name, ref ty, mutbl } => {
                 mutbl.to_tokens(tokens);
                 name.to_tokens(tokens);
-                tokens::Colon::default().to_tokens(tokens);
+                Default::<Token!(:)>::default().to_tokens(tokens);
                 ty.to_tokens(tokens);
             }
         }
@@ -417,7 +417,7 @@ impl<'a> ToTokens for Ty<'a> {
             Ty::Bool(tok) => tok.to_tokens(tokens),
             Ty::Integer(t) => t.to_tokens(tokens),
             Ty::Borrowed(ref t) => {
-                tokens::And::default().to_tokens(tokens);
+                Default::<Token!(&)>::default().to_tokens(tokens);
                 t.to_tokens(tokens)
             }
             Ty::Owned(t) => t.to_tokens(tokens),
@@ -435,7 +435,7 @@ pub mod tests {
 
     fn test_class_and_superclass (raw: &str, class_name: &str, superclass_name: &str) {
         let token_stream = raw.parse::<TokenStream>().unwrap();
-        let buffer = SynomBuffer::new(token_stream);
+        let buffer = TokenBuffer::new(token_stream);
         let cursor = buffer.begin();
         let ast_program = ast::Program::parse(cursor).unwrap().1;
 

@@ -3,7 +3,6 @@
 
 use quote::{Tokens, ToTokens};
 use syn::{Ident, Path};
-use syn::tokens;
 use proc_macro2::Span;
 
 use hir::*;
@@ -244,9 +243,9 @@ impl<'ast> ToTokens for FnArgsWithGlibTypes<'ast> {
             match *arg {
                 FnArg::Arg { name, ref ty, mutbl: _ } => {
                     name.to_tokens(tokens);
-                    tokens::Colon::default().to_tokens(tokens);
+                    Default::<Token!(:)>::default().to_tokens(tokens);
                     ToGlibType(ty, self.0).to_tokens(tokens);
-                    tokens::Comma::default().to_tokens(tokens);
+                    Default::<Token!(,)>::default().to_tokens(tokens);
                 }
                 FnArg::SelfRef(..) => unreachable!(),
             }
@@ -265,7 +264,7 @@ impl<'ast> ToTokens for ArgNamesFromGlib<'ast> {
                     let mut name_tokens = Tokens::new();
                     name.to_tokens(&mut name_tokens);
                     FromGlib(ty, name_tokens).to_tokens(tokens);
-                    tokens::Comma::default().to_tokens(tokens);
+                    Default::<Token!(,)>::default().to_tokens(tokens);
                 }
                 FnArg::SelfRef(..) => unreachable!(),
             }
@@ -282,7 +281,7 @@ impl<'ast> ToTokens for ArgNamesToGlib<'ast> {
             match *arg {
                 FnArg::Arg { ref ty, name, mutbl: _ } => {
                     ToGlib(ty, name).to_tokens(tokens);
-                    tokens::Comma::default().to_tokens(tokens);
+                    Default::<Token!(,)>::default().to_tokens(tokens);
                 }
                 FnArg::SelfRef(..) => unreachable!(),
             }
@@ -299,7 +298,7 @@ impl<'ast> ToTokens for ArgNames<'ast> {
             match *arg {
                 FnArg::Arg { name, .. } => {
                     name.to_tokens(tokens);
-                    tokens::Comma::default().to_tokens(tokens);
+                    Default::<Token!(,)>::default().to_tokens(tokens);
                 }
                 FnArg::SelfRef(..) => unreachable!(),
             }

@@ -1,4 +1,4 @@
-use synom;
+use syn::synom::ParseError;
 
 error_chain! {
     // The type defined for this error. These are the conventional
@@ -12,7 +12,7 @@ error_chain! {
 
     foreign_links {
         Io(::std::io::Error) #[cfg(unix)];
-        Parse(synom::ParseError);
+        Parse(ParseError);
     }
 
     errors {

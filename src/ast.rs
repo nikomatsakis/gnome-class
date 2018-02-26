@@ -2,7 +2,6 @@
 //use quote::Tokens;
 use syn::{Ident, Path, FnArg, ReturnType, Block};
 use syn::{Attribute, Lit};
-use synom::tokens;
 
 pub struct Program {
     pub items: Vec<Item>
@@ -85,10 +84,10 @@ pub struct ImplItemMethod {
 
 // Mostly copied from syn's ImplItemType
 pub struct InstancePrivateItem {
-    pub type_token: tokens::Type,
-    pub eq_token: tokens::Eq,
+    pub type_token: Token!(type),
+    pub eq_token: Token!(=),
     pub path: Path,
-    pub semi_token: tokens::Semi,
+    pub semi_token: Token!(;),
 }
 
 /*

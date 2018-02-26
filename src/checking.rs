@@ -39,7 +39,8 @@ fn check_private_struct(class: &Class) -> Result<()> {
 pub mod tests {
     use super::*;
     use proc_macro2::{TokenStream};
-    use synom::{Synom, SynomBuffer};
+    use syn::synom::Synom;
+    use syn::buffer::TokenBuffer;
 
     use ast;
 
@@ -54,7 +55,7 @@ pub mod tests {
 
         let token_stream = raw.parse::<TokenStream>().unwrap();
 
-        let buffer = SynomBuffer::new(token_stream);
+        let buffer = TokenBuffer::new(token_stream);
         let cursor = buffer.begin();
 
         let program = ast::Program::parse(cursor).unwrap().1;
@@ -69,7 +70,7 @@ pub mod tests {
 
         let token_stream = raw.parse::<TokenStream>().unwrap();
 
-        let buffer = SynomBuffer::new(token_stream);
+        let buffer = TokenBuffer::new(token_stream);
         let cursor = buffer.begin();
 
         let program = ast::Program::parse(cursor).unwrap().1;
@@ -85,7 +86,7 @@ pub mod tests {
 
         let token_stream = raw.parse::<TokenStream>().unwrap();
 
-        let buffer = SynomBuffer::new(token_stream);
+        let buffer = TokenBuffer::new(token_stream);
         let cursor = buffer.begin();
 
         let program = ast::Program::parse(cursor).unwrap().1;
