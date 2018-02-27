@@ -1,7 +1,7 @@
 use proc_macro::TokenStream;
 
-use syn::{self, Ident, Path, FnArg, parse_error};
-use syn::punctuated::Punctuated;
+use syn::{self, Ident, Path, parse_error};
+use syn::punctuated::{Punctuated};
 use syn::synom::{Synom, PResult};
 use syn::buffer::Cursor;
 
@@ -123,7 +123,7 @@ impl Synom for ast::ImplItemMethod {
         signal: map!(option!(call!(keyword("signal"))), |x| x.is_some()) >>
         keyword!(fn) >>
         name: syn!(syn::Ident) >>
-        inputs: parens!(syn!(Punctuated<FnArg, Token!(,)>)) >>
+        params: parens!(Punctuated::parse_terminated) >>
         output: syn!(syn::ReturnType) >>
         body: alt!(
             syn!(syn::Block) => { Some }
@@ -135,7 +135,7 @@ impl Synom for ast::ImplItemMethod {
             virtual_,
             signal,
             name,
-            inputs: inputs.0.into_vec(),
+            inputs: params.1,
             output,
             body,
         })

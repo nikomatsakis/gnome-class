@@ -12,6 +12,7 @@ use proc_macro::TokenStream;
 use proc_macro2::{Delimiter, Span, TokenNode, TokenTree};
 use quote::{Tokens, ToTokens};
 use syn::{self, Ident, Path, Block, ReturnType};
+use syn::punctuated::Punctuated;
 use syn::synom::Synom;
 use syn::buffer::TokenBuffer;
 
@@ -258,8 +259,8 @@ impl<'ast> Class<'ast> {
         }
     }
 
-    fn extract_inputs(&mut self, t: &'ast [syn::FnArg]) -> Result<Vec<FnArg<'ast>>> {
-        t.iter().map(|arg| {
+    fn extract_inputs(&mut self, punc: &'ast Punctuated<syn::FnArg, Token!(,)>) -> Result<Vec<FnArg<'ast>>> {
+        punc.iter().map(|arg| {
             match *arg {
                 syn::FnArg::Captured(syn::ArgCaptured { ref pat, ref ty, .. }) => {
                     let (name, mutbl) = match *pat {

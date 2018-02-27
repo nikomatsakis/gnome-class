@@ -2,6 +2,7 @@
 //use quote::Tokens;
 use syn::{Ident, Path, FnArg, ReturnType, Block};
 use syn::{Attribute, Lit};
+use syn::punctuated::Punctuated;
 
 pub struct Program {
     pub items: Vec<Item>
@@ -77,7 +78,7 @@ pub struct ImplItemMethod {
     pub virtual_: bool, // implies public, doesn't need body
     pub signal: bool, // ignore
     pub name: Ident,
-    pub inputs: Vec<FnArg>, // must start with &self
+    pub inputs: Punctuated<FnArg, Token!(,)>, // must start with &self
     pub output: ReturnType,
     pub body: Option<Block>,
 }
