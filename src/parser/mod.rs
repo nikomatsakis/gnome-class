@@ -51,7 +51,7 @@ impl Synom for ast::Class {
         (ast::Class {
             name:    name,
             extends: extends,
-            items:   items_and_braces.0
+            items:   items_and_braces.1
         })
     ));
 }
@@ -91,7 +91,7 @@ impl Synom for ast::Impl {
         (ast::Impl {
             trait_: trait_,
             self_path: self_path,
-            items: body.0
+            items: body.1
         })
     ));
 }
