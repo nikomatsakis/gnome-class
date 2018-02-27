@@ -228,7 +228,7 @@ impl<'ast> ToTokens for FromGlib<'ast> {
         if needs_conversion {
             tokens.append(TokenTree {
                 span: Span::call_site(),
-                kind: TokenNode::Group(Delimiter::Parenthesis, self.1.into_tokens().into()),
+                kind: TokenNode::Group(Delimiter::Parenthesis, self.1.clone().into_tokens().into()),
             });
         } else {
             self.1.to_tokens(tokens);
