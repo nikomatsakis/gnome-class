@@ -41,7 +41,11 @@ pub fn tokens_ParentClassFfi(class: &ast::Class) -> Tokens {
 }
 
 pub fn glib_callback_guard() -> Tokens {
+    // FIXME: remove this function if we formally declare that
+    // gnome-class will require Rust 1.24 or later?  That version made
+    // glib::CallbackGuard obsolete.
     quote_cs! {
+        #[allow(deprecated)]
         let _guard = glib::CallbackGuard::new();
     }
 }
