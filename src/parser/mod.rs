@@ -151,9 +151,9 @@ impl Synom for ast::ImplItemMethod {
 /// ```
 fn keyword<'a>(name: &'static str) -> impl Fn(Cursor<'a>) -> PResult<()> {
     move |input: Cursor<'a>| {
-        if let Some((rest, _, s)) = input.word() {
+        if let Some((_, s, rest)) = input.term() {
             if s.as_str() == name {
-                return Ok((rest, ()));
+                return Ok(((), rest));
             }
         }
         parse_error() // FIXME: use a meaningful error message when synom allows for it
