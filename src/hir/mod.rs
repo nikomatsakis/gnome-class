@@ -363,7 +363,8 @@ impl<'ast> Class<'ast> {
             return Ok(Ty::Owned(t))
         }
 
-        let ident = t.segments.get(0).item().ident;
+        // let ident = t.segments.get(0).item().ident;
+        let ident = t.segments.first().unwrap().value().ident;
 
         match ident.as_ref() {
             "char" => Ok(Ty::Char(ident)),
