@@ -226,40 +226,13 @@ impl<'ast> ToTokens for FromGlib<'ast> {
             };
 
         if needs_conversion {
-            tokens.append_delimited("(", Span::def_site(), |tokens| {
-                self.1.to_tokens(tokens);
+            tokens.append(TokenTree {
+                span: Span::call_site(),
+                kind: TokenNode::Group(Delimiter::Parenthesis, self.1.into_tokens().into()),
             });
         } else {
             self.1.to_tokens(tokens);
         }
-    }
-}
-
-trait AppendDelimited {
-    fn append_delimited<F, R>(&mut self, delim: &str, span: Span, f: F) -> R
-        where
-        F: FnOnce(&mut Tokens) -> R;
-}
-
-impl AppendDelimited for Tokens {
-    fn append_delimited<F, R>(&mut self, delim: &str, span: Span, f: F) -> R
-        where
-        F: FnOnce(&mut Tokens) -> R
-    {
-        let delim = match delim {
-            "(" => Delimiter::Parenthesis,
-            "[" => Delimiter::Bracket,
-            "{" => Delimiter::Brace,
-            " " => Delimiter::None,
-            _ => panic!("unknown delimiter: {}", delim),
-        };
-        let mut child = Tokens::new();
-        let ret = f(&mut child);
-        self.append(TokenTree {
-            span: span,
-            kind: TokenNode::Group(delim, child.into()),
-        });
-        ret
     }
 }
 

@@ -9,7 +9,7 @@
 use std::collections::HashMap;
 
 use proc_macro::TokenStream;
-use proc_macro2::Span;
+use proc_macro2::{Delimiter, Span, TokenNode, TokenTree};
 use quote::{Tokens, ToTokens};
 use syn::{self, Ident, Path, Block, ReturnType};
 use syn::synom::Synom;
@@ -413,7 +413,10 @@ impl<'a> ToTokens for FnArg<'a> {
 impl<'a> ToTokens for Ty<'a> {
     fn to_tokens(&self, tokens: &mut Tokens) {
         match *self {
-            Ty::Unit => tokens.append_delimited("(", Default::default(), |_| ()),
+            Ty::Unit => tokens.append(TokenTree {
+                span: Span::call_site(),
+                kind: TokenNode::Group(Delimiter::Parenthesis, quote!{ () }.into()),
+            }),
             Ty::Char(tok) => tok.to_tokens(tokens),
             Ty::Bool(tok) => tok.to_tokens(tokens),
             Ty::Integer(t) => t.to_tokens(tokens),
