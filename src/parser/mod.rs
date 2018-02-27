@@ -111,7 +111,7 @@ impl Synom for ast::ImplItemKind {
         do_parse!(
             call!(keyword("reserve_slots")) >>
             slots: parens!(syn!(syn::Lit)) >>
-            (ast::ImplItemKind::ReserveSlots(slots.0))
+            (ast::ImplItemKind::ReserveSlots(slots.1))
         )
     ));
 }
