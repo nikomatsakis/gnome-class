@@ -303,6 +303,7 @@ impl<'ast> Class<'ast> {
                     bail!("lifetime arguments on self not implemented yet")
                 }
                 syn::FnArg::SelfValue(_) => bail!("by-value self not implemented"),
+                syn::FnArg::Inferred(_) => bail!("cannot have inferred function arguments"),
                 syn::FnArg::Ignored(_) => bail!("cannot have ignored function arguments"),
             }
         }).collect()
@@ -348,6 +349,7 @@ impl<'ast> Class<'ast> {
             syn::Type::Group(syn::TypeGroup { ref elem, .. }) => self.extract_ty(elem),
             syn::Type::Infer(_) => bail!("underscore types not allowed"),
             syn::Type::Macro(_) => bail!("type macros not allowed"),
+            syn::Type::Verbatim(_) => bail!("type macros not allowed"),
         }
     }
 
