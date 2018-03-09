@@ -70,13 +70,16 @@ as [glib-rs][glib-rs].
   GNOME's general-purpose libraries, while maintaining backwards
   compatibility with all the GObject-based infrastructure we have.
 
-# Status, and help wanted
+# Contributing to gnome-class
 
-As of November 2017, gnome-class is under heavy development, and is
-not ready yet for general consumption.  We are not finished
-implementing the desired syntax (see the [syntax document][syntax] for
-details).  Also, we don't have proposed syntax yet for all the useful
-features of GObject.
+There is a code of conduct for contributors to gnome-class; please see
+the file [`code-of-conduct.md`][coc].
+
+As of March 2018, gnome-class is under heavy development, and is not
+ready yet for general consumption.  We are not finished implementing
+the desired syntax (see the [syntax document][syntax] for details).
+Also, we don't have proposed syntax yet for all the useful features of
+GObject.
 
 ## Do you want to help with the syntax?
 
@@ -176,3 +179,4 @@ guide?  [Please mail me!][mail]
 [syntax]: gobject-notes/syntax.md
 [syn]: https://github.com/dtolnay/syn/
 [mail]: mailto:federico@gnome.org
+[coc]: code-of-conduct.md
